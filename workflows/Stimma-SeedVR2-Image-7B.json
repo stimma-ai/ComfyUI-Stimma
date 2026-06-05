@@ -1,0 +1,1261 @@
+{
+  "id": "e2c8e6ec-9e8a-4a81-a240-7e7d2befc2bf",
+  "revision": 0,
+  "last_node_id": 28,
+  "last_link_id": 24,
+  "nodes": [
+    {
+      "id": 19,
+      "type": "SeedVR2TorchCompileSettings",
+      "pos": [
+        -366.25065217175177,
+        401.8303561599628
+      ],
+      "size": [
+        307.671484375,
+        178
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 4,
+      "inputs": [
+        {
+          "localized_name": "backend",
+          "name": "backend",
+          "type": "COMBO",
+          "widget": {
+            "name": "backend"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "mode",
+          "name": "mode",
+          "type": "COMBO",
+          "widget": {
+            "name": "mode"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "fullgraph",
+          "name": "fullgraph",
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "fullgraph"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "dynamic",
+          "name": "dynamic",
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "dynamic"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "dynamo_cache_size_limit",
+          "name": "dynamo_cache_size_limit",
+          "type": "INT",
+          "widget": {
+            "name": "dynamo_cache_size_limit"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "dynamo_recompile_limit",
+          "name": "dynamo_recompile_limit",
+          "type": "INT",
+          "widget": {
+            "name": "dynamo_recompile_limit"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "TORCH_COMPILE_ARGS",
+          "name": "TORCH_COMPILE_ARGS",
+          "type": "TORCH_COMPILE_ARGS",
+          "links": [
+            18,
+            19
+          ]
+        }
+      ],
+      "properties": {
+        "aux_id": "ainvfx/ComfyUI-SeedVR2_VideoUpscaler",
+        "ver": "690cc39379c1481159ddd451368dbf2295930fc6",
+        "Node name for S&R": "SeedVR2TorchCompileSettings"
+      },
+      "widgets_values": [
+        "inductor",
+        "default",
+        false,
+        false,
+        64,
+        128
+      ]
+    },
+    {
+      "id": 14,
+      "type": "SeedVR2LoadDiTModel",
+      "pos": [
+        64.4234520647185,
+        212.7072358245033
+      ],
+      "size": [
+        307.6646484375,
+        202
+      ],
+      "flags": {},
+      "order": 4,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "torch_compile_args",
+          "name": "torch_compile_args",
+          "shape": 7,
+          "type": "TORCH_COMPILE_ARGS",
+          "link": 18
+        },
+        {
+          "localized_name": "model",
+          "name": "model",
+          "type": "COMBO",
+          "widget": {
+            "name": "model"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "device",
+          "name": "device",
+          "type": "COMBO",
+          "widget": {
+            "name": "device"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "blocks_to_swap",
+          "name": "blocks_to_swap",
+          "shape": 7,
+          "type": "INT",
+          "widget": {
+            "name": "blocks_to_swap"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "swap_io_components",
+          "name": "swap_io_components",
+          "shape": 7,
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "swap_io_components"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "offload_device",
+          "name": "offload_device",
+          "shape": 7,
+          "type": "COMBO",
+          "widget": {
+            "name": "offload_device"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "cache_model",
+          "name": "cache_model",
+          "shape": 7,
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "cache_model"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "attention_mode",
+          "name": "attention_mode",
+          "shape": 7,
+          "type": "COMBO",
+          "widget": {
+            "name": "attention_mode"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "SEEDVR2_DIT",
+          "name": "SEEDVR2_DIT",
+          "type": "SEEDVR2_DIT",
+          "links": [
+            11
+          ]
+        }
+      ],
+      "properties": {
+        "aux_id": "ainvfx/ComfyUI-SeedVR2_VideoUpscaler",
+        "ver": "690cc39379c1481159ddd451368dbf2295930fc6",
+        "Node name for S&R": "SeedVR2LoadDiTModel"
+      },
+      "widgets_values": [
+        "seedvr2_ema_7b_sharp_fp16.safetensors",
+        "cuda:0",
+        36,
+        false,
+        "cpu",
+        false,
+        "sdpa"
+      ]
+    },
+    {
+      "id": 13,
+      "type": "SeedVR2LoadVAEModel",
+      "pos": [
+        60.33985831471847,
+        499.8798920745057
+      ],
+      "size": [
+        312.866796875,
+        298
+      ],
+      "flags": {},
+      "order": 5,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "torch_compile_args",
+          "name": "torch_compile_args",
+          "shape": 7,
+          "type": "TORCH_COMPILE_ARGS",
+          "link": 19
+        },
+        {
+          "localized_name": "model",
+          "name": "model",
+          "type": "COMBO",
+          "widget": {
+            "name": "model"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "device",
+          "name": "device",
+          "type": "COMBO",
+          "widget": {
+            "name": "device"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "encode_tiled",
+          "name": "encode_tiled",
+          "shape": 7,
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "encode_tiled"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "encode_tile_size",
+          "name": "encode_tile_size",
+          "shape": 7,
+          "type": "INT",
+          "widget": {
+            "name": "encode_tile_size"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "encode_tile_overlap",
+          "name": "encode_tile_overlap",
+          "shape": 7,
+          "type": "INT",
+          "widget": {
+            "name": "encode_tile_overlap"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "decode_tiled",
+          "name": "decode_tiled",
+          "shape": 7,
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "decode_tiled"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "decode_tile_size",
+          "name": "decode_tile_size",
+          "shape": 7,
+          "type": "INT",
+          "widget": {
+            "name": "decode_tile_size"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "decode_tile_overlap",
+          "name": "decode_tile_overlap",
+          "shape": 7,
+          "type": "INT",
+          "widget": {
+            "name": "decode_tile_overlap"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "tile_debug",
+          "name": "tile_debug",
+          "shape": 7,
+          "type": "COMBO",
+          "widget": {
+            "name": "tile_debug"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "offload_device",
+          "name": "offload_device",
+          "shape": 7,
+          "type": "COMBO",
+          "widget": {
+            "name": "offload_device"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "cache_model",
+          "name": "cache_model",
+          "shape": 7,
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "cache_model"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "SEEDVR2_VAE",
+          "name": "SEEDVR2_VAE",
+          "type": "SEEDVR2_VAE",
+          "links": [
+            10
+          ]
+        }
+      ],
+      "properties": {
+        "aux_id": "ainvfx/ComfyUI-SeedVR2_VideoUpscaler",
+        "ver": "690cc39379c1481159ddd451368dbf2295930fc6",
+        "Node name for S&R": "SeedVR2LoadVAEModel"
+      },
+      "widgets_values": [
+        "ema_vae_fp16.safetensors",
+        "cuda:0",
+        true,
+        1024,
+        128,
+        true,
+        1024,
+        128,
+        "false",
+        "cpu",
+        false
+      ]
+    },
+    {
+      "id": 10,
+      "type": "SeedVR2VideoUpscaler",
+      "pos": [
+        843.8992333147189,
+        191.3224701995034
+      ],
+      "size": [
+        270,
+        386
+      ],
+      "flags": {},
+      "order": 7,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "image",
+          "name": "image",
+          "type": "IMAGE",
+          "link": 20
+        },
+        {
+          "localized_name": "dit",
+          "name": "dit",
+          "type": "SEEDVR2_DIT",
+          "link": 11
+        },
+        {
+          "localized_name": "vae",
+          "name": "vae",
+          "type": "SEEDVR2_VAE",
+          "link": 10
+        },
+        {
+          "localized_name": "seed",
+          "name": "seed",
+          "type": "INT",
+          "widget": {
+            "name": "seed"
+          },
+          "link": 21
+        },
+        {
+          "localized_name": "resolution",
+          "name": "resolution",
+          "type": "INT",
+          "widget": {
+            "name": "resolution"
+          },
+          "link": 22
+        },
+        {
+          "localized_name": "max_resolution",
+          "name": "max_resolution",
+          "type": "INT",
+          "widget": {
+            "name": "max_resolution"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "batch_size",
+          "name": "batch_size",
+          "type": "INT",
+          "widget": {
+            "name": "batch_size"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "uniform_batch_size",
+          "name": "uniform_batch_size",
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "uniform_batch_size"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "color_correction",
+          "name": "color_correction",
+          "type": "COMBO",
+          "widget": {
+            "name": "color_correction"
+          },
+          "link": 23
+        },
+        {
+          "localized_name": "temporal_overlap",
+          "name": "temporal_overlap",
+          "shape": 7,
+          "type": "INT",
+          "widget": {
+            "name": "temporal_overlap"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "prepend_frames",
+          "name": "prepend_frames",
+          "shape": 7,
+          "type": "INT",
+          "widget": {
+            "name": "prepend_frames"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "input_noise_scale",
+          "name": "input_noise_scale",
+          "shape": 7,
+          "type": "FLOAT",
+          "widget": {
+            "name": "input_noise_scale"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "latent_noise_scale",
+          "name": "latent_noise_scale",
+          "shape": 7,
+          "type": "FLOAT",
+          "widget": {
+            "name": "latent_noise_scale"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "offload_device",
+          "name": "offload_device",
+          "shape": 7,
+          "type": "COMBO",
+          "widget": {
+            "name": "offload_device"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "enable_debug",
+          "name": "enable_debug",
+          "shape": 7,
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "enable_debug"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "IMAGE",
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            12,
+            24
+          ]
+        }
+      ],
+      "properties": {
+        "aux_id": "ainvfx/ComfyUI-SeedVR2_VideoUpscaler",
+        "ver": "690cc39379c1481159ddd451368dbf2295930fc6",
+        "Node name for S&R": "SeedVR2VideoUpscaler"
+      },
+      "widgets_values": [
+        42,
+        "fixed",
+        4096,
+        4096,
+        1,
+        false,
+        "lab",
+        0,
+        0,
+        0,
+        0,
+        "cpu",
+        false
+      ]
+    },
+    {
+      "id": 15,
+      "type": "SaveImage",
+      "pos": [
+        1167.7234520647182,
+        192.0920014495034
+      ],
+      "size": [
+        270,
+        270
+      ],
+      "flags": {},
+      "order": 8,
+      "mode": 4,
+      "inputs": [
+        {
+          "localized_name": "images",
+          "name": "images",
+          "type": "IMAGE",
+          "link": 12
+        },
+        {
+          "localized_name": "filename_prefix",
+          "name": "filename_prefix",
+          "type": "STRING",
+          "widget": {
+            "name": "filename_prefix"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.68"
+      },
+      "widgets_values": [
+        "ComfyUI"
+      ]
+    },
+    {
+      "id": 21,
+      "type": "StimmaToolInfo",
+      "pos": [
+        -1186.2506521717519,
+        227.3224701995034
+      ],
+      "size": [
+        480,
+        276
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "slug",
+          "type": "STRING",
+          "widget": {
+            "name": "slug"
+          },
+          "link": null
+        },
+        {
+          "name": "display_name",
+          "type": "STRING",
+          "widget": {
+            "name": "display_name"
+          },
+          "link": null
+        },
+        {
+          "name": "task_types",
+          "type": "STRING",
+          "widget": {
+            "name": "task_types"
+          },
+          "link": null
+        },
+        {
+          "name": "badges",
+          "type": "STRING",
+          "widget": {
+            "name": "badges"
+          },
+          "link": null
+        },
+        {
+          "name": "description",
+          "type": "STRING",
+          "widget": {
+            "name": "description"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "Node name for S&R": "StimmaToolInfo"
+      },
+      "widgets_values": [
+        "seedvr2-upscale-7b",
+        "SeedVR2 Image Upscale 7B",
+        "upscale-image",
+        "Open Weights",
+        "Upscale images using SeedVR2 7B model. High-quality FP16 model optimized for 4K output with block swapping for VRAM efficiency."
+      ]
+    },
+    {
+      "id": 22,
+      "type": "StimmaImageParam",
+      "pos": [
+        -1186.2506521717519,
+        697.3224701995034
+      ],
+      "size": [
+        384,
+        200
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "image",
+          "type": "COMBO",
+          "link": null,
+          "widget": {
+            "name": "image"
+          },
+          "localized_name": "image"
+        },
+        {
+          "name": "ui_control",
+          "type": "COMBO",
+          "link": null,
+          "widget": {
+            "name": "ui_control"
+          },
+          "localized_name": "ui_control"
+        },
+        {
+          "name": "ui_order",
+          "type": "INT",
+          "link": null,
+          "widget": {
+            "name": "ui_order"
+          },
+          "localized_name": "ui_order"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "links": [
+            20
+          ],
+          "slot_index": 0
+        },
+        {
+          "name": "mask",
+          "type": "MASK",
+          "links": [],
+          "slot_index": 1
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "StimmaImageParam"
+      },
+      "widgets_values": [
+        "example.png",
+        "",
+        "imagePicker",
+        1
+      ]
+    },
+    {
+      "id": 23,
+      "type": "StimmaSeedParam",
+      "pos": [
+        -1186.2506521717519,
+        1281.3224701995034
+      ],
+      "size": [
+        384,
+        156
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "name",
+          "type": "STRING",
+          "widget": {
+            "name": "name"
+          },
+          "link": null
+        },
+        {
+          "name": "value",
+          "type": "INT",
+          "widget": {
+            "name": "value"
+          },
+          "link": null
+        },
+        {
+          "name": "ui_order",
+          "type": "INT",
+          "widget": {
+            "name": "ui_order"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "seed",
+          "type": "INT",
+          "links": [
+            21
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "StimmaSeedParam"
+      },
+      "widgets_values": [
+        "seed",
+        42,
+        80
+      ]
+    },
+    {
+      "id": 25,
+      "type": "StimmaIntParam",
+      "pos": [
+        -1186.2506521717519,
+        2020.3224701995034
+      ],
+      "size": [
+        384,
+        355
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "name",
+          "type": "STRING",
+          "widget": {
+            "name": "name"
+          },
+          "link": null
+        },
+        {
+          "name": "value",
+          "type": "INT",
+          "widget": {
+            "name": "value"
+          },
+          "link": null
+        },
+        {
+          "name": "minimum",
+          "type": "INT",
+          "widget": {
+            "name": "minimum"
+          },
+          "link": null
+        },
+        {
+          "name": "maximum",
+          "type": "INT",
+          "widget": {
+            "name": "maximum"
+          },
+          "link": null
+        },
+        {
+          "name": "step",
+          "type": "INT",
+          "widget": {
+            "name": "step"
+          },
+          "link": null
+        },
+        {
+          "name": "ui_control",
+          "type": "COMBO",
+          "widget": {
+            "name": "ui_control"
+          },
+          "link": null
+        },
+        {
+          "name": "ui_order",
+          "type": "INT",
+          "widget": {
+            "name": "ui_order"
+          },
+          "link": null
+        },
+        {
+          "name": "ui_description",
+          "type": "STRING",
+          "widget": {
+            "name": "ui_description"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "value",
+          "type": "INT",
+          "links": [
+            22
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "StimmaIntParam"
+      },
+      "widgets_values": [
+        "resolution",
+        1080,
+        480,
+        4320,
+        1,
+        "upscale_resolution",
+        11,
+        ""
+      ]
+    },
+    {
+      "id": 26,
+      "type": "StimmaStringParam",
+      "pos": [
+        -1186.2506521717519,
+        2409.322470199503
+      ],
+      "size": [
+        384,
+        355
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "name",
+          "type": "STRING",
+          "widget": {
+            "name": "name"
+          },
+          "link": null
+        },
+        {
+          "name": "value",
+          "type": "STRING",
+          "widget": {
+            "name": "value"
+          },
+          "link": null
+        },
+        {
+          "name": "enum_values",
+          "type": "STRING",
+          "widget": {
+            "name": "enum_values"
+          },
+          "link": null
+        },
+        {
+          "name": "ui_control",
+          "type": "COMBO",
+          "widget": {
+            "name": "ui_control"
+          },
+          "link": null
+        },
+        {
+          "name": "ui_order",
+          "type": "INT",
+          "widget": {
+            "name": "ui_order"
+          },
+          "link": null
+        },
+        {
+          "name": "ui_description",
+          "type": "STRING",
+          "widget": {
+            "name": "ui_description"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "value",
+          "type": "STRING",
+          "links": [
+            23
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "StimmaStringParam"
+      },
+      "widgets_values": [
+        "color_correction",
+        "lab",
+        "lab\nnone",
+        "dropdown",
+        60,
+        ""
+      ]
+    },
+    {
+      "id": 27,
+      "type": "StimmaImageOutput",
+      "pos": [
+        -1186.2506521717519,
+        2968.322470199503
+      ],
+      "size": [
+        360,
+        300
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 24
+        },
+        {
+          "name": "filename_prefix",
+          "type": "STRING",
+          "widget": {
+            "name": "filename_prefix"
+          },
+          "link": null
+        },
+        {
+          "name": "_stimma_output_dir",
+          "type": "STRING",
+          "widget": {
+            "name": "_stimma_output_dir"
+          },
+          "link": null,
+          "shape": 7
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "Node name for S&R": "StimmaImageOutput"
+      },
+      "widgets_values": [
+        "Stimma",
+        ""
+      ]
+    },
+    {
+      "id": 28,
+      "type": "StimmaLayoutGroup",
+      "pos": [
+        -1186.2506521717519,
+        3462.322470199503
+      ],
+      "size": [
+        365,
+        240
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "group_label",
+          "type": "STRING",
+          "widget": {
+            "name": "group_label"
+          },
+          "link": null
+        },
+        {
+          "name": "param_names",
+          "type": "STRING",
+          "widget": {
+            "name": "param_names"
+          },
+          "link": null
+        },
+        {
+          "name": "collapsed",
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "collapsed"
+          },
+          "link": null
+        },
+        {
+          "name": "ui_order",
+          "type": "INT",
+          "widget": {
+            "name": "ui_order"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "Node name for S&R": "StimmaLayoutGroup"
+      },
+      "widgets_values": [
+        "Advanced",
+        "seed\ncolor_correction",
+        true,
+        10
+      ]
+    }
+  ],
+  "links": [
+    [
+      10,
+      13,
+      0,
+      10,
+      2,
+      "SEEDVR2_VAE"
+    ],
+    [
+      11,
+      14,
+      0,
+      10,
+      1,
+      "SEEDVR2_DIT"
+    ],
+    [
+      12,
+      10,
+      0,
+      15,
+      0,
+      "IMAGE"
+    ],
+    [
+      18,
+      19,
+      0,
+      14,
+      0,
+      "TORCH_COMPILE_ARGS"
+    ],
+    [
+      19,
+      19,
+      0,
+      13,
+      0,
+      "TORCH_COMPILE_ARGS"
+    ],
+    [
+      20,
+      22,
+      0,
+      10,
+      0,
+      "IMAGE"
+    ],
+    [
+      21,
+      23,
+      0,
+      10,
+      3,
+      "INT"
+    ],
+    [
+      22,
+      25,
+      0,
+      10,
+      4,
+      "INT"
+    ],
+    [
+      23,
+      26,
+      0,
+      10,
+      8,
+      "STRING"
+    ],
+    [
+      24,
+      10,
+      0,
+      27,
+      0,
+      "IMAGE"
+    ]
+  ],
+  "groups": [
+    {
+      "id": 1,
+      "title": "Stimma: Metadata",
+      "bounding": [
+        -1236.2506521717519,
+        141.3224701995034,
+        580.0,
+        412.0
+      ],
+      "color": "#3f789e",
+      "font_size": 24,
+      "flags": {
+        "stimma_auto_layout": true
+      }
+    },
+    {
+      "id": 2,
+      "title": "Stimma: Inputs",
+      "bounding": [
+        -1236.2506521717519,
+        611.3224701995034,
+        484.0,
+        876.0
+      ],
+      "color": "#3f789e",
+      "font_size": 24,
+      "flags": {
+        "stimma_auto_layout": true
+      }
+    },
+    {
+      "id": 3,
+      "title": "Stimma: Parameters",
+      "bounding": [
+        -1236.2506521717519,
+        1545.3224701995034,
+        484.0,
+        1278.9999999999998
+      ],
+      "color": "#3f789e",
+      "font_size": 24,
+      "flags": {
+        "stimma_auto_layout": true
+      }
+    },
+    {
+      "id": 4,
+      "title": "Stimma: Outputs",
+      "bounding": [
+        -1236.2506521717519,
+        2882.322470199503,
+        460.0,
+        436.0
+      ],
+      "color": "#3f789e",
+      "font_size": 24,
+      "flags": {
+        "stimma_auto_layout": true
+      }
+    },
+    {
+      "id": 5,
+      "title": "Stimma: Layout",
+      "bounding": [
+        -1236.2506521717519,
+        3376.322470199503,
+        465.0,
+        376.0
+      ],
+      "color": "#3f789e",
+      "font_size": 24,
+      "flags": {
+        "stimma_auto_layout": true
+      }
+    }
+  ],
+  "config": {},
+  "extra": {
+    "ds": {
+      "scale": 0.6934334949441353,
+      "offset": [
+        1011.3669791186508,
+        462.16171611318566
+      ]
+    }
+  },
+  "version": 0.4
+}

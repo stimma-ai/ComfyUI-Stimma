@@ -1,0 +1,78 @@
+{
+  "pipeline_setup": {
+    "delete": [16, 17, 18, 20]
+  },
+  "tool_info": {
+    "slug": "seedvr2-image-3b",
+    "display_name": "SeedVR2 Image Upscale 3B",
+    "task_type": "upscale-image",
+    "description": "Upscale images using SeedVR2 3B model. Fast FP8 quantized model for high-quality image upscaling.",
+    "pos": [-1400, -400]
+  },
+  "inputs": [
+    {
+      "type": "image",
+      "name": "input_image",
+      "required": true,
+      "ui_order": 1,
+      "wire_to": {"node_id": 10, "input_name": "image", "type": "IMAGE"},
+      "pos": [-800, -200]
+    },
+    {
+      "type": "seed",
+      "name": "seed",
+      "value": 42,
+      "ui_order": 80,
+      "wire_to": {"node_id": 10, "input_name": "seed", "type": "INT"},
+      "pos": [-800, 400]
+    }
+  ],
+  "params": [
+    {
+      "type": "float",
+      "name": "scale_factor",
+      "value": 2.0,
+      "min": 0.5,
+      "max": 4.0,
+      "step": 0.1,
+      "ui_control": "upscale_resolution",
+      "ui_order": 10,
+      "pos": [-500, -200]
+    },
+    {
+      "type": "int",
+      "name": "resolution",
+      "value": 1080,
+      "min": 480,
+      "max": 4320,
+      "step": 1,
+      "ui_control": "upscale_resolution",
+      "ui_order": 11,
+      "wire_to": {"node_id": 10, "input_name": "resolution", "type": "INT"},
+      "pos": [-500, 0]
+    },
+    {
+      "type": "string",
+      "name": "color_correction",
+      "value": "lab",
+      "enum_values": "lab\nnone",
+      "ui_control": "dropdown",
+      "ui_order": 60,
+      "wire_to": {"node_id": 10, "input_name": "color_correction", "type": "STRING"},
+      "pos": [-500, 200]
+    }
+  ],
+  "outputs": [
+    {
+      "output_type": "image",
+      "replace_node_id": 15
+    }
+  ],
+  "layout": [
+    {
+      "label": "Advanced",
+      "param_names": ["seed", "color_correction"],
+      "collapsed": true
+    }
+  ]
+}

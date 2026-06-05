@@ -1,0 +1,96 @@
+{
+  "tool_info": {
+    "slug": "flux-dev",
+    "display_name": "Flux Dev",
+    "task_type": "text-to-image",
+    "description": "Flux.1 Dev text-to-image generation"
+  },
+  "inputs": [
+    {
+      "type": "prompt",
+      "name": "prompt",
+      "default_text": "A beautiful sunset over mountains",
+      "required": true,
+      "ui_order": 0,
+      "ui_description": "Describe what you want to generate",
+      "wire_to": {"node_id": 4, "input_name": "text"}
+    },
+    {
+      "type": "resolution",
+      "width": 1024,
+      "height": 1024,
+      "min_size": 512,
+      "max_size": 2048,
+      "step": 64,
+      "supported_resolutions": "1024x1024\n1152x896\n896x1152\n1216x832\n832x1216\n1344x768\n768x1344\n1536x640\n640x1536",
+      "ui_order": 1,
+      "wire_to": {"node_id": 8, "width_input": "width", "height_input": "height"}
+    },
+    {
+      "type": "seed",
+      "name": "seed",
+      "value": 0,
+      "ui_order": 80,
+      "wire_to": {"node_id": 9, "input_name": "noise_seed"}
+    }
+  ],
+  "params": [
+    {
+      "type": "int",
+      "name": "steps",
+      "value": 20,
+      "min": 1,
+      "max": 50,
+      "step": 1,
+      "ui_control": "input",
+      "ui_order": 20,
+      "ui_description": "Number of sampling steps",
+      "wire_to": {"node_id": 7, "input_name": "steps"}
+    },
+    {
+      "type": "float",
+      "name": "guidance",
+      "value": 3.5,
+      "min": 1.0,
+      "max": 10.0,
+      "step": 0.1,
+      "ui_control": "input",
+      "ui_order": 60,
+      "ui_description": "Guidance strength",
+      "wire_to": {"node_id": 5, "input_name": "guidance"}
+    },
+    {
+      "type": "dropdown",
+      "name": "sampler",
+      "value": "euler",
+      "ui_order": 40,
+      "ui_description": "",
+      "wire_to": {"node_id": 10, "input_name": "sampler_name", "link_type": "STRING"}
+    },
+    {
+      "type": "dropdown",
+      "name": "scheduler",
+      "value": "normal",
+      "ui_order": 41,
+      "ui_description": "",
+      "wire_to": {"node_id": 7, "input_name": "scheduler", "link_type": "STRING"}
+    }
+  ],
+  "lora_loader": {
+    "path_filter": "flux/**",
+    "ui_order": 50,
+    "model_source": {"node_id": 1, "slot": 0},
+    "clip_source": {"node_id": 2, "slot": 0}
+  },
+  "outputs": [
+    {"replace_node_id": 13, "output_type": "image"}
+  ],
+  "layout": [
+    {
+      "label": "Advanced",
+      "param_names": ["steps", "guidance", "sampler", "scheduler", "loras", "seed"],
+      "collapsed": true,
+      "ui_order": 10
+    }
+  ]
+}

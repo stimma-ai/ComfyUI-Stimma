@@ -1,0 +1,24 @@
+# ComfyUI-Stimma Configuration
+# Copy this file to config.yaml and customize as needed.
+
+# STP provider identity
+provider:
+  id: comfyui
+  name: ComfyUI Workflows
+
+# ComfyUI instance(s) — leave empty for auto-detect (localhost:8188)
+comfyui:
+  addresses: []
+  # addresses:
+  #   - 127.0.0.1:8188
+  #   - 127.0.0.1:8189
+
+# Workflow discovery
+discovery:
+  # Additional directories to scan for Stimma workflows
+  # (bundled plugin workflows are synced into ComfyUI user workflows on startup/watch)
+  extra_workflow_dirs: []
+  #   - /path/to/my/workflows
+
+  # File watch interval in seconds (0 to disable)
+  watch_interval: 2.0
