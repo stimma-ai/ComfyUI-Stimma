@@ -1,7 +1,7 @@
 """Stimma custom nodes for ComfyUI."""
 
 from .tool_info import StimmaToolInfo
-from .inputs import (
+from .fields import (
     StimmaPromptParam,
     StimmaImageParam,
     StimmaMaskParam,

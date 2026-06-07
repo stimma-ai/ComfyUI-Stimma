@@ -152,8 +152,8 @@ def _build_checkpoint_parameter(
     )
 
 
-def _build_input_parameter(node: Dict[str, Any]) -> Optional[ToolParameter]:
-    """Build a ToolParameter from a Stimma input node."""
+def _build_field_parameter(node: Dict[str, Any]) -> Optional[ToolParameter]:
+    """Build a ToolParameter from a Stimma field node."""
     class_type = node["class_type"]
     inputs = node["inputs"]
     name = inputs.get("name", "")
@@ -701,8 +701,8 @@ def _build_single_tool(
 
     # Build media/prompt/seed/resolution parameters
     media_parameters = []
-    for node in workflow.input_nodes:
-        result = _build_input_parameter(node)
+    for node in workflow.field_nodes:
+        result = _build_field_parameter(node)
         if result:
             if isinstance(result, list):
                 media_parameters.extend(result)

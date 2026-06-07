@@ -32,7 +32,7 @@ Restart ComfyUI. The plugin registers its nodes and starts the STP server automa
 |------|---------|
 | **StimmaToolInfo** | Marks a workflow as a Stimma tool. Set the `slug` (unique ID), `display_name`, `task_type`, and `description`. |
 
-### Inputs
+### Fields
 
 | Node | Purpose |
 |------|---------|

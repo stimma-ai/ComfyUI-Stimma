@@ -1,7 +1,7 @@
 """ComfyUI-Stimma — expose ComfyUI workflows as Stimma tools.
 
 This plugin:
-1. Defines custom ComfyUI nodes (Stimma inputs, outputs, parameters)
+1. Defines custom ComfyUI nodes (Stimma fields, outputs, parameters)
 2. Hooks an STP WebSocket endpoint into ComfyUI's HTTP server
 3. Auto-discovers saved workflows containing Stimma nodes
 4. Exposes them as tools that Stimma can execute

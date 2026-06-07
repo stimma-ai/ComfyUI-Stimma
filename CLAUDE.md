@@ -4,7 +4,7 @@ A ComfyUI plugin that exposes ComfyUI workflows as Stimma tools via the Stimma T
 
 ## What This Project Does
 
-Users save ComfyUI workflows containing special Stimma nodes (inputs, params, outputs, LoRAs, layout). This plugin discovers those workflows, builds tool descriptors from the Stimma nodes, and serves them over a JSON-RPC WebSocket so the Stimma UI can execute them remotely.
+Users save ComfyUI workflows containing special Stimma nodes (fields, params, outputs, LoRAs, layout). This plugin discovers those workflows, builds tool descriptors from the Stimma nodes, and serves them over a JSON-RPC WebSocket so the Stimma UI can execute them remotely.
 
 ## Repository Layout
 
@@ -13,7 +13,7 @@ ComfyUI-Stimma/
   __init__.py          # Entry point — exports NODE_CLASS_MAPPINGS, hooks STP server into ComfyUI
   nodes/               # Custom ComfyUI node definitions
     tool_info.py       #   StimmaToolInfo — metadata (slug, task_type, display_name)
-    inputs.py          #   StimmaPromptParam, StimmaImageParam, StimmaVideoParam, etc.
+    fields.py          #   StimmaPromptParam, StimmaImageParam, StimmaVideoParam, etc.
     params.py          #   StimmaIntParam, StimmaFloatParam, StimmaStringParam, etc.
     loras.py           #   StimmaLoraLoader, StimmaPairedLoraLoader
     outputs.py         #   StimmaImageOutput, StimmaVideoOutput
@@ -25,7 +25,7 @@ ComfyUI-Stimma/
     provider.py        #   StimmaPluginProvider — subclass of stimma_tools_protocol.Provider
     discovery.py       #   Scans workflow JSON files for Stimma nodes
     tool_builder.py    #   Converts DiscoveredWorkflow → Tool objects
-    executor.py        #   Injects params/inputs/loras into workflow, queues on ComfyUI, captures output
+    executor.py        #   Injects params/fields/loras into workflow, queues on ComfyUI, captures output
     comfy_client.py    #   HTTP client for ComfyUI API (/prompt, /object_info, /upload/image)
     workflow_install.py #  Syncs bundled workflows to ComfyUI's user directory
   stimma_tools_protocol/        # EMBEDDED copy of the STP framework (see below)

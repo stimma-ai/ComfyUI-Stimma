@@ -134,7 +134,7 @@ async def execute_workflow(
 
     Steps:
     1. Deep-copy the API prompt
-    2. Inject STP input/parameter values into the prompt
+    2. Inject Stimma node values (media inputs + scalar params) into the prompt
     3. Handle image/video/mask uploads to ComfyUI
     4. Inject LoRA loader nodes if needed
     5. Set up output capture directory
@@ -200,7 +200,7 @@ async def execute_workflow(
             logger.info(f"Acquired ComfyUI instance {instance.addr} for job")
 
             # Step 3: Inject media/prompt/seed/resolution values (uploads go to the acquired instance)
-            unprovided = await _inject_inputs(
+            unprovided = await _inject_fields(
                 prompt, workflow, parameters, context, instance
             )
 
@@ -293,16 +293,16 @@ async def execute_workflow(
         shutil.rmtree(output_dir, ignore_errors=True)
 
 
-async def _inject_inputs(
+async def _inject_fields(
     prompt: Dict[str, Any],
     workflow: "DiscoveredWorkflow",
     input_data: dict,
     context: "ExecutionContext",
     instance,
 ) -> List[str]:
-    """Inject STP input values into the prompt dict.
+    """Inject Stimma field values (media/prompt/seed/resolution) into the prompt dict.
 
-    Returns list of node IDs for optional inputs that weren't provided.
+    Returns list of node IDs for optional fields that weren't provided.
     """
     unprovided_node_ids = []
 
@@ -336,7 +336,7 @@ async def _inject_inputs(
     image_cursor = 0
     video_cursor = 0
 
-    for node in workflow.input_nodes:
+    for node in workflow.field_nodes:
         node_id = node["node_id"]
         class_type = node["class_type"]
         data_field = _INPUT_DATA_FIELDS.get(class_type)
@@ -501,7 +501,7 @@ async def _inject_inputs(
                 prompt[node_id]["inputs"][data_field] = random.randint(0, 0xFFFFFFFF)
 
     # Always randomize seeds that weren't explicitly provided
-    for node in workflow.input_nodes:
+    for node in workflow.field_nodes:
         node_id = node["node_id"]
         class_type = node["class_type"]
         if class_type != "StimmaSeedParam" or node_id not in prompt:
@@ -514,7 +514,7 @@ async def _inject_inputs(
             prompt[node_id]["inputs"][data_field] = random.randint(0, 0xFFFFFFFF)
 
     # Inject resolution inputs (width/height come from input_data, not per-node name)
-    for node in workflow.input_nodes:
+    for node in workflow.field_nodes:
         node_id = node["node_id"]
         if node["class_type"] != "StimmaResolutionParam" or node_id not in prompt:
             continue

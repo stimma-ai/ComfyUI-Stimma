@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 
 # Stimma node class types
 STIMMA_TOOL_INFO = "StimmaToolInfo"
-STIMMA_INPUT_TYPES = {
+STIMMA_FIELD_TYPES = {
     "StimmaPromptParam", "StimmaImageParam", "StimmaMaskParam",
     "StimmaImagesParam", "StimmaVideoParam", "StimmaVideosParam", "StimmaSeedParam",
     "StimmaResolutionParam",
@@ -28,7 +28,7 @@ STIMMA_OUTPUT_TYPES = {"StimmaImageOutput", "StimmaVideoOutput"}
 STIMMA_LAYOUT_TYPES = {"StimmaLayoutGroup"}
 ALL_STIMMA_TYPES = (
     {STIMMA_TOOL_INFO}
-    | STIMMA_INPUT_TYPES
+    | STIMMA_FIELD_TYPES
     | STIMMA_PARAM_TYPES
     | STIMMA_LORA_TYPES
     | STIMMA_CHECKPOINT_TYPES
@@ -65,7 +65,7 @@ class DiscoveredWorkflow:
     file_path: str
     api_prompt: Dict[str, Any]  # API-format prompt dict
     tool_info: Dict[str, Any]   # slug, display_name, task_types, description, badges
-    input_nodes: List[Dict[str, Any]] = field(default_factory=list)   # sorted by order
+    field_nodes: List[Dict[str, Any]] = field(default_factory=list)   # sorted by order
     param_nodes: List[Dict[str, Any]] = field(default_factory=list)   # sorted by order
     output_nodes: List[Dict[str, Any]] = field(default_factory=list)
     layout_nodes: List[Dict[str, Any]] = field(default_factory=list)  # sorted by order
@@ -1108,7 +1108,7 @@ def _resolve_stimma_links(api_prompt: Dict[str, Any]) -> None:
     links targeting COMBO inputs (e.g. sampler_name, scheduler), but
     literal string values are accepted.
 
-    Call this AFTER _inject_params / _inject_inputs so that user-provided
+    Call this AFTER _inject_params / _inject_fields so that user-provided
     values are already on the Stimma nodes.
     """
     # Build map: (stimma_node_id, slot) → output value
@@ -1377,7 +1377,7 @@ def _extract_stimma_nodes(api_prompt: Dict[str, Any]) -> Optional[Dict[str, Any]
     Returns None if no StimmaToolInfo node is found.
     """
     tool_info = None
-    input_nodes = []
+    field_nodes = []
     param_nodes = []
     output_nodes = []
     layout_nodes = []
@@ -1426,7 +1426,7 @@ def _extract_stimma_nodes(api_prompt: Dict[str, Any]) -> Optional[Dict[str, Any]
                 "description": inputs.get("description", ""),
                 "badges": badges,
             }
-        elif class_type in STIMMA_INPUT_TYPES:
+        elif class_type in STIMMA_FIELD_TYPES:
             node_entry["order"] = inputs.get("ui_order", 0)
             if class_type in _IMAGE_INPUT_TYPES:
                 node_entry["name"] = "input_images"
@@ -1434,7 +1434,7 @@ def _extract_stimma_nodes(api_prompt: Dict[str, Any]) -> Optional[Dict[str, Any]
                 node_entry["name"] = "input_videos"
             else:
                 node_entry["name"] = inputs.get("name", "")
-            input_nodes.append(node_entry)
+            field_nodes.append(node_entry)
         elif class_type in STIMMA_PARAM_TYPES:
             node_entry["order"] = inputs.get("ui_order", 0)
             node_entry["name"] = inputs.get("name", "")
@@ -1472,7 +1472,7 @@ def _extract_stimma_nodes(api_prompt: Dict[str, Any]) -> Optional[Dict[str, Any]
         except (ValueError, TypeError):
             return 0
 
-    input_nodes.sort(key=_order_key)
+    field_nodes.sort(key=_order_key)
     param_nodes.sort(key=_order_key)
     layout_nodes.sort(key=_order_key)
     lora_nodes.sort(key=_order_key)
@@ -1506,7 +1506,7 @@ def _extract_stimma_nodes(api_prompt: Dict[str, Any]) -> Optional[Dict[str, Any]
 
     return {
         "tool_info": tool_info,
-        "input_nodes": input_nodes,
+        "field_nodes": field_nodes,
         "param_nodes": param_nodes,
         "output_nodes": output_nodes,
         "layout_nodes": layout_nodes,
@@ -1584,7 +1584,7 @@ def _scan_single_file(
         file_path=filepath,
         api_prompt=api_prompt,
         tool_info=result["tool_info"],
-        input_nodes=result["input_nodes"],
+        field_nodes=result["field_nodes"],
         param_nodes=result["param_nodes"],
         output_nodes=result["output_nodes"],
         layout_nodes=result["layout_nodes"],
@@ -1701,7 +1701,7 @@ def discover_workflows(
         for w in sr.workflows:
             slug = w.tool_info["slug"]
             name = w.tool_info["display_name"]
-            n_in = len(w.input_nodes)
+            n_in = len(w.field_nodes)
             n_p = len(w.param_nodes)
             n_l = len(w.lora_nodes)
             n_o = len(w.output_nodes)

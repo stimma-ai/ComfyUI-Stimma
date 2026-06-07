@@ -165,9 +165,9 @@ def run_tests():
               len(stimma["output_nodes"]) == 1,
               f"output_nodes={stimma['output_nodes']}")
         check("stimma_has_inputs",
-              len(stimma["input_nodes"]) == 4,
-              f"Expected 4 inputs (prompt, resolution, negative_prompt, seed), got {len(stimma['input_nodes'])}: "
-              f"{[n['name'] for n in stimma['input_nodes']]}")
+              len(stimma["field_nodes"]) == 4,
+              f"Expected 4 inputs (prompt, resolution, negative_prompt, seed), got {len(stimma['field_nodes'])}: "
+              f"{[n['name'] for n in stimma['field_nodes']]}")
         check("stimma_has_params",
               len(stimma["param_nodes"]) >= 5,
               f"Expected 5+ params, got {len(stimma['param_nodes'])}: "

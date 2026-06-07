@@ -25,7 +25,7 @@ sys.modules["stp_server.config"] = config_mod
 
 # Now we can import executor functions
 from stp_server.executor import (
-    _inject_inputs,
+    _inject_fields,
     _is_input_required,
     _strip_unprovided_input_chains,
     _expand_stimma_images_reference_chains,
@@ -212,13 +212,13 @@ class TestStripUnprovidedInputChains(unittest.TestCase):
         self.assertEqual(prompt["ref"]["inputs"]["conditioning"], ["other", 0])
 
 
-class TestInjectInputsListHandling(unittest.TestCase):
-    """Test that _inject_inputs correctly handles list values for single-image inputs."""
+class TestInjectFieldsListHandling(unittest.TestCase):
+    """Test that _inject_fields correctly handles list values for single-image fields."""
 
     def _make_workflow_with_image_input(self):
         """Create a minimal mock DiscoveredWorkflow."""
         wf = MagicMock()
-        wf.input_nodes = [
+        wf.field_nodes = [
             {
                 "node_id": "21",
                 "class_type": "StimmaImageParam",
@@ -245,7 +245,7 @@ class TestInjectInputsListHandling(unittest.TestCase):
 
         with self.assertRaises(RuntimeError):
             asyncio.get_event_loop().run_until_complete(
-                _inject_inputs(prompt, wf, input_data, context, comfy)
+                _inject_fields(prompt, wf, input_data, context, comfy)
             )
 
     def test_none_value_raises_for_required_single_image(self):
@@ -265,7 +265,7 @@ class TestInjectInputsListHandling(unittest.TestCase):
 
         with self.assertRaises(RuntimeError):
             asyncio.get_event_loop().run_until_complete(
-                _inject_inputs(prompt, wf, input_data, context, comfy)
+                _inject_fields(prompt, wf, input_data, context, comfy)
             )
 
 

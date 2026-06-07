@@ -1,4 +1,4 @@
-"""Stimma input nodes — capture user-provided data (images, prompts, etc.)."""
+"""Stimma field nodes — capture user-provided data (images, prompts, etc.)."""
 
 import os
 import json
