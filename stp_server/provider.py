@@ -12,6 +12,7 @@ from stimma_tools_protocol.transport import Transport
 
 from .config import Config
 from .comfy_client import Comfy
+from .version import PRODUCT_NAME, PRODUCT_VERSION
 
 logger = logging.getLogger(__name__)
 
@@ -32,7 +33,7 @@ class StimmaPluginProvider(Provider):
         provider_config = ProviderConfig(
             provider_id=config.provider.id,
             provider_name=config.provider.name,
-            server="ComfyUI-Stimma/1.0.0",
+            server=f"{PRODUCT_NAME}/{PRODUCT_VERSION}",
             max_concurrent=max_concurrent,
             supports_cancel=True,
         )
