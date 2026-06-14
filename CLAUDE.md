@@ -57,7 +57,7 @@ Protocol reference: `../stimma/docs/TOOLS_PROTOCOL.md`
 
 1. **Import time** (`__init__.py`): `setup_stp_server()` hooks WebSocket + asset routes into ComfyUI's aiohttp app
 2. **Server start** (`startup.py`): `_run_provider()` creates `StimmaPluginProvider`, starts the event loop
-3. **First `tools.list`** (`provider.py`): Triggers `discover_and_register_tools()` — fetches `/object_info`, scans workflow files, builds Tool objects
+3. **Every `tools.list`** (`provider.py`): Triggers `discover_and_register_tools()` — fetches `/object_info`, scans workflow files, builds Tool objects. Stimma sends one `tools.list` per (re)connection, so LoRAs and dynamic property enums are re-enumerated on every connection (no stale catalog after a reconnect)
 4. **Discovery** (`discovery.py`): Finds JSON files containing `StimmaToolInfo` nodes, extracts all Stimma node data, returns `DiscoveredWorkflow` objects
 5. **Tool building** (`tool_builder.py`): Converts each `DiscoveredWorkflow` into a `Tool` with typed parameters, LoRA enums (filtered by `path_filter`), and layout groups
 6. **Execution** (`executor.py`): Injects param values + input assets into the workflow prompt, resolves Stimma node references, strips unused optional chains, queues on ComfyUI via `/prompt`, monitors progress via websocket, captures output files

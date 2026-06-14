@@ -128,18 +128,35 @@ class StimmaPluginProvider(Provider):
         return False
 
     async def _handle_tools_list(self, request):
-        """Override to ensure discovery runs before first tools.list response."""
-        if not self._initial_discovery_done:
-            try:
-                await self.discover_and_register_tools()
-            except Exception:
-                logger.error(
-                    "\033[1m\033[35m[STP]\033[0m "
-                    "\033[31mDiscovery failed — returning 0 tools\033[0m",
-                    exc_info=True,
-                )
-            self._initial_discovery_done = True
+        """Re-enumerate tools, LoRAs, and property values on every tools.list.
 
+        Stimma sends exactly one tools.list immediately after each
+        (re)connection handshake, so re-running discovery here guarantees a
+        freshly-connected client always sees the *current* LoRA list and
+        dynamic property enums (samplers, schedulers, dropdowns) — never a
+        stale catalog cached from an earlier session. This is what makes a
+        LoRA copied onto the box after ComfyUI started show up on reconnect
+        without needing a ComfyUI restart.
+
+        discover_and_register_tools() refetches /object_info but preserves the
+        previous value if the ComfyUI fetch fails, and only clears+re-registers
+        the tool registry once a build succeeds — so a transient hiccup rebuilds
+        the same catalog rather than wiping it, and the next connection
+        self-heals.
+        """
+        first = not self._initial_discovery_done
+        try:
+            await self.discover_and_register_tools()
+        except Exception:
+            logger.error(
+                "\033[1m\033[35m[STP]\033[0m "
+                "\033[31mDiscovery failed during tools.list — "
+                "returning last known tools\033[0m",
+                exc_info=True,
+            )
+
+        if first:
+            self._initial_discovery_done = True
             n = len(self._tool_registry.list())
             logger.info(
                 f"\033[1m\033[35m[STP]\033[0m Provider ready — "
@@ -192,9 +209,11 @@ class StimmaPluginProvider(Provider):
         """Lightweight fingerprint of models/ and custom_nodes/ directories.
 
         Returns a string hash that changes when models or custom nodes are
-        added or removed.  Only checks top-level entries in each model
-        subfolder and the custom_nodes listing — not recursive mtimes —
-        so it's cheap to call every poll cycle.
+        added or removed.  Model subfolders are walked recursively (by name,
+        not mtime) so nested additions like loras/flux/foo.safetensors are
+        caught; custom_nodes uses a top-level listing.  os.walk reads dir
+        entries via os.scandir without stat-ing files, so it stays cheap
+        enough to call every poll cycle.
         """
         import hashlib
         parts = []
@@ -229,9 +248,21 @@ class StimmaPluginProvider(Provider):
                 if not os.path.isdir(d):
                     continue
                 try:
-                    # Top-level files only (not recursive) — fast
-                    entries = sorted(os.listdir(d))
-                    parts.append(f"{subdir}:{','.join(entries)}")
+                    # Recursive listing so models added in nested folders
+                    # (e.g. loras/flux/foo.safetensors) are detected. A
+                    # top-level os.listdir() misses them because the parent
+                    # subfolder already exists — and LoRAs are almost always
+                    # organized in subdirs (matching path_filter like "flux/**").
+                    # os.walk uses os.scandir and we never read/stat files, so
+                    # this stays cheap even on large model libraries.
+                    names = []
+                    for root, _subdirs, files in os.walk(d):
+                        rel_root = os.path.relpath(root, d)
+                        for f in files:
+                            names.append(
+                                f if rel_root == "." else os.path.join(rel_root, f)
+                            )
+                    parts.append(f"{subdir}:{','.join(sorted(names))}")
                 except OSError:
                     pass
 
