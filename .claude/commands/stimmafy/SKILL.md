@@ -121,13 +121,17 @@ python3 <skill-path>/scripts/analyze_workflow.py <workflow.json> --pretty
 
 This outputs JSON with: model loaders, samplers, text encoders, save nodes,
 latent image nodes, LoRA nodes, detected model family, guidance-distilled
-status, task type, and wiring recommendations.
+status, task type, inner-subgraph sampling nodes (`subgraphs[]`), and wiring
+recommendations (including `sampler_location`, `subgraph_prep_suggestions`, and
+`warnings`).
 
 Present a summary to the user:
 - Model family detected (flux, sdxl, qwen, etc.)
 - Whether it's guidance-distilled (affects which params to expose)
 - Task type (text-to-image, image-to-image, etc.)
 - How many samplers/text encoders/save nodes found
+- **Where the sampler lives** (`recommendations.sampler_location`: top-level vs
+  subgraph) and anything in `recommendations.warnings`
 - Any ambiguities (multiple samplers, unclear text encoder roles)
 
 ## Phase 2: Plan
@@ -183,23 +187,26 @@ to tune. Forgetting them is the single most common stimmafy mistake.
 
 Drive this off the analysis output, then verify nothing is hidden:
 
-1. **For every entry in `recommendations.wiring.targets`, create the matching
-   param.** The analyzer emits targets for `steps`, `sampler_name`, `scheduler`,
-   and (when applicable) `cfg`, `denoise`, `guidance`, `shift`. Each target that
-   exists → one Stimma param wired to it. Use `StimmaIntParam` for steps,
-   `StimmaDropdownParam` for sampler_name and scheduler (auto-resolves the enum).
-2. **If the sampler lives inside a subgraph, the analyzer will NOT see it** (it
-   does not descend into subgraph definitions). The analysis will list no
-   sampler/steps/scheduler targets even though they exist. When the workflow has
-   subgraph/component nodes, open the subgraph definition (`definitions.subgraphs[]`),
-   find the inner KSampler/BasicScheduler, and expose `steps`/`sampler_name`/
-   `scheduler` via `subgraph_prep` → then wire Stimma params to the new boundary
-   inputs. Do not ship a subgraph workflow with these knobs buried.
-3. **Only omit steps/sampler/scheduler when there is a real reason**, and say so
-   to the user: the model has no exposed sampler (pure API-style template with a
-   fixed internal sampler that isn't promotable), or the sampler is genuinely
-   fixed/locked for that model. "The analyzer didn't mention it" is NOT a reason —
-   check the subgraph.
+Check `recommendations.sampler_location` first — it is `top-level`, `subgraph`, or `none`:
+
+1. **`top-level`** — for every entry in `recommendations.wiring.targets`, create
+   the matching param. The analyzer emits targets for `steps`, `sampler_name`,
+   `scheduler`, and (when applicable) `cfg`, `denoise`, `guidance`, `shift`. Each
+   target that exists → one Stimma param wired to it. Use `StimmaIntParam` for
+   steps, `StimmaDropdownParam` for sampler_name and scheduler (auto-resolves the
+   enum).
+2. **`subgraph`** — the sampler lives inside a subgraph, so it is absent from
+   `wiring.targets`. The analyzer surfaces it anyway: use
+   `recommendations.subgraph_prep_suggestions`, which contains ready-made
+   `subgraph_prep.add_inner_inputs` entries (with `inner_node_id` /
+   `inner_widget_name` already resolved) for steps/sampler/scheduler/seed (and cfg
+   when not guidance-distilled). Drop those into the plan's `subgraph_prep`
+   section, then wire Stimma params to the new boundary inputs. Also read
+   `recommendations.warnings`. Do not ship a subgraph workflow with these knobs
+   buried.
+3. **`none`** — no sampler found at all. Only then is it legitimate to omit
+   steps/sampler/scheduler (e.g. a pure API-style template with a fixed internal
+   sampler that isn't promotable). Confirm with the user and say why.
 
 ### What to conditionally add
 - **Negative prompt** (StimmaStringParam, NOT StimmaPromptParam) — only if NOT guidance-distilled. Use `type: "string"` with `ui_control: "textarea"`. Use StimmaStringParam because StimmaPromptParam always claims the canonical `prompt` name (reserved for the main positive prompt) and renders as the primary prompt editor; a negative prompt is just another named string parameter. Place it in a layout group with `full_width: true`.
@@ -303,11 +310,13 @@ original save nodes.
 
 ### Handling subgraphs and group nodes
 If the workflow uses subgraph/component nodes (UUID-type nodes):
-- **The analyzer does NOT look inside subgraph definitions.** It reports the
-  subgraph node but not the inner KSampler/scheduler/text-encoders, so its wiring
-  recommendations will be missing the sampling knobs. You must inspect the
-  subgraph yourself (see "How to find inner node IDs" below) and decide what to
-  promote — especially steps/sampler/scheduler (see "Expose the sampling knobs").
+- **The analyzer descends into subgraph definitions** and reports inner
+  sampling nodes under `subgraphs[]`, sets `recommendations.sampler_location` to
+  `subgraph`, and emits ready-made `recommendations.subgraph_prep_suggestions`
+  for the inner steps/sampler/scheduler/seed. Use those rather than hand-tracing
+  (see "Expose the sampling knobs"). For samplers nested more than one level
+  deep, the analyzer warns instead of guessing — expose through each boundary,
+  innermost first.
 - Stimma parameter nodes should be at the TOP LEVEL
 - Wire into subgraph exposed inputs where possible
 - **Use `subgraph_prep`** to expose inner node widgets/outputs as new subgraph inputs/outputs. This is the preferred approach — cleaner than Set/Get nodes.

@@ -32,9 +32,11 @@ When a workflow uses subgraph/component nodes (UUID-type nodes), inner node widg
     "node_id": 92,
     "add_inner_inputs": [
       {"name": "seed", "type": "INT", "inner_node_id": 11, "inner_widget_name": "noise_seed"},
+      {"name": "steps", "type": "INT", "inner_node_id": 8, "inner_widget_name": "steps"},
+      {"name": "sampler_name", "type": "COMBO", "inner_node_id": 8, "inner_widget_name": "sampler_name"},
+      {"name": "scheduler", "type": "COMBO", "inner_node_id": 8, "inner_widget_name": "scheduler"},
       {"name": "negative_prompt", "type": "STRING", "inner_node_id": 4, "inner_widget_name": "text"},
-      {"name": "cfg", "type": "FLOAT", "inner_node_id": 47, "inner_widget_name": "cfg"},
-      {"name": "sampler_name", "type": "COMBO", "inner_node_id": 8, "inner_widget_name": "sampler_name"}
+      {"name": "cfg", "type": "FLOAT", "inner_node_id": 47, "inner_widget_name": "cfg"}
     ],
     "add_inner_outputs": [
       {"name": "frames", "type": "IMAGE", "inner_node_id": 95, "inner_output_slot": 0}
@@ -46,8 +48,8 @@ When a workflow uses subgraph/component nodes (UUID-type nodes), inner node widg
 - `node_id`: The top-level subgraph node ID
 - `add_inner_inputs`: Creates definition inputs on the -10 (input) node, with internal links to inner node widgets. Stimma params then wire to these via the subgraph node's link inputs.
 - `add_inner_outputs`: Creates definition outputs on the -20 (output) node, with internal links from inner node outputs. The subgraph node gets a new output slot that Stimma output nodes can wire from.
-- **Use case**: Exposing seed, negative_prompt, cfg, sampler_name from inner nodes of a collapsed subgraph. Also exposing intermediate outputs (e.g., IMAGE frames from an inner VAEDecode) so StimmaVideoOutput can capture them.
-- **How to find inner node IDs**: Open the source workflow JSON, find the subgraph definition in `definitions.subgraphs[]` matching the subgraph node's type UUID. Inner nodes are in `defn.nodes[]`.
+- **Use case**: Exposing steps, sampler_name, scheduler, seed, negative_prompt, cfg from inner nodes of a collapsed subgraph. Also exposing intermediate outputs (e.g., IMAGE frames from an inner VAEDecode) so StimmaVideoOutput can capture them.
+- **How to find inner node IDs**: `analyze_workflow.py` resolves these for you — `recommendations.subgraph_prep_suggestions[].expose[]` lists each `inner_node_id` / `inner_widget_name` ready to paste here. To find them by hand: open the source workflow JSON, find the subgraph definition in `definitions.subgraphs[]` matching the subgraph node's type UUID; inner nodes are in `defn.nodes[]`.
 
 ### Pipeline Setup
 

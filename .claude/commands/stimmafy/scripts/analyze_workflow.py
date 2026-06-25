@@ -324,6 +324,159 @@ def find_clip_source(model_loaders, clip_loaders, nodes, links):
     return None
 
 
+def _scan_inner_sampling(def_nodes):
+    """Collect sampling-relevant nodes from a subgraph definition's node list.
+
+    Mirrors the top-level sampler/scheduler scan but for nodes living inside a
+    subgraph definition (which build_graph never sees). Returns the same shaped
+    dicts used elsewhere so widget extractors and downstream logic apply.
+    """
+    found = {
+        "samplers": [], "scheduler_nodes": [], "sampler_select_nodes": [],
+        "noise_nodes": [], "guidance_nodes": [], "text_encoders": [],
+    }
+    for n in def_nodes:
+        t = n.get("type")
+        muted = n.get("mode") == 4
+        nid = n.get("id")
+        if t in KSAMPLER_TYPES:
+            params = (extract_widget_values_ksampler(n) if t == "KSampler"
+                      else extract_widget_values_ksampler_advanced(n))
+            found["samplers"].append({"id": nid, "type": t, "muted": muted,
+                                      "params": params, "pipeline_type": "standard"})
+        elif t in ADVANCED_SAMPLER_TYPES:
+            found["samplers"].append({"id": nid, "type": t, "muted": muted,
+                                      "params": {}, "pipeline_type": "advanced"})
+        elif t in SCHEDULER_NODES:
+            params = extract_widget_values_basic_scheduler(n) if t == "BasicScheduler" else {}
+            found["scheduler_nodes"].append({"id": nid, "type": t, "muted": muted, "params": params})
+        elif t in SAMPLER_SELECT_NODES:
+            found["sampler_select_nodes"].append({"id": nid, "type": t, "muted": muted,
+                                                  "params": extract_widget_values_sampler_select(n)})
+        elif t in NOISE_NODES:
+            found["noise_nodes"].append({"id": nid, "type": t, "muted": muted,
+                                         "params": extract_widget_values_random_noise(n)})
+        elif t in GUIDANCE_NODES:
+            found["guidance_nodes"].append({"id": nid, "type": t, "muted": muted,
+                                            "params": extract_widget_values_flux_guidance(n)})
+        elif t in TEXT_ENCODERS:
+            found["text_encoders"].append({"id": nid, "type": t, "muted": muted,
+                                           "text_preview": extract_text_from_encoder(n)[:120]})
+    return found
+
+
+def collect_subgraphs(node_list, subgraph_defs, chain=(), seen_defs=frozenset()):
+    """Walk top-level nodes, descend into subgraph definitions (recursively), and
+    report sampling-relevant inner nodes per subgraph occurrence.
+
+    `chain` is the list of top→inner subgraph instance node ids leading to this
+    occurrence (length 1 = directly under the top level). The cycle guard
+    (`seen_defs`) prevents infinite recursion on self-referential definitions.
+    """
+    occurrences = []
+    for n in node_list:
+        defn = subgraph_defs.get(n.get("type"))
+        if defn is None:
+            continue
+        def_id = defn.get("id")
+        if def_id in seen_defs:
+            continue
+        inst_id = n.get("id")
+        new_chain = chain + (inst_id,)
+        inner = defn.get("nodes", [])
+        occurrences.append({
+            "instance_node_id": inst_id,
+            "definition_id": def_id,
+            "title": n.get("title") or defn.get("name") or "",
+            "chain": list(new_chain),
+            **_scan_inner_sampling(inner),
+        })
+        occurrences.extend(
+            collect_subgraphs(inner, subgraph_defs, new_chain, seen_defs | {def_id})
+        )
+    return occurrences
+
+
+def build_subgraph_prep_suggestions(occurrences, guidance_distilled):
+    """From subgraph occurrences that contain samplers, produce ready-to-use
+    `subgraph_prep.add_inner_inputs` entries plus human warnings.
+
+    Output entry shape matches references/node-catalog.md so it can be dropped
+    into a plan's `subgraph_prep` section, with an extra `param` field naming the
+    Stimma param to wire to the new boundary input.
+    """
+    suggestions = []
+    warnings = []
+    for occ in occurrences:
+        samplers = [s for s in occ["samplers"] if not s["muted"]]
+        scheds = [s for s in occ["scheduler_nodes"] if not s["muted"]]
+        selects = [s for s in occ["sampler_select_nodes"] if not s["muted"]]
+        noises = [s for s in occ["noise_nodes"] if not s["muted"]]
+        guids = [g for g in occ["guidance_nodes"] if not g["muted"]]
+        if not (samplers or scheds or selects):
+            continue
+
+        if len(occ["chain"]) > 1:
+            warnings.append(
+                f"Sampler is nested {len(occ['chain'])} subgraph levels deep "
+                f"(instance chain {occ['chain']}). Expose steps/sampler/scheduler "
+                f"through EACH subgraph boundary with subgraph_prep, innermost first."
+            )
+            continue
+
+        sg_id = occ["instance_node_id"]
+        expose = []
+
+        def add(name, typ, inner_node_id, widget):
+            expose.append({"name": name, "type": typ, "inner_node_id": inner_node_id,
+                           "inner_widget_name": widget, "param": name})
+
+        # Standard KSampler carries all knobs on one node.
+        for s in samplers:
+            if s["type"] in KSAMPLER_TYPES:
+                seed_widget = "noise_seed" if s["type"] == "KSamplerAdvanced" else "seed"
+                add("steps", "INT", s["id"], "steps")
+                add("sampler_name", "COMBO", s["id"], "sampler_name")
+                add("scheduler", "COMBO", s["id"], "scheduler")
+                add("seed", "INT", s["id"], seed_widget)
+                if not guidance_distilled:
+                    add("cfg", "FLOAT", s["id"], "cfg")
+        # Advanced pipeline spreads knobs across helper nodes.
+        for s in selects:
+            add("sampler_name", "COMBO", s["id"], "sampler_name")
+        for s in scheds:
+            add("scheduler", "COMBO", s["id"], "scheduler")
+            add("steps", "INT", s["id"], "steps")
+        for s in noises:
+            add("seed", "INT", s["id"], "seed")
+        for g in guids:
+            add("guidance", "FLOAT", g["id"], "guidance")
+
+        # Dedupe by param name (keep first); flag if multiple samplers collided.
+        seen = set()
+        deduped = []
+        collided = False
+        for e in expose:
+            if e["param"] in seen:
+                collided = True
+                continue
+            seen.add(e["param"])
+            deduped.append(e)
+        if len(samplers) > 1 or collided:
+            warnings.append(
+                f"Subgraph node {sg_id} has multiple samplers/sources for the same "
+                f"knob — decide whether to share one param across them or expose "
+                f"separate per-stage params (see SKILL 'Handling multiple samplers')."
+            )
+        if deduped:
+            suggestions.append({
+                "subgraph_node_id": sg_id,
+                "definition_id": occ["definition_id"],
+                "expose": deduped,
+            })
+    return suggestions, warnings
+
+
 def analyze(workflow_path, comfy_url="http://localhost:8188"):
     """Main analysis function."""
     workflow = json.loads(Path(workflow_path).read_text())
@@ -355,6 +508,7 @@ def analyze(workflow_path, comfy_url="http://localhost:8188"):
         "guidance_distilled": False,
         "task_type": "text-to-image",
         "has_existing_stimma_nodes": False,
+        "subgraphs": [],
         "recommendations": {},
     }
 
@@ -527,15 +681,25 @@ def analyze(workflow_path, comfy_url="http://localhost:8188"):
                 "id": nid, "type": ntype, "muted": is_muted,
             })
 
+    # Descend into subgraph definitions for sampling-relevant inner nodes that
+    # build_graph (top-level only) cannot see. Without this, a sampler buried in
+    # a subgraph is invisible and steps/sampler/scheduler get silently dropped.
+    definitions = workflow.get("definitions", {})
+    subgraph_defs = {sg.get("id"): sg for sg in definitions.get("subgraphs", []) if sg.get("id")}
+    subgraph_occurrences = collect_subgraphs(workflow.get("nodes", []), subgraph_defs)
+    result["subgraphs"] = subgraph_occurrences
+    inner_samplers = [s for occ in subgraph_occurrences for s in occ["samplers"]]
+
     # Detect model family
     result["model_family"] = detect_model_family(
         result["model_loaders"], result["guidance_nodes"],
         result["model_sampling_nodes"], nodes,
     )
 
-    # Detect guidance-distilled
+    # Detect guidance-distilled — include inner subgraph samplers so a cfg=1.0
+    # sampler hidden in a subgraph still trips the signal.
     result["guidance_distilled"] = detect_guidance_distilled(
-        result["model_loaders"], result["samplers"],
+        result["model_loaders"], result["samplers"] + inner_samplers,
         result["guidance_nodes"], result["model_family"],
     )
 
@@ -671,6 +835,32 @@ def analyze(workflow_path, comfy_url="http://localhost:8188"):
 
     recs["defaults"] = defaults
     recs["wiring"] = wiring
+
+    # Where do the sampling knobs live? This tells the author whether the wiring
+    # targets above are complete or whether subgraph_prep is required.
+    active_inner_samplers = [s for s in inner_samplers if not s["muted"]]
+    if active_samplers:
+        recs["sampler_location"] = "top-level"
+    elif active_inner_samplers:
+        recs["sampler_location"] = "subgraph"
+    else:
+        recs["sampler_location"] = "none"
+
+    prep_suggestions, prep_warnings = build_subgraph_prep_suggestions(
+        subgraph_occurrences, result["guidance_distilled"],
+    )
+    recs["subgraph_prep_suggestions"] = prep_suggestions
+
+    warnings = list(prep_warnings)
+    if recs["sampler_location"] == "subgraph":
+        warnings.insert(0,
+            "Sampler(s) live INSIDE a subgraph, so steps/sampler/scheduler are "
+            "absent from wiring.targets. Expose them via subgraph_prep using "
+            "recommendations.subgraph_prep_suggestions, then wire Stimma params to "
+            "the new subgraph boundary inputs. Do NOT ship without these knobs."
+        )
+    recs["warnings"] = warnings
+
     result["recommendations"] = recs
 
     return result
