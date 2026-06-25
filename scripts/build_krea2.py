@@ -5,17 +5,26 @@ Keeps the stock "Text to Image (Krea-2 Turbo)" subgraph and wires Stimma params
 into its promoted inputs (matched BY NAME via the instance inputs array).
 
 Subgraph definition input names -> Stimma source:
-  value         (prompt)        <- StimmaPromptParam
-  value_1       (prompt_enhance)<- StimmaBoolParam (default False; avoids LLM path)
-  width / height                <- StimmaResolutionParam
-  seed                          <- StimmaSeedParam
-  value_2       (enable_lora?)  <- StimmaBoolParam (default False)
-  strength_model(lora_strength) <- StimmaFloatParam
-  max_length / lora_name / string_b / unet/clip/vae  -> internal defaults
+  value         (prompt)   <- StimmaPromptParam
+  width / height           <- StimmaResolutionParam
+  seed                     <- StimmaSeedParam
+  model_in / clip_in       <- StimmaLoraLoader outputs (added boundary inputs)
+  max_length / string_b / unet/clip/vae  -> internal defaults
+
+LoRA handling (done right): instead of the stock fixed darkbrush toggle, a real
+StimmaLoraLoader is inserted at the top level and intercepts the model + clip
+through the subgraph boundary:
+  - new subgraph OUTPUTS model_out (<- UNETLoader.MODEL) / clip_out (<- CLIPLoader.CLIP)
+  - new subgraph INPUTS  model_in  (-> KSampler.model) / clip_in (-> CLIPTextEncode.clip)
+  - StimmaLoraLoader(model_out, clip_out) -> model_in / clip_in
+The stock inner LoraLoaderModelOnly + enable_lora switch are bypassed (orphaned and
+stripped at execution). path_filter "krea2/**" exposes loras/krea2/* for selection.
+The LLM prompt_enhance path is dropped (it needs an external LLM backend).
 """
 import copy
 import json
 import os
+import uuid
 
 HERE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SRC = os.path.join(HERE, "source_workflows", "image_krea2_turbo_t2i.json")
@@ -73,37 +82,95 @@ def make_bool(nid, pos, wv):
     }
 
 
+def defn_add_output(defn, name, type_str, inner_node_id, inner_output_slot):
+    """Expose an inner node output as a new subgraph definition output (-20 side)."""
+    st = defn.setdefault("state", {})
+    lid = st.get("lastLinkId", 0) + 1
+    st["lastLinkId"] = lid
+    outs = defn.setdefault("outputs", [])
+    tslot = len(outs)
+    outs.append({"id": str(uuid.uuid4()), "name": name, "type": type_str,
+                 "linkIds": [lid], "pos": [1560, 496 + tslot * 20]})
+    defn["links"].append({"id": lid, "origin_id": inner_node_id,
+                          "origin_slot": inner_output_slot, "target_id": -20,
+                          "target_slot": tslot, "type": type_str})
+    return tslot
+
+
+def defn_add_input(defn, name, type_str, inner_node_id, inner_input_name):
+    """Add a new subgraph definition input (-10 side) feeding an inner node's input.
+
+    Appended last so it wins the last-link-wins resolution, overriding whatever
+    previously fed inner_node_id.inner_input_name.
+    """
+    st = defn.setdefault("state", {})
+    lid = st.get("lastLinkId", 0) + 1
+    st["lastLinkId"] = lid
+    inps = defn.setdefault("inputs", [])
+    oslot = len(inps)
+    inps.append({"id": str(uuid.uuid4()), "name": name, "type": type_str,
+                 "linkIds": [lid], "pos": [-1230, 3890 + oslot * 20]})
+    inner = next(n for n in defn["nodes"] if n["id"] == inner_node_id)
+    islot = next(i for i, inp in enumerate(inner["inputs"])
+                 if inp.get("name") == inner_input_name)
+    inner["inputs"][islot]["link"] = lid
+    defn["links"].append({"id": lid, "origin_id": -10, "origin_slot": oslot,
+                          "target_id": inner_node_id, "target_slot": islot,
+                          "type": type_str})
+    return oslot
+
+
 def main():
     src = json.load(open(SRC))
     sk = harvest(FLUX2, {
         "StimmaToolInfo", "StimmaPromptParam", "StimmaResolutionParam",
-        "StimmaSeedParam", "StimmaFloatParam", "StimmaImageOutput", "StimmaLayoutGroup",
+        "StimmaSeedParam", "StimmaImageOutput", "StimmaLayoutGroup",
+        "StimmaLoraLoader",
     })
 
-    # Patch inner LoRA path to where we actually placed the file (loras/krea2/)
     sub = next(n for n in src["nodes"] if n["id"] == 30)
     defn = src["definitions"]["subgraphs"][0]
+
+    # Force the inner prompt-enhance switch OFF. We no longer promote that input,
+    # so without this the inner default (true) would route the prompt through the
+    # LLM TextGenerate node (broken without an LLM backend). node 24 = enhance bool.
     for n in defn["nodes"]:
+        if n["id"] == 24:                       # PrimitiveBoolean (prompt_enhance)
+            n["widgets_values"] = [False]
+        if n["id"] == 23:                       # PrimitiveBoolean (enable_lora switch)
+            n["widgets_values"] = [False]
         if n.get("type") == "LoraLoaderModelOnly":
+            # Orphaned once we bypass the model switch, but keep a valid path so
+            # discovery doesn't flag a missing model on the dead node.
             n["widgets_values"][0] = "krea2/krea2_darkbrush.safetensors"
 
-    # Clean promoted-input array (names must match definition input names).
+    # --- LoRA-through-boundary: expose UNET/CLIP out, feed model/clip back in ---
+    # inner node ids: 10 UNETLoader, 11 CLIPLoader, 3 KSampler, 6 CLIPTextEncode
+    defn_add_output(defn, "model_out", "MODEL", 10, 0)   # UNETLoader.MODEL
+    defn_add_output(defn, "clip_out", "CLIP", 11, 0)     # CLIPLoader.CLIP
+    defn_add_input(defn, "model_in", "MODEL", 3, "model")        # -> KSampler.model
+    defn_add_input(defn, "clip_in", "CLIP", 6, "clip")          # -> CLIPTextEncode.clip
+
+    # Promoted inputs (names match definition input names); link inputs have no widget.
     sub["inputs"] = [
         {"label": "prompt", "name": "value", "type": "STRING", "widget": {"name": "value"}, "link": None},
-        {"label": "prompt_enhance", "name": "value_1", "type": "BOOLEAN", "widget": {"name": "value_1"}, "link": None},
         {"name": "width", "type": "INT", "widget": {"name": "width"}, "link": None},
         {"name": "height", "type": "INT", "widget": {"name": "height"}, "link": None},
         {"name": "seed", "type": "INT", "widget": {"name": "seed"}, "link": None},
-        {"label": "enable_lora", "name": "value_2", "type": "BOOLEAN", "widget": {"name": "value_2"}, "link": None},
-        {"label": "lora_strength", "name": "strength_model", "type": "FLOAT", "widget": {"name": "strength_model"}, "link": None},
+        {"name": "model_in", "type": "MODEL", "link": None},
+        {"name": "clip_in", "type": "CLIP", "link": None},
     ]
-    sub["outputs"] = [{"name": "IMAGE", "type": "IMAGE", "links": []}]
+    sub["outputs"] = [
+        {"name": "IMAGE", "type": "IMAGE", "links": []},
+        {"name": "model_out", "type": "MODEL", "links": []},
+        {"name": "clip_out", "type": "CLIP", "links": []},
+    ]
     sub["pos"] = [640, 400]
 
     tool = clean_node(sk["StimmaToolInfo"], 200, [40, 40], [
         "krea2-turbo-t2i", "Krea 2 Turbo", "text-to-image", "Open Weights",
-        "Fast, high-quality text-to-image with Krea 2 Turbo (FP8). Optional "
-        "Krea Darkbrush style LoRA and LLM prompt enhancement.",
+        "Fast, high-quality text-to-image with Krea 2 Turbo (FP8). Supports "
+        "selectable Krea 2 style LoRAs (e.g. Darkbrush).",
         "krea", "krea-2-turbo",
     ])
     prompt = clean_node(sk["StimmaPromptParam"], 201, [40, 260],
@@ -111,24 +178,15 @@ def main():
     res = clean_node(sk["StimmaResolutionParam"], 202, [40, 540],
                      [1024, 1024, 1024, 2048, 64, RES_PRESETS, 1])
     seed = clean_node(sk["StimmaSeedParam"], 204, [40, 800], ["seed", 0, 2])
-    enhance = make_bool(205, [40, 980], [
-        "prompt_enhance", False, 5,
-        "Expand your prompt with an LLM before generating (requires an LLM "
-        "backend configured in ComfyUI).",
-    ])
-    enable_lora = make_bool(206, [40, 1120], [
-        "enable_lora", False, 6, "Apply the Krea Darkbrush style LoRA.",
-    ])
-    lora_str = clean_node(sk["StimmaFloatParam"], 207, [40, 1260], [
-        "lora_strength", 0.8, 0.0, 1.5, 0.05, "slider", 7,
-        "Strength of the Darkbrush style LoRA.",
-    ])
+    # StimmaLoraLoader: path_filter + ui_order + 10x (lora_name, strength) slots.
+    lora = clean_node(sk["StimmaLoraLoader"], 207, [40, 1000],
+                      ["krea2/**", 50] + ["None", 1] * 10)
     out = clean_node(sk["StimmaImageOutput"], 208, [1160, 400], ["Krea2_Turbo", ""])
     layout = clean_node(sk["StimmaLayoutGroup"], 209, [40, 1400], [
-        "Advanced", "prompt_enhance\nenable_lora\nlora_strength\nseed", True, 10,
+        "Advanced", "loras\nseed", True, 10,
     ])
 
-    nodes = [tool, prompt, res, seed, enhance, enable_lora, lora_str, out, layout, sub]
+    nodes = [tool, prompt, res, seed, lora, out, layout, sub]
     L, lid = [], [0]
 
     def link(src_node, src_slot, dst_node, dst_slot, typ):
@@ -137,13 +195,17 @@ def main():
         next(n for n in nodes if n["id"] == src_node)["outputs"][src_slot].setdefault("links", []).append(lid[0])
         next(n for n in nodes if n["id"] == dst_node)["inputs"][dst_slot]["link"] = lid[0]
 
-    link(201, 0, 30, 0, "STRING")    # prompt        -> value
-    link(205, 0, 30, 1, "BOOLEAN")   # prompt_enhance-> value_1
-    link(202, 0, 30, 2, "INT")       # width
-    link(202, 1, 30, 3, "INT")       # height
-    link(204, 0, 30, 4, "INT")       # seed
-    link(206, 0, 30, 5, "BOOLEAN")   # enable_lora   -> value_2
-    link(207, 0, 30, 6, "FLOAT")     # lora_strength -> strength_model
+    # sub instance slots: in [0 value,1 width,2 height,3 seed,4 model_in,5 clip_in]
+    #                     out [0 IMAGE,1 model_out,2 clip_out]
+    # lora slots:         in [0 model,1 clip,...]  out [0 model,1 clip]
+    link(201, 0, 30, 0, "STRING")    # prompt  -> value
+    link(202, 0, 30, 1, "INT")       # width
+    link(202, 1, 30, 2, "INT")       # height
+    link(204, 0, 30, 3, "INT")       # seed
+    link(30, 1, 207, 0, "MODEL")     # subgraph model_out -> lora.model
+    link(30, 2, 207, 1, "CLIP")      # subgraph clip_out  -> lora.clip
+    link(207, 0, 30, 4, "MODEL")     # lora.model -> subgraph model_in
+    link(207, 1, 30, 5, "CLIP")      # lora.clip  -> subgraph clip_in
     link(30, 0, 208, 0, "IMAGE")     # IMAGE -> output
 
     wf = {

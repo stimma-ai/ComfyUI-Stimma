@@ -2,14 +2,14 @@
   "id": "08988737-a544-4ab1-99fb-22d67b7c36e3",
   "revision": 0,
   "last_node_id": 209,
-  "last_link_id": 8,
+  "last_link_id": 9,
   "nodes": [
     {
       "id": 200,
       "type": "StimmaToolInfo",
       "pos": [
-        -180.0,
-        436.0
+        40,
+        40
       ],
       "size": [
         480,
@@ -69,7 +69,7 @@
         "Krea 2 Turbo",
         "text-to-image",
         "Open Weights",
-        "Fast, high-quality text-to-image with Krea 2 Turbo (FP8). Optional Krea Darkbrush style LoRA and LLM prompt enhancement.",
+        "Fast, high-quality text-to-image with Krea 2 Turbo (FP8). Supports selectable Krea 2 style LoRAs (e.g. Darkbrush).",
         "krea",
         "krea-2-turbo"
       ]
@@ -78,8 +78,8 @@
       "id": 201,
       "type": "StimmaPromptParam",
       "pos": [
-        -180.0,
-        906.0
+        40,
+        260
       ],
       "size": [
         480,
@@ -155,8 +155,8 @@
       "id": 202,
       "type": "StimmaResolutionParam",
       "pos": [
-        -180.0,
-        1330.0
+        40,
+        540
       ],
       "size": [
         480,
@@ -228,7 +228,7 @@
           "name": "width",
           "type": "INT",
           "links": [
-            3
+            2
           ],
           "slot_index": 0
         },
@@ -236,7 +236,7 @@
           "name": "height",
           "type": "INT",
           "links": [
-            4
+            3
           ],
           "slot_index": 1
         }
@@ -258,8 +258,8 @@
       "id": 204,
       "type": "StimmaSeedParam",
       "pos": [
-        -180.0,
-        1724.0
+        40,
+        800
       ],
       "size": [
         384,
@@ -299,7 +299,7 @@
           "name": "seed",
           "type": "INT",
           "links": [
-            5
+            4
           ],
           "slot_index": 0
         }
@@ -314,201 +314,38 @@
       ]
     },
     {
-      "id": 205,
-      "type": "StimmaBoolParam",
-      "pos": [
-        -180.0,
-        1914.0
-      ],
-      "size": [
-        320,
-        120
-      ],
-      "flags": {},
-      "order": 205,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "name",
-          "type": "STRING",
-          "widget": {
-            "name": "name"
-          },
-          "link": null
-        },
-        {
-          "name": "value",
-          "type": "BOOLEAN",
-          "widget": {
-            "name": "value"
-          },
-          "link": null
-        },
-        {
-          "name": "ui_order",
-          "type": "INT",
-          "widget": {
-            "name": "ui_order"
-          },
-          "link": null
-        },
-        {
-          "name": "ui_description",
-          "type": "STRING",
-          "widget": {
-            "name": "ui_description"
-          },
-          "link": null
-        }
-      ],
-      "outputs": [
-        {
-          "name": "value",
-          "type": "BOOLEAN",
-          "links": [
-            2
-          ],
-          "slot_index": 0
-        }
-      ],
-      "properties": {
-        "Node name for S&R": "StimmaBoolParam"
-      },
-      "widgets_values": [
-        "prompt_enhance",
-        false,
-        5,
-        "Expand your prompt with an LLM before generating (requires an LLM backend configured in ComfyUI)."
-      ]
-    },
-    {
-      "id": 206,
-      "type": "StimmaBoolParam",
-      "pos": [
-        -180.0,
-        2068.0
-      ],
-      "size": [
-        320,
-        120
-      ],
-      "flags": {},
-      "order": 206,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "name",
-          "type": "STRING",
-          "widget": {
-            "name": "name"
-          },
-          "link": null
-        },
-        {
-          "name": "value",
-          "type": "BOOLEAN",
-          "widget": {
-            "name": "value"
-          },
-          "link": null
-        },
-        {
-          "name": "ui_order",
-          "type": "INT",
-          "widget": {
-            "name": "ui_order"
-          },
-          "link": null
-        },
-        {
-          "name": "ui_description",
-          "type": "STRING",
-          "widget": {
-            "name": "ui_description"
-          },
-          "link": null
-        }
-      ],
-      "outputs": [
-        {
-          "name": "value",
-          "type": "BOOLEAN",
-          "links": [
-            6
-          ],
-          "slot_index": 0
-        }
-      ],
-      "properties": {
-        "Node name for S&R": "StimmaBoolParam"
-      },
-      "widgets_values": [
-        "enable_lora",
-        false,
-        6,
-        "Apply the Krea Darkbrush style LoRA."
-      ]
-    },
-    {
       "id": 207,
-      "type": "StimmaFloatParam",
+      "type": "StimmaLoraLoader",
       "pos": [
-        -180.0,
-        2222.0
+        40,
+        1000
       ],
       "size": [
-        384,
-        355
+        480,
+        806
       ],
       "flags": {},
       "order": 207,
       "mode": 0,
       "inputs": [
         {
-          "name": "name",
+          "name": "model",
+          "type": "MODEL",
+          "link": 5
+        },
+        {
+          "name": "clip",
+          "type": "CLIP",
+          "link": 6
+        },
+        {
+          "name": "path_filter",
           "type": "STRING",
           "widget": {
-            "name": "name"
-          },
-          "link": null
-        },
-        {
-          "name": "value",
-          "type": "FLOAT",
-          "widget": {
-            "name": "value"
-          },
-          "link": null
-        },
-        {
-          "name": "minimum",
-          "type": "FLOAT",
-          "widget": {
-            "name": "minimum"
-          },
-          "link": null
-        },
-        {
-          "name": "maximum",
-          "type": "FLOAT",
-          "widget": {
-            "name": "maximum"
-          },
-          "link": null
-        },
-        {
-          "name": "step",
-          "type": "FLOAT",
-          "widget": {
-            "name": "step"
-          },
-          "link": null
-        },
-        {
-          "name": "ui_control",
-          "type": "COMBO",
-          "widget": {
-            "name": "ui_control"
+            "name": "path_filter",
+            "config": {
+              "default": "flux2-dev/**"
+            }
           },
           "link": null
         },
@@ -521,44 +358,238 @@
           "link": null
         },
         {
-          "name": "ui_description",
-          "type": "STRING",
+          "name": "lora_1",
+          "type": "COMBO",
           "widget": {
-            "name": "ui_description"
+            "name": "lora_1"
           },
-          "link": null
+          "link": null,
+          "shape": 7
+        },
+        {
+          "name": "strength_1",
+          "type": "FLOAT",
+          "widget": {
+            "name": "strength_1"
+          },
+          "link": null,
+          "shape": 7
+        },
+        {
+          "name": "lora_2",
+          "type": "COMBO",
+          "widget": {
+            "name": "lora_2"
+          },
+          "link": null,
+          "shape": 7
+        },
+        {
+          "name": "strength_2",
+          "type": "FLOAT",
+          "widget": {
+            "name": "strength_2"
+          },
+          "link": null,
+          "shape": 7
+        },
+        {
+          "name": "lora_3",
+          "type": "COMBO",
+          "widget": {
+            "name": "lora_3"
+          },
+          "link": null,
+          "shape": 7
+        },
+        {
+          "name": "strength_3",
+          "type": "FLOAT",
+          "widget": {
+            "name": "strength_3"
+          },
+          "link": null,
+          "shape": 7
+        },
+        {
+          "name": "lora_4",
+          "type": "COMBO",
+          "widget": {
+            "name": "lora_4"
+          },
+          "link": null,
+          "shape": 7
+        },
+        {
+          "name": "strength_4",
+          "type": "FLOAT",
+          "widget": {
+            "name": "strength_4"
+          },
+          "link": null,
+          "shape": 7
+        },
+        {
+          "name": "lora_5",
+          "type": "COMBO",
+          "widget": {
+            "name": "lora_5"
+          },
+          "link": null,
+          "shape": 7
+        },
+        {
+          "name": "strength_5",
+          "type": "FLOAT",
+          "widget": {
+            "name": "strength_5"
+          },
+          "link": null,
+          "shape": 7
+        },
+        {
+          "name": "lora_6",
+          "type": "COMBO",
+          "widget": {
+            "name": "lora_6"
+          },
+          "link": null,
+          "shape": 7
+        },
+        {
+          "name": "strength_6",
+          "type": "FLOAT",
+          "widget": {
+            "name": "strength_6"
+          },
+          "link": null,
+          "shape": 7
+        },
+        {
+          "name": "lora_7",
+          "type": "COMBO",
+          "widget": {
+            "name": "lora_7"
+          },
+          "link": null,
+          "shape": 7
+        },
+        {
+          "name": "strength_7",
+          "type": "FLOAT",
+          "widget": {
+            "name": "strength_7"
+          },
+          "link": null,
+          "shape": 7
+        },
+        {
+          "name": "lora_8",
+          "type": "COMBO",
+          "widget": {
+            "name": "lora_8"
+          },
+          "link": null,
+          "shape": 7
+        },
+        {
+          "name": "strength_8",
+          "type": "FLOAT",
+          "widget": {
+            "name": "strength_8"
+          },
+          "link": null,
+          "shape": 7
+        },
+        {
+          "name": "lora_9",
+          "type": "COMBO",
+          "widget": {
+            "name": "lora_9"
+          },
+          "link": null,
+          "shape": 7
+        },
+        {
+          "name": "strength_9",
+          "type": "FLOAT",
+          "widget": {
+            "name": "strength_9"
+          },
+          "link": null,
+          "shape": 7
+        },
+        {
+          "name": "lora_10",
+          "type": "COMBO",
+          "widget": {
+            "name": "lora_10"
+          },
+          "link": null,
+          "shape": 7
+        },
+        {
+          "name": "strength_10",
+          "type": "FLOAT",
+          "widget": {
+            "name": "strength_10"
+          },
+          "link": null,
+          "shape": 7
         }
       ],
       "outputs": [
         {
-          "name": "value",
-          "type": "FLOAT",
+          "name": "model",
+          "type": "MODEL",
           "links": [
             7
           ],
           "slot_index": 0
+        },
+        {
+          "name": "clip",
+          "type": "CLIP",
+          "links": [
+            8
+          ],
+          "slot_index": 1
         }
       ],
       "properties": {
-        "Node name for S&R": "StimmaFloatParam"
+        "Node name for S&R": "StimmaLoraLoader"
       },
       "widgets_values": [
-        "lora_strength",
-        0.8,
-        0.0,
-        1.5,
-        0.05,
-        "slider",
-        7,
-        "Strength of the Darkbrush style LoRA."
+        "krea2/**",
+        50,
+        "None",
+        1,
+        "None",
+        1,
+        "None",
+        1,
+        "None",
+        1,
+        "None",
+        1,
+        "None",
+        1,
+        "None",
+        1,
+        "None",
+        1,
+        "None",
+        1,
+        "None",
+        1
       ]
     },
     {
       "id": 208,
       "type": "StimmaImageOutput",
       "pos": [
-        -180.0,
-        2781.0
+        1160,
+        400
       ],
       "size": [
         360,
@@ -571,7 +602,7 @@
         {
           "name": "images",
           "type": "IMAGE",
-          "link": 8
+          "link": 9
         },
         {
           "name": "filename_prefix",
@@ -604,8 +635,8 @@
       "id": 209,
       "type": "StimmaLayoutGroup",
       "pos": [
-        -180.0,
-        3275.0
+        40,
+        1400
       ],
       "size": [
         365,
@@ -654,7 +685,7 @@
       },
       "widgets_values": [
         "Advanced",
-        "prompt_enhance\nenable_lora\nlora_strength\nseed",
+        "loras\nseed",
         true,
         10
       ]
@@ -684,21 +715,12 @@
           "link": 1
         },
         {
-          "label": "prompt_enhance",
-          "name": "value_1",
-          "type": "BOOLEAN",
-          "widget": {
-            "name": "value_1"
-          },
-          "link": 2
-        },
-        {
           "name": "width",
           "type": "INT",
           "widget": {
             "name": "width"
           },
-          "link": 3
+          "link": 2
         },
         {
           "name": "height",
@@ -706,7 +728,7 @@
           "widget": {
             "name": "height"
           },
-          "link": 4
+          "link": 3
         },
         {
           "name": "seed",
@@ -714,25 +736,17 @@
           "widget": {
             "name": "seed"
           },
-          "link": 5
+          "link": 4
         },
         {
-          "label": "enable_lora",
-          "name": "value_2",
-          "type": "BOOLEAN",
-          "widget": {
-            "name": "value_2"
-          },
-          "link": 6
-        },
-        {
-          "label": "lora_strength",
-          "name": "strength_model",
-          "type": "FLOAT",
-          "widget": {
-            "name": "strength_model"
-          },
+          "name": "model_in",
+          "type": "MODEL",
           "link": 7
+        },
+        {
+          "name": "clip_in",
+          "type": "CLIP",
+          "link": 8
         }
       ],
       "outputs": [
@@ -740,7 +754,21 @@
           "name": "IMAGE",
           "type": "IMAGE",
           "links": [
-            8
+            9
+          ]
+        },
+        {
+          "name": "model_out",
+          "type": "MODEL",
+          "links": [
+            5
+          ]
+        },
+        {
+          "name": "clip_out",
+          "type": "CLIP",
+          "links": [
+            6
           ]
         }
       ],
@@ -823,54 +851,62 @@
     ],
     [
       2,
-      205,
+      202,
       0,
       30,
       1,
-      "BOOLEAN"
+      "INT"
     ],
     [
       3,
       202,
-      0,
+      1,
       30,
       2,
       "INT"
     ],
     [
       4,
-      202,
-      1,
+      204,
+      0,
       30,
       3,
       "INT"
     ],
     [
       5,
-      204,
-      0,
       30,
-      4,
-      "INT"
+      1,
+      207,
+      0,
+      "MODEL"
     ],
     [
       6,
-      206,
-      0,
       30,
-      5,
-      "BOOLEAN"
+      2,
+      207,
+      1,
+      "CLIP"
     ],
     [
       7,
       207,
       0,
       30,
-      6,
-      "FLOAT"
+      4,
+      "MODEL"
     ],
     [
       8,
+      207,
+      1,
+      30,
+      5,
+      "CLIP"
+    ],
+    [
+      9,
       30,
       0,
       208,
@@ -878,68 +914,7 @@
       "IMAGE"
     ]
   ],
-  "groups": [
-    {
-      "id": 1,
-      "title": "Stimma: Metadata",
-      "bounding": [
-        -230.0,
-        350.0,
-        580.0,
-        412.0
-      ],
-      "color": "#3f789e",
-      "font_size": 24,
-      "flags": {
-        "stimma_auto_layout": true
-      }
-    },
-    {
-      "id": 2,
-      "title": "Stimma: Parameters",
-      "bounding": [
-        -230.0,
-        820.0,
-        580.0,
-        1817.0
-      ],
-      "color": "#3f789e",
-      "font_size": 24,
-      "flags": {
-        "stimma_auto_layout": true
-      }
-    },
-    {
-      "id": 3,
-      "title": "Stimma: Outputs",
-      "bounding": [
-        -230.0,
-        2695.0,
-        460.0,
-        436.0
-      ],
-      "color": "#3f789e",
-      "font_size": 24,
-      "flags": {
-        "stimma_auto_layout": true
-      }
-    },
-    {
-      "id": 4,
-      "title": "Stimma: Layout",
-      "bounding": [
-        -230.0,
-        3189.0,
-        465.0,
-        376.0
-      ],
-      "color": "#3f789e",
-      "font_size": 24,
-      "flags": {
-        "stimma_auto_layout": true
-      }
-    }
-  ],
+  "groups": [],
   "definitions": {
     "subgraphs": [
       {
@@ -948,7 +923,7 @@
         "state": {
           "lastGroupId": 10,
           "lastNodeId": 50,
-          "lastLinkId": 71,
+          "lastLinkId": 75,
           "lastRerouteId": 0
         },
         "revision": 0,
@@ -1133,6 +1108,30 @@
               -1597.533203125,
               674
             ]
+          },
+          {
+            "id": "bbf3f256-14b3-4dee-9cf8-a360c45579b9",
+            "name": "model_in",
+            "type": "MODEL",
+            "linkIds": [
+              74
+            ],
+            "pos": [
+              -1230,
+              4150
+            ]
+          },
+          {
+            "id": "205ebd89-6f7c-4008-b248-4df1b888fed2",
+            "name": "clip_in",
+            "type": "CLIP",
+            "linkIds": [
+              75
+            ],
+            "pos": [
+              -1230,
+              4170
+            ]
           }
         ],
         "outputs": [
@@ -1147,6 +1146,30 @@
             "pos": [
               1584,
               520
+            ]
+          },
+          {
+            "id": "e6964a40-b6bf-49b3-8d73-428faa5ab716",
+            "name": "model_out",
+            "type": "MODEL",
+            "linkIds": [
+              72
+            ],
+            "pos": [
+              1560,
+              516
+            ]
+          },
+          {
+            "id": "44942ac0-002b-4df3-a4dd-4de791040a52",
+            "name": "clip_out",
+            "type": "CLIP",
+            "linkIds": [
+              73
+            ],
+            "pos": [
+              1560,
+              536
             ]
           }
         ],
@@ -1171,7 +1194,7 @@
                 "localized_name": "clip",
                 "name": "clip",
                 "type": "CLIP",
-                "link": 10
+                "link": 75
               },
               {
                 "localized_name": "text",
@@ -1281,7 +1304,7 @@
                 "localized_name": "model",
                 "name": "model",
                 "type": "MODEL",
-                "link": 30
+                "link": 74
               },
               {
                 "localized_name": "positive",
@@ -2129,7 +2152,7 @@
               "Node name for S&R": "PrimitiveBoolean"
             },
             "widgets_values": [
-              true
+              false
             ]
           },
           {
@@ -2645,6 +2668,38 @@
             "target_id": 12,
             "target_slot": 0,
             "type": "COMBO"
+          },
+          {
+            "id": 72,
+            "origin_id": 10,
+            "origin_slot": 0,
+            "target_id": -20,
+            "target_slot": 1,
+            "type": "MODEL"
+          },
+          {
+            "id": 73,
+            "origin_id": 11,
+            "origin_slot": 0,
+            "target_id": -20,
+            "target_slot": 2,
+            "type": "CLIP"
+          },
+          {
+            "id": 74,
+            "origin_id": -10,
+            "origin_slot": 13,
+            "target_id": 3,
+            "target_slot": 0,
+            "type": "MODEL"
+          },
+          {
+            "id": 75,
+            "origin_id": -10,
+            "origin_slot": 14,
+            "target_id": 6,
+            "target_slot": 0,
+            "type": "CLIP"
           }
         ],
         "extra": {}

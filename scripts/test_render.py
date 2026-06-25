@@ -6,9 +6,9 @@ then queues the resulting prompt on localhost:8188 and waits for the
 StimmaImageOutput to write a file. Proves the stimmafied workflow actually
 renders with chosen inputs.
 
-Usage (on localhost, inside ComfyUI venv, cwd = ~/ComfyUI):
-  python custom_nodes/ComfyUI-Stimma/scripts/test_render.py \
-      custom_nodes/ComfyUI-Stimma/workflows/Stimma-Ideogram4-T2I.json \
+Run inside the ComfyUI venv with a ComfyUI instance live on localhost:8188:
+  python scripts/test_render.py \
+      workflows/Stimma-Ideogram4-T2I.json \
       '{"prompt":"a red fox in snow","width":1024,"height":1024,"seed":42,"rendering_speed":"Turbo"}'
 """
 import asyncio
@@ -19,7 +19,9 @@ import sys
 import time
 import urllib.request
 
-PLUGIN = "/home/user/ComfyUI/custom_nodes/ComfyUI-Stimma"
+# Plugin root = parent of this scripts/ directory. Keeps the test portable
+# instead of hardcoding an install path.
+PLUGIN = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, PLUGIN)
 
 COMFY = "http://127.0.0.1:8188"

@@ -1,15 +1,15 @@
 {
   "id": "fdcfc2b2-168f-4f3d-a1d0-6986b802fce5",
   "revision": 0,
-  "last_node_id": 206,
-  "last_link_id": 6,
+  "last_node_id": 207,
+  "last_link_id": 10,
   "nodes": [
     {
       "id": 200,
       "type": "StimmaToolInfo",
       "pos": [
-        -220.0,
-        436.0
+        40,
+        40
       ],
       "size": [
         480,
@@ -69,7 +69,7 @@
         "Ideogram 4.0",
         "text-to-image",
         "Open Weights",
-        "Generate images with Ideogram 4.0. Accepts plain natural-language prompts or a structured JSON prompt for precise control over layout, colors and style.",
+        "Generate images with Ideogram 4.0, a model trained on structured JSON captions. For best results \u2014 and to avoid the model's built-in content filter, which plain prompts trip easily \u2014 describe the image as a JSON prompt (high_level_description / style_description / compositional_deconstruction). Plain text works but is more likely to be filtered.",
         "ideogram",
         "ideogram-v4"
       ]
@@ -78,8 +78,8 @@
       "id": 201,
       "type": "StimmaPromptParam",
       "pos": [
-        -220.0,
-        906.0
+        40,
+        260
       ],
       "size": [
         480,
@@ -148,15 +148,15 @@
         "",
         true,
         0,
-        "Describe the image. Natural language works; or paste a structured JSON prompt (high_level_description / style_description / compositional_deconstruction) for precise control."
+        "Recommended: a structured JSON prompt with high_level_description, style_description (aesthetics / lighting / photo / medium / color_palette) and compositional_deconstruction (background + elements with bbox/desc). Ideogram 4 is trained on these and follows them closely. Plain natural language also works but is more likely to hit the model's content filter."
       ]
     },
     {
       "id": 202,
       "type": "StimmaResolutionParam",
       "pos": [
-        -220.0,
-        1330.0
+        40,
+        560
       ],
       "size": [
         480,
@@ -258,8 +258,8 @@
       "id": 203,
       "type": "StimmaStringParam",
       "pos": [
-        -220.0,
-        1724.0
+        40,
+        820
       ],
       "size": [
         384,
@@ -344,8 +344,8 @@
       "id": 204,
       "type": "StimmaSeedParam",
       "pos": [
-        -220.0,
-        2113.0
+        40,
+        1040
       ],
       "size": [
         384,
@@ -400,11 +400,282 @@
       ]
     },
     {
+      "id": 207,
+      "type": "StimmaLoraLoader",
+      "pos": [
+        40,
+        1300
+      ],
+      "size": [
+        480,
+        806
+      ],
+      "flags": {},
+      "order": 207,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "model",
+          "type": "MODEL",
+          "link": 6
+        },
+        {
+          "name": "clip",
+          "type": "CLIP",
+          "link": 7
+        },
+        {
+          "name": "path_filter",
+          "type": "STRING",
+          "widget": {
+            "name": "path_filter",
+            "config": {
+              "default": "flux2-dev/**"
+            }
+          },
+          "link": null
+        },
+        {
+          "name": "ui_order",
+          "type": "INT",
+          "widget": {
+            "name": "ui_order"
+          },
+          "link": null
+        },
+        {
+          "name": "lora_1",
+          "type": "COMBO",
+          "widget": {
+            "name": "lora_1"
+          },
+          "link": null,
+          "shape": 7
+        },
+        {
+          "name": "strength_1",
+          "type": "FLOAT",
+          "widget": {
+            "name": "strength_1"
+          },
+          "link": null,
+          "shape": 7
+        },
+        {
+          "name": "lora_2",
+          "type": "COMBO",
+          "widget": {
+            "name": "lora_2"
+          },
+          "link": null,
+          "shape": 7
+        },
+        {
+          "name": "strength_2",
+          "type": "FLOAT",
+          "widget": {
+            "name": "strength_2"
+          },
+          "link": null,
+          "shape": 7
+        },
+        {
+          "name": "lora_3",
+          "type": "COMBO",
+          "widget": {
+            "name": "lora_3"
+          },
+          "link": null,
+          "shape": 7
+        },
+        {
+          "name": "strength_3",
+          "type": "FLOAT",
+          "widget": {
+            "name": "strength_3"
+          },
+          "link": null,
+          "shape": 7
+        },
+        {
+          "name": "lora_4",
+          "type": "COMBO",
+          "widget": {
+            "name": "lora_4"
+          },
+          "link": null,
+          "shape": 7
+        },
+        {
+          "name": "strength_4",
+          "type": "FLOAT",
+          "widget": {
+            "name": "strength_4"
+          },
+          "link": null,
+          "shape": 7
+        },
+        {
+          "name": "lora_5",
+          "type": "COMBO",
+          "widget": {
+            "name": "lora_5"
+          },
+          "link": null,
+          "shape": 7
+        },
+        {
+          "name": "strength_5",
+          "type": "FLOAT",
+          "widget": {
+            "name": "strength_5"
+          },
+          "link": null,
+          "shape": 7
+        },
+        {
+          "name": "lora_6",
+          "type": "COMBO",
+          "widget": {
+            "name": "lora_6"
+          },
+          "link": null,
+          "shape": 7
+        },
+        {
+          "name": "strength_6",
+          "type": "FLOAT",
+          "widget": {
+            "name": "strength_6"
+          },
+          "link": null,
+          "shape": 7
+        },
+        {
+          "name": "lora_7",
+          "type": "COMBO",
+          "widget": {
+            "name": "lora_7"
+          },
+          "link": null,
+          "shape": 7
+        },
+        {
+          "name": "strength_7",
+          "type": "FLOAT",
+          "widget": {
+            "name": "strength_7"
+          },
+          "link": null,
+          "shape": 7
+        },
+        {
+          "name": "lora_8",
+          "type": "COMBO",
+          "widget": {
+            "name": "lora_8"
+          },
+          "link": null,
+          "shape": 7
+        },
+        {
+          "name": "strength_8",
+          "type": "FLOAT",
+          "widget": {
+            "name": "strength_8"
+          },
+          "link": null,
+          "shape": 7
+        },
+        {
+          "name": "lora_9",
+          "type": "COMBO",
+          "widget": {
+            "name": "lora_9"
+          },
+          "link": null,
+          "shape": 7
+        },
+        {
+          "name": "strength_9",
+          "type": "FLOAT",
+          "widget": {
+            "name": "strength_9"
+          },
+          "link": null,
+          "shape": 7
+        },
+        {
+          "name": "lora_10",
+          "type": "COMBO",
+          "widget": {
+            "name": "lora_10"
+          },
+          "link": null,
+          "shape": 7
+        },
+        {
+          "name": "strength_10",
+          "type": "FLOAT",
+          "widget": {
+            "name": "strength_10"
+          },
+          "link": null,
+          "shape": 7
+        }
+      ],
+      "outputs": [
+        {
+          "name": "model",
+          "type": "MODEL",
+          "links": [
+            8
+          ],
+          "slot_index": 0
+        },
+        {
+          "name": "clip",
+          "type": "CLIP",
+          "links": [
+            9
+          ],
+          "slot_index": 1
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "StimmaLoraLoader"
+      },
+      "widgets_values": [
+        "ideogram4/**",
+        50,
+        "None",
+        1,
+        "None",
+        1,
+        "None",
+        1,
+        "None",
+        1,
+        "None",
+        1,
+        "None",
+        1,
+        "None",
+        1,
+        "None",
+        1,
+        "None",
+        1,
+        "None",
+        1
+      ]
+    },
+    {
       "id": 205,
       "type": "StimmaImageOutput",
       "pos": [
-        -220.0,
-        2473.0
+        1120,
+        400
       ],
       "size": [
         360,
@@ -417,7 +688,7 @@
         {
           "name": "images",
           "type": "IMAGE",
-          "link": 6
+          "link": 10
         },
         {
           "name": "filename_prefix",
@@ -450,8 +721,8 @@
       "id": 206,
       "type": "StimmaLayoutGroup",
       "pos": [
-        -220.0,
-        2967.0
+        40,
+        1180
       ],
       "size": [
         365,
@@ -500,7 +771,7 @@
       },
       "widgets_values": [
         "Advanced",
-        "rendering_speed\nseed",
+        "rendering_speed\nloras\nseed",
         true,
         10
       ]
@@ -564,6 +835,16 @@
             "name": "choice"
           },
           "link": 5
+        },
+        {
+          "name": "model_in",
+          "type": "MODEL",
+          "link": 8
+        },
+        {
+          "name": "clip_in",
+          "type": "CLIP",
+          "link": 9
         }
       ],
       "outputs": [
@@ -571,7 +852,21 @@
           "name": "IMAGE",
           "type": "IMAGE",
           "links": [
+            10
+          ]
+        },
+        {
+          "name": "model_out",
+          "type": "MODEL",
+          "links": [
             6
+          ]
+        },
+        {
+          "name": "clip_out",
+          "type": "CLIP",
+          "links": [
+            7
           ]
         }
       ],
@@ -671,74 +966,45 @@
     [
       6,
       98,
+      1,
+      207,
+      0,
+      "MODEL"
+    ],
+    [
+      7,
+      98,
+      2,
+      207,
+      1,
+      "CLIP"
+    ],
+    [
+      8,
+      207,
+      0,
+      98,
+      5,
+      "MODEL"
+    ],
+    [
+      9,
+      207,
+      1,
+      98,
+      6,
+      "CLIP"
+    ],
+    [
+      10,
+      98,
       0,
       205,
       0,
       "IMAGE"
     ]
   ],
-  "groups": [
-    {
-      "id": 1,
-      "title": "Stimma: Metadata",
-      "bounding": [
-        -270.0,
-        350.0,
-        580.0,
-        412.0
-      ],
-      "color": "#3f789e",
-      "font_size": 24,
-      "flags": {
-        "stimma_auto_layout": true
-      }
-    },
-    {
-      "id": 2,
-      "title": "Stimma: Parameters",
-      "bounding": [
-        -270.0,
-        820.0,
-        580.0,
-        1509.0
-      ],
-      "color": "#3f789e",
-      "font_size": 24,
-      "flags": {
-        "stimma_auto_layout": true
-      }
-    },
-    {
-      "id": 3,
-      "title": "Stimma: Outputs",
-      "bounding": [
-        -270.0,
-        2387.0,
-        460.0,
-        436.0
-      ],
-      "color": "#3f789e",
-      "font_size": 24,
-      "flags": {
-        "stimma_auto_layout": true
-      }
-    },
-    {
-      "id": 4,
-      "title": "Stimma: Layout",
-      "bounding": [
-        -270.0,
-        2881.0,
-        465.0,
-        376.0
-      ],
-      "color": "#3f789e",
-      "font_size": 24,
-      "flags": {
-        "stimma_auto_layout": true
-      }
-    }
-  ],
+  "groups": [],
   "definitions": {
     "subgraphs": [
       {
@@ -747,7 +1013,7 @@
         "state": {
           "lastGroupId": 9,
           "lastNodeId": 176,
-          "lastLinkId": 252,
+          "lastLinkId": 256,
           "lastRerouteId": 0
         },
         "revision": 0,
@@ -884,6 +1150,30 @@
               3620.921875,
               1104
             ]
+          },
+          {
+            "id": "3d0ce19f-3979-4a19-bbe0-50f0d4c0d0d7",
+            "name": "model_in",
+            "type": "MODEL",
+            "linkIds": [
+              255
+            ],
+            "pos": [
+              -1230,
+              4070
+            ]
+          },
+          {
+            "id": "32a7a5d7-d8d8-4585-897e-aed3a354aa44",
+            "name": "clip_in",
+            "type": "CLIP",
+            "linkIds": [
+              256
+            ],
+            "pos": [
+              -1230,
+              4090
+            ]
           }
         ],
         "outputs": [
@@ -898,6 +1188,30 @@
             "pos": [
               6874,
               960
+            ]
+          },
+          {
+            "id": "c550a206-f4b3-491b-b8ef-beee6bdca4c0",
+            "name": "model_out",
+            "type": "MODEL",
+            "linkIds": [
+              253
+            ],
+            "pos": [
+              1560,
+              516
+            ]
+          },
+          {
+            "id": "c5b42da9-cd50-4ec1-b791-a0fbd04f889f",
+            "name": "clip_out",
+            "type": "CLIP",
+            "linkIds": [
+              254
+            ],
+            "pos": [
+              1560,
+              536
             ]
           }
         ],
@@ -1463,7 +1777,7 @@
                 "localized_name": "clip",
                 "name": "clip",
                 "type": "CLIP",
-                "link": 24
+                "link": 256
               },
               {
                 "localized_name": "text",
@@ -2447,7 +2761,7 @@
                 "localized_name": "model",
                 "name": "model",
                 "type": "MODEL",
-                "link": 222
+                "link": 255
               }
             ],
             "outputs": [
@@ -2881,6 +3195,38 @@
             "target_id": 155,
             "target_slot": 0,
             "type": "MODEL"
+          },
+          {
+            "id": 253,
+            "origin_id": 23,
+            "origin_slot": 0,
+            "target_id": -20,
+            "target_slot": 1,
+            "type": "MODEL"
+          },
+          {
+            "id": 254,
+            "origin_id": 14,
+            "origin_slot": 0,
+            "target_id": -20,
+            "target_slot": 2,
+            "type": "CLIP"
+          },
+          {
+            "id": 255,
+            "origin_id": -10,
+            "origin_slot": 9,
+            "target_id": 157,
+            "target_slot": 0,
+            "type": "MODEL"
+          },
+          {
+            "id": 256,
+            "origin_id": -10,
+            "origin_slot": 10,
+            "target_id": 24,
+            "target_slot": 0,
+            "type": "CLIP"
           }
         ],
         "extra": {}
