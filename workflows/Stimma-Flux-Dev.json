@@ -635,7 +635,9 @@
         "Flux Dev",
         "text-to-image",
         "Open Weights",
-        "Flux.1 Dev text-to-image generation"
+        "Flux.1 Dev text-to-image generation",
+        "black-forest-labs",
+        "flux1-dev"
       ]
     },
     {

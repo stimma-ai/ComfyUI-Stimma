@@ -976,7 +976,9 @@
         "Qwen Image Edit 2511",
         "image-to-image",
         "Open Weights",
-        "Edit images with natural language prompts using Qwen Image Edit 2511. Supports up to 3 reference images."
+        "Edit images with natural language prompts using Qwen Image Edit 2511. Supports up to 3 reference images.",
+        "alibaba",
+        "qwen-image-edit-2511"
       ]
     },
     {

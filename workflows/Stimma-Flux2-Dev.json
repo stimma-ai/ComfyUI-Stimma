@@ -365,7 +365,9 @@
         "Flux.2 Dev",
         "text-to-image,image-to-image",
         "Open Weights",
-        "Generate or edit images with Flux.2 Dev"
+        "Generate or edit images with Flux.2 Dev",
+        "black-forest-labs",
+        "flux2-dev"
       ]
     },
     {

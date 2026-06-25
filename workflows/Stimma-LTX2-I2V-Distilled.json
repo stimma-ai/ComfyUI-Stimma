@@ -191,7 +191,9 @@
         "LTX-2 Image to Video (Distilled)",
         "image-to-video",
         "Open Weights\nFast",
-        "Generate video from an image using LTX-2 distilled model (fast, no CFG)"
+        "Generate video from an image using LTX-2 distilled model (fast, no CFG)",
+        "lightricks",
+        "ltx-2-distilled"
       ]
     },
     {

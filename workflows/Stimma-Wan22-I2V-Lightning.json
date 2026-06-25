@@ -1679,7 +1679,9 @@
         "Wan 2.2 I2V \u26a1",
         "image-to-video",
         "Open Weights\nFast",
-        "Fast 4-step image animation using Wan 2.2 14B with Lightning LoRA"
+        "Fast 4-step image animation using Wan 2.2 14B with Lightning LoRA",
+        "alibaba",
+        "wan-2.2"
       ]
     },
     {

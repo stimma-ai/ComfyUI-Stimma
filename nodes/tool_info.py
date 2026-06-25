@@ -18,6 +18,10 @@ class StimmaToolInfo:
                 "badges": ("STRING", {"default": "", "multiline": True}),
                 "description": ("STRING", {"default": "", "multiline": True}),
             },
+            "optional": {
+                "model_vendor": ("STRING", {"default": ""}),
+                "model": ("STRING", {"default": ""}),
+            },
         }
 
     RETURN_TYPES = ()
@@ -25,5 +29,14 @@ class StimmaToolInfo:
     FUNCTION = "execute"
     CATEGORY = "Stimma"
 
-    def execute(self, slug, display_name, task_types, badges, description):
+    def execute(
+        self,
+        slug,
+        display_name,
+        task_types,
+        badges,
+        description,
+        model_vendor="",
+        model="",
+    ):
         return {}

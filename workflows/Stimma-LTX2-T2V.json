@@ -216,7 +216,9 @@
         "LTX-2 Text to Video",
         "text-to-video",
         "Open Weights",
-        "Generate video from text using LTX-2"
+        "Generate video from text using LTX-2",
+        "lightricks",
+        "ltx-2"
       ]
     },
     {

@@ -3267,7 +3267,9 @@
         "Wan 2.2 FLF2V \u26a1",
         "image-to-video",
         "Open Weights\nFast",
-        "Fast 4-step video from start and end frames using Wan 2.2 14B with Lightning LoRA"
+        "Fast 4-step video from start and end frames using Wan 2.2 14B with Lightning LoRA",
+        "alibaba",
+        "wan-2.2"
       ]
     },
     {

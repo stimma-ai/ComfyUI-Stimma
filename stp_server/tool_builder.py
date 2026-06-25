@@ -755,6 +755,8 @@ def _build_single_tool(
         layout=layout,
         task_types=task_types,
         metadata=metadata,
+        model_vendor=(info.get("model_vendor") or "").strip() or None,
+        model=(info.get("model") or "").strip() or None,
     )
 
     return tool

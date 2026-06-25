@@ -1419,12 +1419,17 @@ def _extract_stimma_nodes(api_prompt: Dict[str, Any]) -> Optional[Dict[str, Any]
                     seen_badges.add(badge)
                     badges.append(badge)
 
+            model_vendor = (inputs.get("model_vendor") or "").strip()
+            model = (inputs.get("model") or "").strip()
+
             tool_info = {
                 "slug": inputs.get("slug", ""),
                 "display_name": inputs.get("display_name", ""),
                 "task_types": task_types,
                 "description": inputs.get("description", ""),
                 "badges": badges,
+                "model_vendor": model_vendor,
+                "model": model,
             }
         elif class_type in STIMMA_FIELD_TYPES:
             node_entry["order"] = inputs.get("ui_order", 0)

@@ -108,6 +108,8 @@ class Tool:
     layout: Optional[List[Group]] = None  # Tool-level layout (grouping, order)
     metadata: dict = field(default_factory=dict)
     task_types: List[str] = field(default_factory=list)
+    model_vendor: Optional[str] = None
+    model: Optional[str] = None
 
     def __post_init__(self):
         if not self.task_types and self.task_type:
@@ -166,6 +168,8 @@ class Tool:
             output_schema=output_schema,
             metadata=serializable_metadata,
             task_types=self.task_types,
+            model_vendor=self.model_vendor or None,
+            model=self.model or None,
         )
 
 

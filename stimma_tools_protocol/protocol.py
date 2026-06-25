@@ -195,13 +195,15 @@ class ToolDescriptor:
     output_schema: dict = field(default_factory=dict)
     metadata: dict = field(default_factory=dict)
     task_types: List[str] = field(default_factory=list)
+    model_vendor: Optional[str] = None
+    model: Optional[str] = None
 
     def __post_init__(self):
         if not self.task_types and self.task_type:
             self.task_types = [self.task_type]
 
     def to_dict(self) -> dict:
-        return {
+        result = {
             "id": self.id,
             "name": self.name,
             "task_types": self.task_types,
@@ -209,6 +211,11 @@ class ToolDescriptor:
             "output_schema": self.output_schema,
             "metadata": self.metadata,
         }
+        if self.model_vendor:
+            result["model_vendor"] = self.model_vendor
+        if self.model:
+            result["model"] = self.model
+        return result
 
 
 @dataclass

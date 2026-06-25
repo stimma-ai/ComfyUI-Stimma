@@ -660,7 +660,9 @@
         "SeedVR2 Image Upscale 7B",
         "upscale-image",
         "Open Weights",
-        "Upscale images using SeedVR2 7B model. High-quality FP16 model optimized for 4K output with block swapping for VRAM efficiency."
+        "Upscale images using SeedVR2 7B model. High-quality FP16 model optimized for 4K output with block swapping for VRAM efficiency.",
+        "bytedance",
+        "seedvr2-7b"
       ]
     },
     {

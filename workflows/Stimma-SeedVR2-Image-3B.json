@@ -660,7 +660,9 @@
         "SeedVR2 Image Upscale 3B",
         "upscale-image",
         "Open Weights",
-        "Upscale images using SeedVR2 3B model. Fast FP8 quantized model for high-quality image upscaling."
+        "Upscale images using SeedVR2 3B model. Fast FP8 quantized model for high-quality image upscaling.",
+        "bytedance",
+        "seedvr2-3b"
       ]
     },
     {

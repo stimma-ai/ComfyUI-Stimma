@@ -620,7 +620,9 @@
         "SeedVR2 Video Upscale 7B",
         "upscale-video",
         "Open Weights",
-        "Upscale videos using SeedVR2 7B model. High-quality FP16 model with block swapping for 4K video upscaling."
+        "Upscale videos using SeedVR2 7B model. High-quality FP16 model with block swapping for 4K video upscaling.",
+        "bytedance",
+        "seedvr2-7b"
       ]
     },
     {

@@ -488,7 +488,9 @@
         "SDXL",
         "text-to-image",
         "Open Weights",
-        "Text-to-image generation using SDXL models"
+        "Text-to-image generation using SDXL models",
+        "stability-ai",
+        "sdxl"
       ]
     },
     {

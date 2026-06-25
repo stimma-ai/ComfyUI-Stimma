@@ -687,7 +687,9 @@
         "Z-Image Turbo",
         "text-to-image",
         "Open Weights\nFast",
-        "Fast text-to-image generation with Z-Image Turbo"
+        "Fast text-to-image generation with Z-Image Turbo",
+        "alibaba",
+        "z-image-turbo"
       ]
     },
     {

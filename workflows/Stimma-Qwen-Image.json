@@ -587,7 +587,9 @@
         "Qwen Image",
         "text-to-image",
         "Open Weights",
-        ""
+        "",
+        "alibaba",
+        "qwen-image"
       ]
     },
     {

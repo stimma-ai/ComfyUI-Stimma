@@ -254,7 +254,9 @@
         "LTX-2 Image to Video",
         "image-to-video",
         "Open Weights",
-        "Generate video from an image using LTX-2"
+        "Generate video from an image using LTX-2",
+        "lightricks",
+        "ltx-2"
       ]
     },
     {

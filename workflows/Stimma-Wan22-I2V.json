@@ -1559,7 +1559,9 @@
         "Wan 2.2 I2V",
         "image-to-video",
         "Open Weights",
-        "Animate images into videos using Wan 2.2 14B"
+        "Animate images into videos using Wan 2.2 14B",
+        "alibaba",
+        "wan-2.2"
       ]
     },
     {

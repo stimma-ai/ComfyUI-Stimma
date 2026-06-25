@@ -350,7 +350,9 @@
         "Flux.2 Klein 9B",
         "text-to-image,image-to-image",
         "Open Weights\nFast",
-        "Generate or edit images with Flux.2 Klein 9B"
+        "Generate or edit images with Flux.2 Klein 9B",
+        "black-forest-labs",
+        "flux2-klein-9b"
       ]
     },
     {

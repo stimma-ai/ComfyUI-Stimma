@@ -620,7 +620,9 @@
         "SeedVR2 Video Upscale 3B",
         "upscale-video",
         "Open Weights",
-        "Upscale videos using SeedVR2 3B model. FP16 model for high-quality video upscaling."
+        "Upscale videos using SeedVR2 3B model. FP16 model for high-quality video upscaling.",
+        "bytedance",
+        "seedvr2-3b"
       ]
     },
     {

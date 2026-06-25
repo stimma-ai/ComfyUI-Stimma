@@ -3103,7 +3103,9 @@
         "Wan 2.2 FLF2V",
         "image-to-video",
         "Open Weights",
-        "Generate videos from start and end frame images using Wan 2.2 14B"
+        "Generate videos from start and end frame images using Wan 2.2 14B",
+        "alibaba",
+        "wan-2.2"
       ]
     },
     {

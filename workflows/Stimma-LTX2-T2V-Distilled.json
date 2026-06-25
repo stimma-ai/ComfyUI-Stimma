@@ -212,7 +212,9 @@
         "LTX-2 Text to Video (Distilled)",
         "text-to-video",
         "Open Weights\nFast",
-        "Generate video from text using LTX-2 distilled model (fast, no CFG)"
+        "Generate video from text using LTX-2 distilled model (fast, no CFG)",
+        "lightricks",
+        "ltx-2-distilled"
       ]
     },
     {
