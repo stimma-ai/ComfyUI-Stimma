@@ -334,6 +334,19 @@ class StimmaVideoParam:
         image_tensor = torch.from_numpy(image_np)[None,]
         return (image_tensor, 30)
 
+    @classmethod
+    def IS_CHANGED(cls, video, ui_control="video_picker", ui_order=0, **kwargs):
+        return _safe_mtime_from_annotated(video)
+
+    @classmethod
+    def VALIDATE_INPUTS(cls, video, ui_control="video_picker", ui_order=0, **kwargs):
+        # Mirror StimmaImageParam: validate the uploaded file exists rather than
+        # relying on ComfyUI's COMBO "value in list" check, which snapshots the
+        # input directory listing and rejects freshly-uploaded videos.
+        if not folder_paths.exists_annotated_filepath(video):
+            return f"Invalid video file: {video}"
+        return True
+
 
 class StimmaVideosParam:
     """Multiple video input — for workflows that can accept several videos."""
@@ -362,6 +375,16 @@ class StimmaVideosParam:
     def execute(self, video, min_videos, max_videos, ui_control, ui_order):
         # Same placeholder behavior as StimmaVideoParam.
         return StimmaVideoParam().execute(video, ui_control, ui_order)
+
+    @classmethod
+    def IS_CHANGED(cls, video, min_videos=1, max_videos=3, ui_control="video_picker", ui_order=0, **kwargs):
+        return _safe_mtime_from_annotated(video)
+
+    @classmethod
+    def VALIDATE_INPUTS(cls, video, min_videos=1, max_videos=3, ui_control="video_picker", ui_order=0, **kwargs):
+        if not folder_paths.exists_annotated_filepath(video):
+            return f"Invalid video file: {video}"
+        return True
 
 
 class StimmaSeedParam:
