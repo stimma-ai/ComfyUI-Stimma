@@ -116,6 +116,16 @@ All instances must have the same models and custom nodes installed — the plugi
 
 Stimma automatically scans the default user's workflows directory in ComfyUI looking for workflows that contain `StimmaToolInfo` nodes. These are automatically turned into tools for Stimma.
 
+## Smoke-testing the bundled workflows
+
+The [`stp`](https://github.com/stimma-ai/stimma-tools-protocol-cli) CLI can sweep every workflow this plugin exposes — running the cheapest valid generation of each and checking the output is a plausible asset. It's a fast way to surveil that the bundled workflows still work end-to-end after a ComfyUI/model update. Point it at a ComfyUI instance with this plugin loaded:
+
+```
+stp --url ws://<comfyui-host>:8188/stp-v1 sweep --report sweep.json -o sweep-out/
+```
+
+Each workflow is reported PASS / FAIL / SKIP (SKIP = a referenced model isn't installed, or a required image/video input has no fixture). Fixtures for image-to-image / upscale / video workflows are fetched automatically from Stimma Cloud. Use `stp ... sweep --list` to preview the plan without running anything, and `--only <slug>` to test a single workflow. The run takes a while (one real generation per workflow), so it's a manual/periodic check rather than something to run constantly.
+
 ## Building Stimma workflows in ComfyUI
 
 We highly recommend checking out the workflows in workflows/ to get an idea of how it is done. The general pattern is:
