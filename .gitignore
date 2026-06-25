@@ -7,6 +7,11 @@ build/
 
 .pytest_cache/
 
+# Transient stimmafy working files (plan.json, temp scripts, render outputs).
+# Keep the directory and its README, ignore everything else inside it.
+scratch/*
+!scratch/README.md
+
 .claude/*
 !.claude/commands/
 

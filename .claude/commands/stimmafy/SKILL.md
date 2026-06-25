@@ -14,6 +14,29 @@ Convert a working ComfyUI workflow into a Stimma tool by adding an interface
 layer of Stimma nodes. The core workflow logic stays untouched — you're adding
 inputs, parameters, outputs, and metadata around it.
 
+The user you are helping is bringing **their own** ComfyUI workflow and wants to
+expose it as a Stimma tool. Don't assume anything about a particular model,
+filename, or prior workflow — derive every decision from the workflow in front of
+you and the heuristics in `references/`.
+
+## Prerequisites
+
+Confirm (or help the user set up) before testing:
+- **ComfyUI is running locally** — default `localhost:8188`. If it's on another
+  host/port, pass `--comfy-url HOST:PORT` to `test_workflow.py`.
+- **The ComfyUI-Stimma plugin is installed** in that ComfyUI — the Stimma nodes
+  must be importable or the test won't queue.
+- The user has a **working** ComfyUI workflow JSON (it already runs in ComfyUI).
+  We add an interface layer; we don't fix a broken graph.
+
+## Scratch space
+
+Write `plan.json`, intermediate workflow copies, and any one-off helper scripts
+to the plugin's **`scratch/`** directory (gitignored — safe to fill with junk,
+nothing there is committed). Don't scatter temp files in the repo root, the
+user's workflow directory, or `/tmp`. The final stimmafied workflow does NOT go
+in `scratch/` — see "Output file naming" below.
+
 ## Quick Reference
 
 Scripts live at: `<skill-path>/scripts/`
@@ -146,18 +169,41 @@ Every Stimma workflow MUST have ALL of the following. Missing any of these is a 
 - **StimmaImageParam** (if image task) — name MUST match the task_type schema above (e.g. `input_images` for image-to-image)
 - **Resolution control** — one of:
   - **StimmaResolutionParam** (for text-to-image/text-to-video) — wire to EmptyLatentImage/EmptyImage width/height
-  - **StimmaFloatParam(megapixels)** + **ImageScaleToTotalPixels** (for image-to-image/image-to-video) — scales the input image, wire downstream. See WAN I2V for reference.
+  - **StimmaFloatParam(megapixels)** + **ImageScaleToTotalPixels** (for image-to-image/image-to-video) — scales the input image, wire downstream. (Preserves the input image's aspect ratio while bounding total pixels.)
 - **StimmaSeedParam** — wire to KSampler.seed or RandomNoise.seed
-- **StimmaDropdownParam** for sampler — wire to sampler_name input
-- **StimmaDropdownParam** for scheduler — wire to scheduler input
+- **Sampling knobs that exist in the workflow** — see "Expose the sampling knobs" below. **Steps, sampler, and scheduler are exposed by default** whenever the workflow has a tunable sampler.
 - **StimmaLoraLoader** — insert inline between model/checkpoint loader and downstream consumers. Takes MODEL + CLIP inputs, outputs MODEL + CLIP. Set path_filter to match model family (e.g. `*ltx*;*LTX*`). NEVER skip this.
 - **StimmaImageOutput** or **StimmaVideoOutput** — replace each SaveImage/SaveVideo with a Stimma output
 - **StimmaLayoutGroup** — group advanced params under "Advanced"
 
+### Expose the sampling knobs — DON'T silently drop these
+**Steps, sampler, and scheduler should almost always be exposed** when the
+workflow has a sampler with those widgets — they are the knobs users most expect
+to tune. Forgetting them is the single most common stimmafy mistake.
+
+Drive this off the analysis output, then verify nothing is hidden:
+
+1. **For every entry in `recommendations.wiring.targets`, create the matching
+   param.** The analyzer emits targets for `steps`, `sampler_name`, `scheduler`,
+   and (when applicable) `cfg`, `denoise`, `guidance`, `shift`. Each target that
+   exists → one Stimma param wired to it. Use `StimmaIntParam` for steps,
+   `StimmaDropdownParam` for sampler_name and scheduler (auto-resolves the enum).
+2. **If the sampler lives inside a subgraph, the analyzer will NOT see it** (it
+   does not descend into subgraph definitions). The analysis will list no
+   sampler/steps/scheduler targets even though they exist. When the workflow has
+   subgraph/component nodes, open the subgraph definition (`definitions.subgraphs[]`),
+   find the inner KSampler/BasicScheduler, and expose `steps`/`sampler_name`/
+   `scheduler` via `subgraph_prep` → then wire Stimma params to the new boundary
+   inputs. Do not ship a subgraph workflow with these knobs buried.
+3. **Only omit steps/sampler/scheduler when there is a real reason**, and say so
+   to the user: the model has no exposed sampler (pure API-style template with a
+   fixed internal sampler that isn't promotable), or the sampler is genuinely
+   fixed/locked for that model. "The analyzer didn't mention it" is NOT a reason —
+   check the subgraph.
+
 ### What to conditionally add
 - **Negative prompt** (StimmaStringParam, NOT StimmaPromptParam) — only if NOT guidance-distilled. Use `type: "string"` with `ui_control: "textarea"`. Use StimmaStringParam because StimmaPromptParam always claims the canonical `prompt` name (reserved for the main positive prompt) and renders as the primary prompt editor; a negative prompt is just another named string parameter. Place it in a layout group with `full_width: true`.
 - **CFG** (StimmaFloatParam) — only if NOT guidance-distilled
-- **Steps** (StimmaIntParam) — always expose
 - **Denoise** (StimmaFloatParam) — only for img2img/inpaint task types
 - **Guidance** (StimmaFloatParam) — if FluxGuidance node present (Flux models)
 - **Shift** (StimmaFloatParam) — if ModelSamplingFlux/AuraFlow present
@@ -211,8 +257,9 @@ different schemas:
 
 ## Phase 3: Build and Modify
 
-Create a `plan.json` based on the analysis and user decisions. See
-`references/node-catalog.md` for the exact format of each node type.
+Create a `plan.json` (write it to the plugin's `scratch/` directory) based on the
+analysis and user decisions. See `references/node-catalog.md` for the exact format
+of each node type.
 
 The plan structure:
 ```json
@@ -235,16 +282,18 @@ Run the modification:
 python3 <skill-path>/scripts/stimmafy.py <source.json> plan.json -o <output.json>
 ```
 
-### Output file naming and dual save
-- **Primary**: Always save to ComfyUI's user workflows directory as `Stimma-<SlugTitleCase>.json`
-  (e.g. `Stimma-ZImage-Turbo.json`). This is the one ComfyUI discovers. Resolve the directory
-  at runtime via ComfyUI's `folder_paths` (the `user/default/workflows` dir) rather than
-  hardcoding a path.
-- **Repo copy**: Also copy the output into this plugin's own `workflows/` directory
-  (the `workflows/` folder at the repo root). This keeps sample workflows checked into the repo.
+### Output file naming
+- **Save to ComfyUI's user workflows directory** as `Stimma-<SlugTitleCase>.json`
+  (e.g. `Stimma-ZImage-Turbo.json`). This is the file ComfyUI/the Stimma plugin
+  discovers and serves. Resolve the directory at runtime via ComfyUI's
+  `folder_paths` (the `user/default/workflows` dir) rather than hardcoding a path.
 - Use the slug to derive the filename: title-case each hyphen-separated word,
   join with hyphens, prefix with `Stimma-`. e.g. slug `qwen-image-2512` →
   `Stimma-Qwen-Image-2512.json`
+- **Only if you are contributing to the ComfyUI-Stimma repo itself**: also copy
+  the output into the repo's `workflows/` directory so it ships as a bundled
+  sample. A user stimmafying their own workflow does NOT need this step — the
+  user-directory copy above is what gets used.
 
 ### Visual layout
 The script positions Stimma nodes to the LEFT of the existing workflow.
@@ -254,14 +303,17 @@ original save nodes.
 
 ### Handling subgraphs and group nodes
 If the workflow uses subgraph/component nodes (UUID-type nodes):
-- The analysis script reads through to find inner nodes for analysis
+- **The analyzer does NOT look inside subgraph definitions.** It reports the
+  subgraph node but not the inner KSampler/scheduler/text-encoders, so its wiring
+  recommendations will be missing the sampling knobs. You must inspect the
+  subgraph yourself (see "How to find inner node IDs" below) and decide what to
+  promote — especially steps/sampler/scheduler (see "Expose the sampling knobs").
 - Stimma parameter nodes should be at the TOP LEVEL
 - Wire into subgraph exposed inputs where possible
 - **Use `subgraph_prep`** to expose inner node widgets/outputs as new subgraph inputs/outputs. This is the preferred approach — cleaner than Set/Get nodes.
-  - `add_inner_inputs`: Expose inner node widgets (seed, negative_prompt, cfg, sampler_name) as new link inputs on the subgraph node
+  - `add_inner_inputs`: Expose inner node widgets (seed, steps, sampler_name, scheduler, negative_prompt, cfg) as new link inputs on the subgraph node
   - `add_inner_outputs`: Expose inner node outputs (e.g., IMAGE frames from VAEDecode) as new outputs on the subgraph node
   - See `references/node-catalog.md` → Subgraph Prep for the full format
-  - Reference: `plans/ltx2-i2v.json` for a working example
 - **How to find inner node IDs**: Open the source workflow JSON, search for `definitions.subgraphs`. Find the definition matching the subgraph node's type UUID. The inner nodes are in `defn.nodes[]` with their class_types and widget values.
 - Keep the top-level graph clean and readable
 
@@ -323,7 +375,7 @@ When processing multiple workflows:
 ## Common Patterns by Task Type
 
 ### text-to-image
-Prompt + StimmaResolutionParam + seed + sampler/scheduler + optional CFG/steps + StimmaLoraLoader + StimmaImageOutput
+Prompt + StimmaResolutionParam + seed + steps + sampler + scheduler (+ CFG/negative prompt unless guidance-distilled) + StimmaLoraLoader + StimmaImageOutput
 
 ### image-to-image
 Same as t2i but with: StimmaImageParam + megapixels(StimmaFloatParam)+ImageScaleToTotalPixels instead of StimmaResolutionParam + denoise param (lower default, e.g. 0.7)
