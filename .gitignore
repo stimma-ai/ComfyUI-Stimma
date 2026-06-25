@@ -7,7 +7,7 @@ build/
 
 .pytest_cache/
 
-.claude/
+.claude/*
 !.claude/commands/
 
 plans/
