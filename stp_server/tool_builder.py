@@ -177,6 +177,10 @@ def _build_field_parameter(node: Dict[str, Any]) -> Optional[ToolParameter]:
         }
         if controlnet_types:
             ui_hints["controlnet"] = controlnet_types
+        # Surface the prep controls (Scale / Extend Canvas / Paint). Defaults on
+        # for image inputs; the frontend also enables prep when controlnet is set.
+        if inputs.get("allow_prep", True):
+            ui_hints["allow-prep"] = True
         return ToolParameter(
             name="input_images",
             type="array",
@@ -209,6 +213,8 @@ def _build_field_parameter(node: Dict[str, Any]) -> Optional[ToolParameter]:
         }
         if controlnet_types:
             ui_hints["controlnet"] = controlnet_types
+        if inputs.get("allow_prep", True):
+            ui_hints["allow-prep"] = True
         return ToolParameter(
             name="input_images",
             type="array",

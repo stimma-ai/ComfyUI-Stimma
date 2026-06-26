@@ -335,6 +335,38 @@ def _has_control_after_generate(inp_spec) -> bool:
     return False
 
 
+def _is_dynamic_combo(inp_spec) -> bool:
+    """Check if an input spec is a ComfyUI V3 dynamic combo (COMFY_DYNAMICCOMBO_V3).
+
+    A dynamic combo is a widget whose selected key reveals a set of sub-inputs
+    (themselves widgets/connections). In widgets_values it serializes as the key
+    followed by the active option's sub-widget values, before any remaining
+    top-level widgets. The frontend exposes connected sub-inputs under dotted
+    names like ``resize_type.width``.
+    """
+    return (
+        isinstance(inp_spec, (list, tuple))
+        and len(inp_spec) >= 1
+        and inp_spec[0] == "COMFY_DYNAMICCOMBO_V3"
+    )
+
+
+def _dynamic_combo_suboptions(inp_spec, selected_key) -> List:
+    """Return ordered [(sub_name, sub_spec), ...] for the active option of a dynamic combo."""
+    if not (isinstance(inp_spec, (list, tuple)) and len(inp_spec) >= 2):
+        return []
+    opts = inp_spec[1].get("options", []) if isinstance(inp_spec[1], dict) else []
+    for opt in opts:
+        if opt.get("key") == selected_key:
+            sub = []
+            opt_inputs = opt.get("inputs", {})
+            for cat in ("required", "optional"):
+                for sub_name, sub_spec in opt_inputs.get(cat, {}).items():
+                    sub.append((sub_name, sub_spec))
+            return sub
+    return []
+
+
 def _convert_inner_node_widgets(
     inner_node: Dict, class_type: str, object_info: Optional[Dict],
 ) -> Dict[str, Any]:
@@ -360,11 +392,31 @@ def _convert_inner_node_widgets(
     connected_names = {inp.get("name") for inp in node_inputs if inp.get("name")}
 
     specs = _get_input_specs(class_type, object_info)
-    widget_idx = 0
-    for inp_name, inp_spec in specs:
+
+    def _consume(inp_name, inp_spec):
+        """Map one widget-type input spec, consuming widgets_values slots.
+
+        Handles plain widgets, connected-but-converted widgets, dynamic combos
+        (which recurse into their active option's sub-inputs), and the
+        control_after_generate frontend-only extra slot.
+        """
+        nonlocal widget_idx
         inp_type = inp_spec[0] if isinstance(inp_spec, (list, tuple)) else inp_spec
+
+        # V3 dynamic combo: the selected key occupies one slot, then the active
+        # option's sub-inputs follow (in order), using dotted names.
+        if _is_dynamic_combo(inp_spec):
+            if widget_idx >= len(widget_values):
+                return
+            selected_key = widget_values[widget_idx]
+            result[inp_name] = selected_key
+            widget_idx += 1
+            for sub_name, sub_spec in _dynamic_combo_suboptions(inp_spec, selected_key):
+                _consume(f"{inp_name}.{sub_name}", sub_spec)
+            return
+
         if _is_connection_type(inp_type):
-            continue
+            return
         if inp_name in connected_names:
             # Converted widget — still consumes a widgets_values slot
             is_converted = any(
@@ -372,7 +424,7 @@ def _convert_inner_node_widgets(
                 for inp in node_inputs
             )
             if not is_converted:
-                continue
+                return
         if widget_idx < len(widget_values):
             result[inp_name] = widget_values[widget_idx]
             widget_idx += 1
@@ -380,6 +432,10 @@ def _convert_inner_node_widgets(
         # the next slot in widgets_values but is not a backend input
         if _has_control_after_generate(inp_spec):
             widget_idx += 1
+
+    widget_idx = 0
+    for inp_name, inp_spec in specs:
+        _consume(inp_name, inp_spec)
     return result
 
 

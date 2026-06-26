@@ -12,6 +12,9 @@ build/
 scratch/*
 !scratch/README.md
 
+# Test-render outputs (e.g. workflows/gen_20260626-010850.png)
+gen_*.*
+
 .claude/*
 !.claude/commands/
 

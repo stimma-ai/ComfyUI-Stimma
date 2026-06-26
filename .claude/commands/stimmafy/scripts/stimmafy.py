@@ -785,7 +785,9 @@ class WorkflowModifier:
 
         return node
 
-    def add_video_output(self, fps=24, pos=(800, 400), wire_from=None, fps_source=None):
+    def add_video_output(self, fps=24, pos=(800, 400), wire_from=None, fps_source=None,
+                         audio_source=None, generate_audio_source=None,
+                         generate_audio_default=True):
         """Add StimmaVideoOutput node.
 
         Args:
@@ -794,7 +796,15 @@ class WorkflowModifier:
             wire_from: {"src_node": N, "src_slot": S} for frames input
             fps_source: {"ref": "name"} or {"node_id": N, "slot": S} to wire fps
                         from a Stimma param node instead of using hardcoded widget value
+            audio_source: {"src_node": N, "src_slot": S} for the optional AUDIO input
+                          (mux an audio track into the mp4)
+            generate_audio_source: {"ref": "name"} to wire the generate_audio toggle
+                          from a Stimma bool param
+            generate_audio_default: widget default for generate_audio when not wired
         """
+        # Widget order must match nodes/outputs.py StimmaVideoOutput.INPUT_TYPES
+        # (object_info spec order, widget-type inputs only):
+        # fps, filename_prefix, generate_audio, _stimma_output_dir.
         node = self._base_node("StimmaVideoOutput", pos, [360, 300])
         node["inputs"] = [
             self._make_connection_input("frames", "IMAGE"),
@@ -806,13 +816,18 @@ class WorkflowModifier:
                 "name": "filename_prefix", "type": "STRING",
                 "widget": {"name": "filename_prefix"}, "link": None,
             },
+            self._make_connection_input("audio", "AUDIO"),
+            {
+                "name": "generate_audio", "type": "BOOLEAN",
+                "widget": {"name": "generate_audio"}, "link": None, "shape": 7,
+            },
             {
                 "name": "_stimma_output_dir", "type": "STRING",
                 "widget": {"name": "_stimma_output_dir"}, "link": None, "shape": 7,
             },
         ]
         node["outputs"] = []
-        node["widgets_values"] = [fps, "Stimma", ""]
+        node["widgets_values"] = [fps, "Stimma", generate_audio_default, ""]
         self._add_node(node)
 
         if wire_from:
@@ -827,15 +842,35 @@ class WorkflowModifier:
             if src_id is not None:
                 self._wire_output_to_input(src_id, src_slot, node["id"], "fps", "INT")
 
+        # Wire the optional audio track (e.g. exposed from a subgraph)
+        if audio_source:
+            src_id = audio_source.get("src_node")
+            src_slot = audio_source.get("src_slot", 0)
+            if src_id is not None:
+                self._wire_output_to_input(src_id, src_slot, node["id"], "audio", "AUDIO")
+
+        # Wire the generate_audio toggle from a Stimma bool param
+        if generate_audio_source:
+            src_id, src_slot = self._resolve_node_ref(generate_audio_source)
+            if src_id is not None:
+                self._wire_output_to_input(src_id, src_slot, node["id"], "generate_audio", "BOOLEAN")
+
         return node
 
     def add_image_input(self, name="input_image", required=True, ui_order=5,
-                        pos=(-800, -200)):
+                        pos=(-800, -200), allow_prep=True):
         """Add StimmaImageParam node."""
         node = self._base_node("StimmaImageParam", pos, [384, 200])
+        # Widget order MUST match nodes/fields.py StimmaImageParam.INPUT_TYPES:
+        # [image, controlnet_types, ui_control, ui_order]. The connector maps
+        # widgets_values positionally against the real node def, so a mismatch
+        # silently shifts values (e.g. ui_control -> True -> x-control: True,
+        # which makes the backend skip the media upload). The param name is
+        # forced to 'input_images' by discovery.py — there is no name widget.
         node["inputs"] = self._make_widget_inputs([
-            ("name", "STRING"), ("image", "COMBO"),
-            ("required", "BOOLEAN"), ("ui_order", "INT"),
+            ("image", "COMBO"), ("controlnet_types", "STRING"),
+            ("ui_control", "COMBO"), ("ui_order", "INT"),
+            ("allow_prep", "BOOLEAN"),
         ])
         node["outputs"] = [
             self._make_output("image", "IMAGE"),
@@ -843,30 +878,35 @@ class WorkflowModifier:
         ]
         node["outputs"][0]["slot_index"] = 0
         node["outputs"][1]["slot_index"] = 1
-        # Need a placeholder image filename
-        node["widgets_values"] = [name, "example.png", required, ui_order]
+        node["widgets_values"] = ["example.png", "", "image_picker", ui_order, allow_prep]
         self._add_node(node)
         return node
 
     def add_images_input(self, name="input_images", min_images=1, max_images=3,
-                        required=True, ui_order=5, pos=(-800, -200)):
+                        required=True, ui_order=5, pos=(-800, -200), allow_prep=True):
         """Add StimmaImagesParam node (multi-image batch).
 
         Note: The node name is always 'input_images' (hardcoded in discovery.py).
         The 'required' flag maps to min_images: min_images=0 means optional.
         """
         node = self._base_node("StimmaImagesParam", pos, [384, 240])
+        # Widget order MUST match nodes/fields.py StimmaImagesParam.INPUT_TYPES:
+        # [image, min_images, max_images, controlnet_types, ui_control, ui_order].
         node["inputs"] = self._make_widget_inputs([
             ("image", "COMBO"),
             ("min_images", "INT"), ("max_images", "INT"),
+            ("controlnet_types", "STRING"),
             ("ui_control", "COMBO"), ("ui_order", "INT"),
+            ("allow_prep", "BOOLEAN"),
         ])
         node["outputs"] = [
             self._make_output("image", "IMAGE"),
         ]
         node["outputs"][0]["slot_index"] = 0
         effective_min = 0 if not required else max(1, min_images)
-        node["widgets_values"] = ["example.png", effective_min, max_images, "imagePicker", ui_order]
+        node["widgets_values"] = [
+            "example.png", effective_min, max_images, "", "image_picker", ui_order, allow_prep,
+        ]
         self._add_node(node)
         return node
 
@@ -874,15 +914,17 @@ class WorkflowModifier:
                         pos=(-800, -200)):
         """Add StimmaVideoParam node."""
         node = self._base_node("StimmaVideoParam", pos, [384, 200])
+        # Widget order MUST match nodes/fields.py StimmaVideoParam.INPUT_TYPES:
+        # [video, ui_control, ui_order]. Name is forced to 'input_videos' by
+        # discovery.py — there is no name widget.
         node["inputs"] = self._make_widget_inputs([
-            ("name", "STRING"), ("video", "COMBO"),
-            ("required", "BOOLEAN"), ("ui_order", "INT"),
+            ("video", "COMBO"), ("ui_control", "COMBO"), ("ui_order", "INT"),
         ])
         node["outputs"] = [
             self._make_output("frames", "IMAGE"),
         ]
         node["outputs"][0]["slot_index"] = 0
-        node["widgets_values"] = [name, "example.mp4", required, ui_order]
+        node["widgets_values"] = ["example.mp4", "video_picker", ui_order]
         self._add_node(node)
         return node
 
@@ -1441,12 +1483,22 @@ def apply_plan(workflow_path, plan_path, output_path):
                     wire_from = None
             elif wire_from and "node_id" in wire_from:
                 wire_from = {"src_node": wire_from["node_id"], "src_slot": wire_from.get("src_slot", 0)}
+            # Resolve the optional audio source (subgraph output_name or direct node)
+            audio_source = out.get("audio_source")
+            if audio_source and "output_name" in audio_source:
+                a_slot = mod._find_output_slot(audio_source["node_id"], audio_source["output_name"])
+                audio_source = {"src_node": audio_source["node_id"], "src_slot": a_slot} if a_slot is not None else None
+            elif audio_source and "node_id" in audio_source:
+                audio_source = {"src_node": audio_source["node_id"], "src_slot": audio_source.get("src_slot", 0)}
             if output_type == "video":
                 mod.add_video_output(
                     fps=out.get("fps", 24),
                     pos=out.get("pos", [800, 400]),
                     wire_from=wire_from,
                     fps_source=fps_source,
+                    audio_source=audio_source,
+                    generate_audio_source=out.get("generate_audio_source"),
+                    generate_audio_default=out.get("generate_audio_default", True),
                 )
             else:
                 mod.add_image_output(

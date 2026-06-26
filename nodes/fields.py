@@ -58,6 +58,9 @@ class StimmaImageParam:
                 "controlnet_types": ("STRING", {"default": "", "multiline": False}),
                 "ui_control": (["image_picker", "video_frame_picker"],),
                 "ui_order": ("INT", {"default": 0, "min": 0, "max": 100}),
+                # Show the Stimma prep controls (Scale / Extend Canvas / Paint)
+                # on this input. Independent of controlnet support.
+                "allow_prep": ("BOOLEAN", {"default": True}),
             },
         }
 
@@ -66,7 +69,8 @@ class StimmaImageParam:
     FUNCTION = "execute"
     CATEGORY = "Stimma/Params"
 
-    def execute(self, image, controlnet_types="", ui_control="image_picker", ui_order=0):
+    def execute(self, image, controlnet_types="", ui_control="image_picker", ui_order=0,
+                allow_prep=True):
         image_path = folder_paths.get_annotated_filepath(image)
         img = Image.open(image_path)
         img = ImageOps.exif_transpose(img)
@@ -186,6 +190,8 @@ class StimmaImagesParam:
                 "controlnet_types": ("STRING", {"default": "", "multiline": False}),
                 "ui_control": (["image_picker", "video_frame_picker"],),
                 "ui_order": ("INT", {"default": 0, "min": 0, "max": 100}),
+                # Show the Stimma prep controls (Scale / Extend Canvas / Paint).
+                "allow_prep": ("BOOLEAN", {"default": True}),
             },
             "optional": {
                 "_stimma_images": ("STRING", {"default": "", "multiline": False}),
@@ -205,6 +211,7 @@ class StimmaImagesParam:
         controlnet_types="",
         ui_control="image_picker",
         ui_order=0,
+        allow_prep=True,
         _stimma_images="",
     ):
         filenames = [image]

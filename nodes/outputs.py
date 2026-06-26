@@ -7,6 +7,47 @@ from PIL import Image
 from PIL.PngImagePlugin import PngInfo
 
 
+def _write_audio_wav(audio, wav_path):
+    """Write a ComfyUI AUDIO dict ({waveform, sample_rate}) to a 16-bit PCM WAV.
+
+    Uses only the stdlib `wave` module (torchaudio isn't available in the ComfyUI
+    env). waveform is a tensor of shape [batch, channels, samples]; we take the
+    first batch item. Returns the path on success, or None if there's no usable
+    audio (so the caller falls back to a silent video).
+    """
+    import wave
+
+    if not isinstance(audio, dict):
+        return None
+    waveform = audio.get("waveform")
+    sample_rate = int(audio.get("sample_rate") or 0)
+    if waveform is None or sample_rate <= 0:
+        return None
+
+    arr = waveform
+    if hasattr(arr, "detach"):
+        arr = arr.detach().cpu().numpy()
+    arr = np.asarray(arr, dtype=np.float32)
+    if arr.ndim == 3:  # [batch, channels, samples] -> first batch item
+        arr = arr[0]
+    if arr.ndim == 1:  # [samples] -> [1, samples]
+        arr = arr[None, :]
+    # arr is now [channels, samples]; WAV wants interleaved [samples, channels]
+    channels = arr.shape[0]
+    if channels == 0 or arr.shape[1] == 0:
+        return None
+    interleaved = arr.T  # [samples, channels]
+    pcm = np.clip(interleaved, -1.0, 1.0)
+    pcm = (pcm * 32767.0).astype("<i2")
+
+    with wave.open(wav_path, "wb") as wf:
+        wf.setnchannels(channels)
+        wf.setsampwidth(2)
+        wf.setframerate(sample_rate)
+        wf.writeframes(pcm.tobytes())
+    return wav_path
+
+
 class StimmaImageOutput:
     """Image output node.
 
@@ -104,6 +145,8 @@ class StimmaVideoOutput:
                 "filename_prefix": ("STRING", {"default": "Stimma"}),
             },
             "optional": {
+                "audio": ("AUDIO",),
+                "generate_audio": ("BOOLEAN", {"default": True}),
                 "_stimma_output_dir": ("STRING", {"default": ""}),
             },
         }
@@ -113,7 +156,8 @@ class StimmaVideoOutput:
     FUNCTION = "execute"
     CATEGORY = "Stimma/Outputs"
 
-    def execute(self, frames, fps=16, filename_prefix="Stimma", _stimma_output_dir=""):
+    def execute(self, frames, fps=16, filename_prefix="Stimma", audio=None,
+                generate_audio=True, _stimma_output_dir=""):
         import folder_paths
         import tempfile
         import subprocess
@@ -126,6 +170,12 @@ class StimmaVideoOutput:
                 img_np = 255.0 * frame.cpu().numpy()
                 img = Image.fromarray(np.clip(img_np, 0, 255).astype(np.uint8))
                 img.save(os.path.join(temp_dir, f"frame_{i:06d}.png"))
+
+            # Optionally write the audio track to a WAV for muxing. Disabled when
+            # generate_audio is False or no audio is connected.
+            audio_path = None
+            if generate_audio and audio is not None:
+                audio_path = _write_audio_wav(audio, os.path.join(temp_dir, "audio.wav"))
 
             if _stimma_output_dir:
                 # STP mode
@@ -143,18 +193,25 @@ class StimmaVideoOutput:
                         break
                     counter += 1
 
-            # Encode with ffmpeg
+            # Encode with ffmpeg, muxing the audio track when present.
             cmd = [
                 "ffmpeg", "-y",
                 "-framerate", str(fps),
                 "-i", os.path.join(temp_dir, "frame_%06d.png"),
+            ]
+            if audio_path:
+                cmd += ["-i", audio_path]
+            cmd += [
                 "-c:v", "libx264",
                 "-preset", "fast",
                 "-crf", "18",
                 "-pix_fmt", "yuv420p",
                 "-movflags", "+faststart",
-                output_path,
             ]
+            if audio_path:
+                # Map the video stream + audio stream; end at the shorter input.
+                cmd += ["-c:a", "aac", "-b:a", "192k", "-shortest"]
+            cmd += [output_path]
             result = subprocess.run(cmd, capture_output=True)
             if result.returncode != 0:
                 raise RuntimeError(f"ffmpeg encoding failed: {result.stderr.decode()}")
