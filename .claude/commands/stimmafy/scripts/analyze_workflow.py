@@ -339,26 +339,36 @@ def _scan_inner_sampling(def_nodes):
         t = n.get("type")
         muted = n.get("mode") == 4
         nid = n.get("id")
+        # Widget names already promoted to connected inputs — i.e. a Stimma param
+        # (or anything) is already driving them, so they're exposed already.
+        connected = sorted(i.get("name") for i in n.get("inputs", [])
+                           if i.get("link") is not None and i.get("name"))
         if t in KSAMPLER_TYPES:
             params = (extract_widget_values_ksampler(n) if t == "KSampler"
                       else extract_widget_values_ksampler_advanced(n))
             found["samplers"].append({"id": nid, "type": t, "muted": muted,
-                                      "params": params, "pipeline_type": "standard"})
+                                      "params": params, "pipeline_type": "standard",
+                                      "connected": connected})
         elif t in ADVANCED_SAMPLER_TYPES:
             found["samplers"].append({"id": nid, "type": t, "muted": muted,
-                                      "params": {}, "pipeline_type": "advanced"})
+                                      "params": {}, "pipeline_type": "advanced",
+                                      "connected": connected})
         elif t in SCHEDULER_NODES:
             params = extract_widget_values_basic_scheduler(n) if t == "BasicScheduler" else {}
-            found["scheduler_nodes"].append({"id": nid, "type": t, "muted": muted, "params": params})
+            found["scheduler_nodes"].append({"id": nid, "type": t, "muted": muted,
+                                             "params": params, "connected": connected})
         elif t in SAMPLER_SELECT_NODES:
             found["sampler_select_nodes"].append({"id": nid, "type": t, "muted": muted,
-                                                  "params": extract_widget_values_sampler_select(n)})
+                                                  "params": extract_widget_values_sampler_select(n),
+                                                  "connected": connected})
         elif t in NOISE_NODES:
             found["noise_nodes"].append({"id": nid, "type": t, "muted": muted,
-                                         "params": extract_widget_values_random_noise(n)})
+                                         "params": extract_widget_values_random_noise(n),
+                                         "connected": connected})
         elif t in GUIDANCE_NODES:
             found["guidance_nodes"].append({"id": nid, "type": t, "muted": muted,
-                                            "params": extract_widget_values_flux_guidance(n)})
+                                            "params": extract_widget_values_flux_guidance(n),
+                                            "connected": connected})
         elif t in TEXT_ENCODERS:
             found["text_encoders"].append({"id": nid, "type": t, "muted": muted,
                                            "text_preview": extract_text_from_encoder(n)[:120]})
@@ -416,41 +426,49 @@ def build_subgraph_prep_suggestions(occurrences, guidance_distilled):
         if not (samplers or scheds or selects):
             continue
 
-        if len(occ["chain"]) > 1:
-            warnings.append(
-                f"Sampler is nested {len(occ['chain'])} subgraph levels deep "
-                f"(instance chain {occ['chain']}). Expose steps/sampler/scheduler "
-                f"through EACH subgraph boundary with subgraph_prep, innermost first."
-            )
-            continue
-
         sg_id = occ["instance_node_id"]
         expose = []
 
-        def add(name, typ, inner_node_id, widget):
-            expose.append({"name": name, "type": typ, "inner_node_id": inner_node_id,
+        # A knob is "handled" if it's already promoted on ANY active node in this
+        # subgraph — covers both a prior stimmafy run AND alternate-pipeline
+        # duplicates (e.g. LTX2 has two KSamplerSelect, only the live one wired;
+        # the dead sibling shouldn't re-flag a sampler that's already exposed).
+        _widget_param = {"sampler_name": "sampler_name", "scheduler": "scheduler",
+                         "steps": "steps", "seed": "seed", "noise_seed": "seed",
+                         "cfg": "cfg", "guidance": "guidance"}
+        exposed_params = set()
+        for grp in (samplers, scheds, selects, noises, guids):
+            for nd in grp:
+                for w in nd.get("connected", []):
+                    if w in _widget_param:
+                        exposed_params.add(_widget_param[w])
+
+        def add(name, typ, src, widget):
+            if name in exposed_params or widget in src.get("connected", []):
+                return
+            expose.append({"name": name, "type": typ, "inner_node_id": src["id"],
                            "inner_widget_name": widget, "param": name})
 
         # Standard KSampler carries all knobs on one node.
         for s in samplers:
             if s["type"] in KSAMPLER_TYPES:
                 seed_widget = "noise_seed" if s["type"] == "KSamplerAdvanced" else "seed"
-                add("steps", "INT", s["id"], "steps")
-                add("sampler_name", "COMBO", s["id"], "sampler_name")
-                add("scheduler", "COMBO", s["id"], "scheduler")
-                add("seed", "INT", s["id"], seed_widget)
+                add("steps", "INT", s, "steps")
+                add("sampler_name", "COMBO", s, "sampler_name")
+                add("scheduler", "COMBO", s, "scheduler")
+                add("seed", "INT", s, seed_widget)
                 if not guidance_distilled:
-                    add("cfg", "FLOAT", s["id"], "cfg")
+                    add("cfg", "FLOAT", s, "cfg")
         # Advanced pipeline spreads knobs across helper nodes.
         for s in selects:
-            add("sampler_name", "COMBO", s["id"], "sampler_name")
+            add("sampler_name", "COMBO", s, "sampler_name")
         for s in scheds:
-            add("scheduler", "COMBO", s["id"], "scheduler")
-            add("steps", "INT", s["id"], "steps")
+            add("scheduler", "COMBO", s, "scheduler")
+            add("steps", "INT", s, "steps")
         for s in noises:
-            add("seed", "INT", s["id"], "seed")
+            add("seed", "INT", s, "noise_seed")
         for g in guids:
-            add("guidance", "FLOAT", g["id"], "guidance")
+            add("guidance", "FLOAT", g, "guidance")
 
         # Dedupe by param name (keep first); flag if multiple samplers collided.
         seen = set()
@@ -462,18 +480,32 @@ def build_subgraph_prep_suggestions(occurrences, guidance_distilled):
                 continue
             seen.add(e["param"])
             deduped.append(e)
+
+        # Nothing un-exposed here → no suggestion and no warning (already handled,
+        # e.g. an already-stimmafied workflow). This keeps the analyzer accurate
+        # when re-run on a finished tool.
+        if not deduped:
+            continue
+
+        if len(occ["chain"]) > 1:
+            warnings.append(
+                f"Sampler is nested {len(occ['chain'])} subgraph levels deep "
+                f"(instance chain {occ['chain']}). Expose steps/sampler/scheduler "
+                f"through EACH subgraph boundary with subgraph_prep, innermost first."
+            )
+            continue
+
         if len(samplers) > 1 or collided:
             warnings.append(
                 f"Subgraph node {sg_id} has multiple samplers/sources for the same "
                 f"knob — decide whether to share one param across them or expose "
                 f"separate per-stage params (see SKILL 'Handling multiple samplers')."
             )
-        if deduped:
-            suggestions.append({
-                "subgraph_node_id": sg_id,
-                "definition_id": occ["definition_id"],
-                "expose": deduped,
-            })
+        suggestions.append({
+            "subgraph_node_id": sg_id,
+            "definition_id": occ["definition_id"],
+            "expose": deduped,
+        })
     return suggestions, warnings
 
 
@@ -836,20 +868,24 @@ def analyze(workflow_path, comfy_url="http://localhost:8188"):
     recs["defaults"] = defaults
     recs["wiring"] = wiring
 
-    # Where do the sampling knobs live? This tells the author whether the wiring
-    # targets above are complete or whether subgraph_prep is required.
-    active_inner_samplers = [s for s in inner_samplers if not s["muted"]]
-    if active_samplers:
-        recs["sampler_location"] = "top-level"
-    elif active_inner_samplers:
-        recs["sampler_location"] = "subgraph"
-    else:
-        recs["sampler_location"] = "none"
-
+    # Suggestions cover only the inner knobs that are NOT already exposed, so an
+    # empty list means the subgraph sampler is either top-level or already wired out.
     prep_suggestions, prep_warnings = build_subgraph_prep_suggestions(
         subgraph_occurrences, result["guidance_distilled"],
     )
     recs["subgraph_prep_suggestions"] = prep_suggestions
+
+    # Where do the sampling knobs live? `subgraph` means action is needed (there
+    # are un-exposed inner knobs); `subgraph-exposed` means the sampler is in a
+    # subgraph but its knobs are already wired out (e.g. an already-stimmafied
+    # tool) so nothing is missing.
+    active_inner_samplers = [s for s in inner_samplers if not s["muted"]]
+    if active_samplers:
+        recs["sampler_location"] = "top-level"
+    elif active_inner_samplers:
+        recs["sampler_location"] = "subgraph" if prep_suggestions else "subgraph-exposed"
+    else:
+        recs["sampler_location"] = "none"
 
     warnings = list(prep_warnings)
     if recs["sampler_location"] == "subgraph":

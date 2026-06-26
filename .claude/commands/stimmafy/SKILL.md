@@ -130,8 +130,9 @@ Present a summary to the user:
 - Whether it's guidance-distilled (affects which params to expose)
 - Task type (text-to-image, image-to-image, etc.)
 - How many samplers/text encoders/save nodes found
-- **Where the sampler lives** (`recommendations.sampler_location`: top-level vs
-  subgraph) and anything in `recommendations.warnings`
+- **Where the sampler lives** (`recommendations.sampler_location`: `top-level`,
+  `subgraph` = knobs still buried/action needed, `subgraph-exposed` = already
+  wired out, `none`) and anything in `recommendations.warnings`
 - Any ambiguities (multiple samplers, unclear text encoder roles)
 
 ## Phase 2: Plan
@@ -187,8 +188,12 @@ to tune. Forgetting them is the single most common stimmafy mistake.
 
 Drive this off the analysis output, then verify nothing is hidden:
 
-Check `recommendations.sampler_location` first — it is `top-level`, `subgraph`, or `none`:
+Check `recommendations.sampler_location` first — it is `top-level`, `subgraph`,
+`subgraph-exposed`, or `none`:
 
+0. **`subgraph-exposed`** — the sampler is inside a subgraph but its knobs are
+   ALREADY wired out to Stimma params (e.g. you're re-running on a finished tool).
+   `subgraph_prep_suggestions` is empty and there are no warnings. Nothing to do.
 1. **`top-level`** — for every entry in `recommendations.wiring.targets`, create
    the matching param. The analyzer emits targets for `steps`, `sampler_name`,
    `scheduler`, and (when applicable) `cfg`, `denoise`, `guidance`, `shift`. Each
