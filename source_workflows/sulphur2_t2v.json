@@ -1,8 +1,8 @@
 {
   "id": "07824bbb-6672-4bb0-ac36-4313a519e35b",
   "revision": 0,
-  "last_node_id": 340,
-  "last_link_id": 657,
+  "last_node_id": 330,
+  "last_link_id": 647,
   "nodes": [
     {
       "id": 75,
@@ -19,7 +19,7 @@
         "collapsed": false
       },
       "order": 2,
-      "mode": 4,
+      "mode": 0,
       "inputs": [
         {
           "name": "video",
@@ -76,7 +76,7 @@
         }
       },
       "widgets_values": [
-        "- Huggingface: [Lightricks/LTX-2.3](https://huggingface.co/Lightricks/LTX-2.3/)\n- Github: [LTX-2](https://github.com/Lightricks/LTX-2)\n\n## LTX-2.3 Prompting Tips\n\n1. **Core Actions**: Describe events and actions as they occur over time  \n2. **Visual Details**: Describe all visual details you want to appear in the video  \n3. **Audio**: Describe sounds and dialogue needed for the scene\n\n## Report LTX-2.3 Issues\nTo report any issues when running this workflow, [go to GitHub](https://github.com/Lightricks/ComfyUI-LTXVideo/issues)\n\n## Model Links (for Local Users)\n\n**checkpoints**\n\n- [ltx-2.3-22b-dev-fp8.safetensors](https://huggingface.co/Lightricks/LTX-2.3-fp8/resolve/main/ltx-2.3-22b-dev-fp8.safetensors)\n\n**loras**\n\n- [ltx_2.3_22b_distilled_1.1_lora_dynamic_fro09_avg_rank_111_bf16.safetensors](https://huggingface.co/Comfy-Org/ltx-2.3/resolve/main/split_files/loras/ltx_2.3_22b_distilled_1.1_lora_dynamic_fro09_avg_rank_111_bf16.safetensors)\n- [gemma-3-12b-it-abliterated_lora_rank64_bf16.safetensors](https://huggingface.co/Comfy-Org/ltx-2/resolve/main/split_files/loras/gemma-3-12b-it-abliterated_lora_rank64_bf16.safetensors)\n\n**latent_upscale_models**\n- [ltx-2.3-spatial-upscaler-x2-1.1.safetensors](https://huggingface.co/Lightricks/LTX-2.3/resolve/main/ltx-2.3-spatial-upscaler-x2-1.1.safetensors)\n\n\n## Model Storage Location\n\n```\n\ud83d\udcc2 ComfyUI/\n\u251c\u2500\u2500 \ud83d\udcc2 models/\n\u2502   \u251c\u2500\u2500 \ud83d\udcc2 checkpoints/\n\u2502   \u2502   \u2514\u2500\u2500 ltx-2.3-22b-dev-fp8.safetensors\n\u2502   \u251c\u2500\u2500 \ud83d\udcc2 loras/\n\u2502   \u2502   \u251c\u2500\u2500 ltx_2.3_22b_distilled_1.1_lora_dynamic_fro09_avg_rank_111_bf16.safetensors\n\u2502   \u2502   \u2514\u2500\u2500 gemma-3-12b-it-abliterated_lora_rank64_bf16.safetensors\n\u2502   \u2514\u2500\u2500 \ud83d\udcc2 latent_upscale_models/\n\u2502       \u2514\u2500\u2500 ltx-2.3-spatial-upscaler-x2-1.1.safetensors\n```\n\n## Report Issue\n\nNote: Please update ComfyUI first ([guide](https://docs.comfy.org/installation/update_comfyui)) and prepare required models. Desktop/Cloud updates follow stable releases, so some nightly-supported models may not be available yet.\n\n- Cannot run / runtime errors: [ComfyUI/issues](https://github.com/Comfy-Org/ComfyUI/issues)\n- UI / frontend issues: [ComfyUI_frontend/issues](https://github.com/Comfy-Org/ComfyUI_frontend/issues)\n- Workflow issues: [workflow_templates/issues](https://github.com/Comfy-Org/workflow_templates/issues)\n"
+        "- Huggingface: [Lightricks/LTX-2.3](https://huggingface.co/Lightricks/LTX-2.3/)\n- Github: [LTX-2](https://github.com/Lightricks/LTX-2)\n\n## LTX-2.3 Prompting Tips\n\n1. **Core Actions**: Describe events and actions as they occur over time  \n2. **Visual Details**: Describe all visual details you want to appear in the video  \n3. **Audio**: Describe sounds and dialogue needed for the scene\n\n## Report LTX-2.3 Issues\nTo report any issues when running this workflow, [go to GitHub](https://github.com/Lightricks/ComfyUI-LTXVideo/issues)\n\n## Model Links (for Local Users)\n\n**checkpoints**\n\n- [sulphur_dev_fp8mixed.safetensors](https://huggingface.co/Lightricks/LTX-2.3-fp8/resolve/main/sulphur_dev_fp8mixed.safetensors)\n\n**loras**\n\n- [ltx-2.3-22b-distilled-lora-1.1_fro90_ceil72_condsafe.safetensors](https://huggingface.co/Comfy-Org/ltx-2.3/resolve/main/split_files/loras/ltx-2.3-22b-distilled-lora-1.1_fro90_ceil72_condsafe.safetensors)\n- [gemma-3-12b-it-abliterated_lora_rank64_bf16.safetensors](https://huggingface.co/Comfy-Org/ltx-2/resolve/main/split_files/loras/gemma-3-12b-it-abliterated_lora_rank64_bf16.safetensors)\n\n**latent_upscale_models**\n- [ltx-2.3-spatial-upscaler-x2-1.1.safetensors](https://huggingface.co/Lightricks/LTX-2.3/resolve/main/ltx-2.3-spatial-upscaler-x2-1.1.safetensors)\n\n\n## Model Storage Location\n\n```\n📂 ComfyUI/\n├── 📂 models/\n│   ├── 📂 checkpoints/\n│   │   └── sulphur_dev_fp8mixed.safetensors\n│   ├── 📂 loras/\n│   │   ├── ltx-2.3-22b-distilled-lora-1.1_fro90_ceil72_condsafe.safetensors\n│   │   └── gemma-3-12b-it-abliterated_lora_rank64_bf16.safetensors\n│   └── 📂 latent_upscale_models/\n│       └── ltx-2.3-spatial-upscaler-x2-1.1.safetensors\n```\n\n## Report Issue\n\nNote: Please update ComfyUI first ([guide](https://docs.comfy.org/installation/update_comfyui)) and prepare required models. Desktop/Cloud updates follow stable releases, so some nightly-supported models may not be available yet.\n\n- Cannot run / runtime errors: [ComfyUI/issues](https://github.com/Comfy-Org/ComfyUI/issues)\n- UI / frontend issues: [ComfyUI_frontend/issues](https://github.com/Comfy-Org/ComfyUI_frontend/issues)\n- Workflow issues: [workflow_templates/issues](https://github.com/Comfy-Org/workflow_templates/issues)\n"
       ],
       "color": "#222",
       "bgcolor": "#000"
@@ -112,7 +112,7 @@
           "widget": {
             "name": "value_2"
           },
-          "link": 649
+          "link": null
         },
         {
           "label": "height",
@@ -121,7 +121,7 @@
           "widget": {
             "name": "value_3"
           },
-          "link": 650
+          "link": null
         },
         {
           "label": "duration",
@@ -130,7 +130,7 @@
           "widget": {
             "name": "value_4"
           },
-          "link": 652
+          "link": null
         },
         {
           "label": "fps",
@@ -139,7 +139,7 @@
           "widget": {
             "name": "value_1"
           },
-          "link": 653
+          "link": null
         },
         {
           "label": "seed",
@@ -148,7 +148,7 @@
           "widget": {
             "name": "noise_seed"
           },
-          "link": 651
+          "link": null
         },
         {
           "label": "distilled_lora",
@@ -176,14 +176,6 @@
             "name": "lora_name_1"
           },
           "link": null
-        },
-        {
-          "name": "value",
-          "type": "STRING",
-          "widget": {
-            "name": "value"
-          },
-          "link": 648
         }
       ],
       "outputs": [
@@ -193,22 +185,6 @@
           "links": [
             594
           ]
-        },
-        {
-          "name": "frames",
-          "type": "IMAGE",
-          "links": [
-            654
-          ],
-          "slot_index": 1
-        },
-        {
-          "name": "audio",
-          "type": "AUDIO",
-          "links": [
-            656
-          ],
-          "slot_index": 2
         }
       ],
       "properties": {
@@ -285,799 +261,6 @@
         }
       },
       "widgets_values": []
-    },
-    {
-      "id": 331,
-      "type": "StimmaToolInfo",
-      "pos": [
-        -1400,
-        -400
-      ],
-      "size": [
-        480,
-        276
-      ],
-      "flags": {},
-      "order": 0,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "slug",
-          "type": "STRING",
-          "widget": {
-            "name": "slug"
-          },
-          "link": null
-        },
-        {
-          "name": "display_name",
-          "type": "STRING",
-          "widget": {
-            "name": "display_name"
-          },
-          "link": null
-        },
-        {
-          "name": "task_types",
-          "type": "STRING",
-          "widget": {
-            "name": "task_types"
-          },
-          "link": null
-        },
-        {
-          "name": "badges",
-          "type": "STRING",
-          "widget": {
-            "name": "badges"
-          },
-          "link": null
-        },
-        {
-          "name": "description",
-          "type": "STRING",
-          "widget": {
-            "name": "description"
-          },
-          "link": null
-        },
-        {
-          "name": "model_vendor",
-          "type": "STRING",
-          "widget": {
-            "name": "model_vendor"
-          },
-          "link": null,
-          "shape": 7
-        },
-        {
-          "name": "model",
-          "type": "STRING",
-          "widget": {
-            "name": "model"
-          },
-          "link": null,
-          "shape": 7
-        }
-      ],
-      "outputs": [],
-      "properties": {
-        "Node name for S&R": "StimmaToolInfo"
-      },
-      "widgets_values": [
-        "ltx23-t2v",
-        "LTX-2.3 Text to Video",
-        "text-to-video",
-        "Open Weights",
-        "Generate video from text using LTX-2.3",
-        "lightricks",
-        "ltx-2.3"
-      ]
-    },
-    {
-      "id": 332,
-      "type": "StimmaPromptParam",
-      "pos": [
-        -800,
-        0
-      ],
-      "size": [
-        480,
-        360
-      ],
-      "flags": {},
-      "order": 0,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "name",
-          "type": "STRING",
-          "widget": {
-            "name": "name"
-          },
-          "link": null
-        },
-        {
-          "name": "default_text",
-          "type": "STRING",
-          "widget": {
-            "name": "default_text"
-          },
-          "link": null
-        },
-        {
-          "name": "required",
-          "type": "BOOLEAN",
-          "widget": {
-            "name": "required"
-          },
-          "link": null
-        },
-        {
-          "name": "ui_order",
-          "type": "INT",
-          "widget": {
-            "name": "ui_order"
-          },
-          "link": null
-        },
-        {
-          "name": "ui_description",
-          "type": "STRING",
-          "widget": {
-            "name": "ui_description"
-          },
-          "link": null
-        }
-      ],
-      "outputs": [
-        {
-          "name": "text",
-          "type": "STRING",
-          "links": [
-            648
-          ],
-          "slot_index": 0
-        }
-      ],
-      "properties": {
-        "Node name for S&R": "StimmaPromptParam"
-      },
-      "widgets_values": [
-        "prompt",
-        "",
-        true,
-        0,
-        "Describe the motion, scene, and any audio for the video"
-      ]
-    },
-    {
-      "id": 333,
-      "type": "StimmaResolutionParam",
-      "pos": [
-        -800,
-        600
-      ],
-      "size": [
-        480,
-        360
-      ],
-      "flags": {},
-      "order": 0,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "width",
-          "type": "INT",
-          "widget": {
-            "name": "width"
-          },
-          "link": null
-        },
-        {
-          "name": "height",
-          "type": "INT",
-          "widget": {
-            "name": "height"
-          },
-          "link": null
-        },
-        {
-          "name": "min_size",
-          "type": "INT",
-          "widget": {
-            "name": "min_size"
-          },
-          "link": null
-        },
-        {
-          "name": "max_size",
-          "type": "INT",
-          "widget": {
-            "name": "max_size"
-          },
-          "link": null
-        },
-        {
-          "name": "step",
-          "type": "INT",
-          "widget": {
-            "name": "step"
-          },
-          "link": null
-        },
-        {
-          "name": "supported_resolutions",
-          "type": "STRING",
-          "widget": {
-            "name": "supported_resolutions"
-          },
-          "link": null
-        },
-        {
-          "name": "ui_order",
-          "type": "INT",
-          "widget": {
-            "name": "ui_order"
-          },
-          "link": null
-        }
-      ],
-      "outputs": [
-        {
-          "name": "width",
-          "type": "INT",
-          "links": [
-            649
-          ],
-          "slot_index": 0
-        },
-        {
-          "name": "height",
-          "type": "INT",
-          "links": [
-            650
-          ],
-          "slot_index": 1
-        }
-      ],
-      "properties": {
-        "Node name for S&R": "StimmaResolutionParam"
-      },
-      "widgets_values": [
-        1280,
-        720,
-        256,
-        1920,
-        32,
-        "1280x720\n960x544\n768x512\n704x1280\n544x960",
-        10
-      ]
-    },
-    {
-      "id": 334,
-      "type": "StimmaSeedParam",
-      "pos": [
-        -800,
-        400
-      ],
-      "size": [
-        384,
-        156
-      ],
-      "flags": {},
-      "order": 0,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "name",
-          "type": "STRING",
-          "widget": {
-            "name": "name"
-          },
-          "link": null
-        },
-        {
-          "name": "value",
-          "type": "INT",
-          "widget": {
-            "name": "value"
-          },
-          "link": null
-        },
-        {
-          "name": "ui_order",
-          "type": "INT",
-          "widget": {
-            "name": "ui_order"
-          },
-          "link": null
-        }
-      ],
-      "outputs": [
-        {
-          "name": "seed",
-          "type": "INT",
-          "links": [
-            651
-          ],
-          "slot_index": 0
-        }
-      ],
-      "properties": {
-        "Node name for S&R": "StimmaSeedParam"
-      },
-      "widgets_values": [
-        "seed",
-        0,
-        80
-      ]
-    },
-    {
-      "id": 335,
-      "type": "StimmaIntParam",
-      "pos": [
-        -300,
-        0
-      ],
-      "size": [
-        384,
-        355
-      ],
-      "flags": {},
-      "order": 0,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "name",
-          "type": "STRING",
-          "widget": {
-            "name": "name"
-          },
-          "link": null
-        },
-        {
-          "name": "value",
-          "type": "INT",
-          "widget": {
-            "name": "value"
-          },
-          "link": null
-        },
-        {
-          "name": "minimum",
-          "type": "INT",
-          "widget": {
-            "name": "minimum"
-          },
-          "link": null
-        },
-        {
-          "name": "maximum",
-          "type": "INT",
-          "widget": {
-            "name": "maximum"
-          },
-          "link": null
-        },
-        {
-          "name": "step",
-          "type": "INT",
-          "widget": {
-            "name": "step"
-          },
-          "link": null
-        },
-        {
-          "name": "ui_control",
-          "type": "COMBO",
-          "widget": {
-            "name": "ui_control"
-          },
-          "link": null
-        },
-        {
-          "name": "ui_order",
-          "type": "INT",
-          "widget": {
-            "name": "ui_order"
-          },
-          "link": null
-        },
-        {
-          "name": "ui_description",
-          "type": "STRING",
-          "widget": {
-            "name": "ui_description"
-          },
-          "link": null
-        }
-      ],
-      "outputs": [
-        {
-          "name": "value",
-          "type": "INT",
-          "links": [
-            652
-          ],
-          "slot_index": 0
-        }
-      ],
-      "properties": {
-        "Node name for S&R": "StimmaIntParam"
-      },
-      "widgets_values": [
-        "duration",
-        5,
-        1,
-        20,
-        1,
-        "slider",
-        20,
-        "Video duration in seconds"
-      ]
-    },
-    {
-      "id": 336,
-      "type": "StimmaIntParam",
-      "pos": [
-        -300,
-        0
-      ],
-      "size": [
-        384,
-        355
-      ],
-      "flags": {},
-      "order": 0,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "name",
-          "type": "STRING",
-          "widget": {
-            "name": "name"
-          },
-          "link": null
-        },
-        {
-          "name": "value",
-          "type": "INT",
-          "widget": {
-            "name": "value"
-          },
-          "link": null
-        },
-        {
-          "name": "minimum",
-          "type": "INT",
-          "widget": {
-            "name": "minimum"
-          },
-          "link": null
-        },
-        {
-          "name": "maximum",
-          "type": "INT",
-          "widget": {
-            "name": "maximum"
-          },
-          "link": null
-        },
-        {
-          "name": "step",
-          "type": "INT",
-          "widget": {
-            "name": "step"
-          },
-          "link": null
-        },
-        {
-          "name": "ui_control",
-          "type": "COMBO",
-          "widget": {
-            "name": "ui_control"
-          },
-          "link": null
-        },
-        {
-          "name": "ui_order",
-          "type": "INT",
-          "widget": {
-            "name": "ui_order"
-          },
-          "link": null
-        },
-        {
-          "name": "ui_description",
-          "type": "STRING",
-          "widget": {
-            "name": "ui_description"
-          },
-          "link": null
-        }
-      ],
-      "outputs": [
-        {
-          "name": "value",
-          "type": "INT",
-          "links": [
-            653,
-            655
-          ],
-          "slot_index": 0
-        }
-      ],
-      "properties": {
-        "Node name for S&R": "StimmaIntParam"
-      },
-      "widgets_values": [
-        "fps",
-        25,
-        8,
-        60,
-        1,
-        "input",
-        21,
-        "Frames per second"
-      ]
-    },
-    {
-      "id": 337,
-      "type": "StimmaBoolParam",
-      "pos": [
-        -300,
-        1200
-      ],
-      "size": [
-        384,
-        180
-      ],
-      "flags": {},
-      "order": 0,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "name",
-          "type": "STRING",
-          "widget": {
-            "name": "name"
-          },
-          "link": null
-        },
-        {
-          "name": "value",
-          "type": "BOOLEAN",
-          "widget": {
-            "name": "value"
-          },
-          "link": null
-        },
-        {
-          "name": "ui_order",
-          "type": "INT",
-          "widget": {
-            "name": "ui_order"
-          },
-          "link": null
-        },
-        {
-          "name": "ui_description",
-          "type": "STRING",
-          "widget": {
-            "name": "ui_description"
-          },
-          "link": null
-        }
-      ],
-      "outputs": [
-        {
-          "name": "value",
-          "type": "BOOLEAN",
-          "links": [
-            657
-          ],
-          "slot_index": 0
-        }
-      ],
-      "properties": {
-        "Node name for S&R": "StimmaBoolParam"
-      },
-      "widgets_values": [
-        "generate_audio",
-        true,
-        22,
-        "Generate an audio track alongside the video"
-      ]
-    },
-    {
-      "id": 338,
-      "type": "StimmaVideoOutput",
-      "pos": [
-        800,
-        400
-      ],
-      "size": [
-        360,
-        300
-      ],
-      "flags": {},
-      "order": 0,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "frames",
-          "type": "IMAGE",
-          "link": 654
-        },
-        {
-          "name": "fps",
-          "type": "INT",
-          "widget": {
-            "name": "fps"
-          },
-          "link": 655
-        },
-        {
-          "name": "filename_prefix",
-          "type": "STRING",
-          "widget": {
-            "name": "filename_prefix"
-          },
-          "link": null
-        },
-        {
-          "name": "audio",
-          "type": "AUDIO",
-          "link": 656
-        },
-        {
-          "name": "generate_audio",
-          "type": "BOOLEAN",
-          "widget": {
-            "name": "generate_audio"
-          },
-          "link": 657,
-          "shape": 7
-        },
-        {
-          "name": "_stimma_output_dir",
-          "type": "STRING",
-          "widget": {
-            "name": "_stimma_output_dir"
-          },
-          "link": null,
-          "shape": 7
-        }
-      ],
-      "outputs": [],
-      "properties": {
-        "Node name for S&R": "StimmaVideoOutput"
-      },
-      "widgets_values": [
-        24,
-        "Stimma",
-        true,
-        ""
-      ]
-    },
-    {
-      "id": 339,
-      "type": "StimmaLayoutGroup",
-      "pos": [
-        -1400,
-        400
-      ],
-      "size": [
-        365,
-        240
-      ],
-      "flags": {},
-      "order": 0,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "group_label",
-          "type": "STRING",
-          "widget": {
-            "name": "group_label"
-          },
-          "link": null
-        },
-        {
-          "name": "param_names",
-          "type": "STRING",
-          "widget": {
-            "name": "param_names"
-          },
-          "link": null
-        },
-        {
-          "name": "collapsed",
-          "type": "BOOLEAN",
-          "widget": {
-            "name": "collapsed"
-          },
-          "link": null
-        },
-        {
-          "name": "ui_order",
-          "type": "INT",
-          "widget": {
-            "name": "ui_order"
-          },
-          "link": null
-        }
-      ],
-      "outputs": [],
-      "properties": {
-        "Node name for S&R": "StimmaLayoutGroup"
-      },
-      "widgets_values": [
-        "Video Settings",
-        "resolution\nduration\nfps\ngenerate_audio",
-        false,
-        5
-      ]
-    },
-    {
-      "id": 340,
-      "type": "StimmaLayoutGroup",
-      "pos": [
-        -1400,
-        400
-      ],
-      "size": [
-        365,
-        240
-      ],
-      "flags": {},
-      "order": 0,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "group_label",
-          "type": "STRING",
-          "widget": {
-            "name": "group_label"
-          },
-          "link": null
-        },
-        {
-          "name": "param_names",
-          "type": "STRING",
-          "widget": {
-            "name": "param_names"
-          },
-          "link": null
-        },
-        {
-          "name": "collapsed",
-          "type": "BOOLEAN",
-          "widget": {
-            "name": "collapsed"
-          },
-          "link": null
-        },
-        {
-          "name": "ui_order",
-          "type": "INT",
-          "widget": {
-            "name": "ui_order"
-          },
-          "link": null
-        }
-      ],
-      "outputs": [],
-      "properties": {
-        "Node name for S&R": "StimmaLayoutGroup"
-      },
-      "widgets_values": [
-        "Advanced",
-        "seed",
-        true,
-        10
-      ]
     }
   ],
   "links": [
@@ -1088,86 +271,6 @@
       75,
       0,
       "VIDEO"
-    ],
-    [
-      648,
-      332,
-      0,
-      267,
-      9,
-      "STRING"
-    ],
-    [
-      649,
-      333,
-      0,
-      267,
-      1,
-      "INT"
-    ],
-    [
-      650,
-      333,
-      1,
-      267,
-      2,
-      "INT"
-    ],
-    [
-      651,
-      334,
-      0,
-      267,
-      5,
-      "INT"
-    ],
-    [
-      652,
-      335,
-      0,
-      267,
-      3,
-      "INT"
-    ],
-    [
-      653,
-      336,
-      0,
-      267,
-      4,
-      "INT"
-    ],
-    [
-      654,
-      267,
-      1,
-      338,
-      0,
-      "IMAGE"
-    ],
-    [
-      655,
-      336,
-      0,
-      338,
-      1,
-      "INT"
-    ],
-    [
-      656,
-      267,
-      2,
-      338,
-      3,
-      "AUDIO"
-    ],
-    [
-      657,
-      337,
-      0,
-      338,
-      4,
-      "BOOLEAN"
     ]
   ],
   "groups": [],
@@ -1179,7 +282,7 @@
         "state": {
           "lastGroupId": 27,
           "lastNodeId": 330,
-          "lastLinkId": 649,
+          "lastLinkId": 647,
           "lastRerouteId": 0
         },
         "revision": 0,
@@ -1372,30 +475,6 @@
             "pos": [
               6124,
               4184
-            ]
-          },
-          {
-            "id": "3a14a1d2-fc40-4a57-82ad-a3b6a1ff7340",
-            "name": "frames",
-            "type": "IMAGE",
-            "linkIds": [
-              648
-            ],
-            "pos": [
-              6120,
-              4180
-            ]
-          },
-          {
-            "id": "a3cc34cb-aef0-4b72-acb1-553e1d27bd3d",
-            "name": "audio",
-            "type": "AUDIO",
-            "linkIds": [
-              649
-            ],
-            "pos": [
-              6120,
-              4200
             ]
           }
         ],
@@ -1611,8 +690,8 @@
               "Node name for S&R": "LTXVAudioVAELoader",
               "models": [
                 {
-                  "name": "ltx-2.3-22b-dev-fp8.safetensors",
-                  "url": "https://huggingface.co/Lightricks/LTX-2.3-fp8/resolve/main/ltx-2.3-22b-dev-fp8.safetensors",
+                  "name": "sulphur_dev_fp8mixed.safetensors",
+                  "url": "https://huggingface.co/Lightricks/LTX-2.3-fp8/resolve/main/sulphur_dev_fp8mixed.safetensors",
                   "directory": "checkpoints"
                 }
               ],
@@ -1623,7 +702,7 @@
               }
             },
             "widgets_values": [
-              "ltx-2.3-22b-dev-fp8.safetensors"
+              "sulphur_dev_fp8mixed.safetensors"
             ]
           },
           {
@@ -1998,8 +1077,8 @@
               "Node name for S&R": "LoraLoaderModelOnly",
               "models": [
                 {
-                  "name": "ltx_2.3_22b_distilled_1.1_lora_dynamic_fro09_avg_rank_111_bf16.safetensors",
-                  "url": "https://huggingface.co/Comfy-Org/ltx-2.3/resolve/main/split_files/loras/ltx_2.3_22b_distilled_1.1_lora_dynamic_fro09_avg_rank_111_bf16.safetensors",
+                  "name": "ltx-2.3-22b-distilled-lora-1.1_fro90_ceil72_condsafe.safetensors",
+                  "url": "https://huggingface.co/Comfy-Org/ltx-2.3/resolve/main/split_files/loras/ltx-2.3-22b-distilled-lora-1.1_fro90_ceil72_condsafe.safetensors",
                   "directory": "loras"
                 }
               ],
@@ -2010,7 +1089,7 @@
               }
             },
             "widgets_values": [
-              "ltx_2.3_22b_distilled_1.1_lora_dynamic_fro09_avg_rank_111_bf16.safetensors",
+              "ltx-2.3-22b-distilled-lora-1.1_fro90_ceil72_condsafe.safetensors",
               0.5
             ]
           },
@@ -3987,8 +3066,8 @@
               "Node name for S&R": "CheckpointLoaderSimple",
               "models": [
                 {
-                  "name": "ltx-2.3-22b-dev-fp8.safetensors",
-                  "url": "https://huggingface.co/Lightricks/LTX-2.3-fp8/resolve/main/ltx-2.3-22b-dev-fp8.safetensors",
+                  "name": "sulphur_dev_fp8mixed.safetensors",
+                  "url": "https://huggingface.co/Lightricks/LTX-2.3-fp8/resolve/main/sulphur_dev_fp8mixed.safetensors",
                   "directory": "checkpoints"
                 }
               ],
@@ -3999,7 +3078,7 @@
               }
             },
             "widgets_values": [
-              "ltx-2.3-22b-dev-fp8.safetensors"
+              "sulphur_dev_fp8mixed.safetensors"
             ]
           },
           {
@@ -4061,8 +3140,8 @@
               "Node name for S&R": "LTXAVTextEncoderLoader",
               "models": [
                 {
-                  "name": "ltx-2.3-22b-dev-fp8.safetensors",
-                  "url": "https://huggingface.co/Lightricks/LTX-2.3-fp8/resolve/main/ltx-2.3-22b-dev-fp8.safetensors",
+                  "name": "sulphur_dev_fp8mixed.safetensors",
+                  "url": "https://huggingface.co/Lightricks/LTX-2.3-fp8/resolve/main/sulphur_dev_fp8mixed.safetensors",
                   "directory": "checkpoints"
                 },
                 {
@@ -4079,7 +3158,7 @@
             },
             "widgets_values": [
               "gemma_3_12B_it_fp4_mixed.safetensors",
-              "ltx-2.3-22b-dev-fp8.safetensors",
+              "sulphur_dev_fp8mixed.safetensors",
               "default"
             ]
           },
@@ -4138,7 +3217,7 @@
               }
             },
             "widgets_values": [
-              "Dynamic cinematic close-up of high-tech modular machinery self-assembling in midair, precision robotic parts, magnetic connectors, and glowing circuits clicking together, subtle smoke and light flares, extremely detailed titanium textures. The final product displays a clean, clear surface with large glowing engraved text \u201cLTX-2.3\u201d centered and unobstructed, dramatic lighting, photorealism, 8K, sharp focus.\n"
+              "Dynamic cinematic close-up of high-tech modular machinery self-assembling in midair, precision robotic parts, magnetic connectors, and glowing circuits clicking together, subtle smoke and light flares, extremely detailed titanium textures. The final product displays a clean, clear surface with large glowing engraved text “LTX-2.3” centered and unobstructed, dramatic lighting, photorealism, 8K, sharp focus.\n"
             ]
           },
           {
@@ -4658,7 +3737,7 @@
               "Node name for S&R": "PrimitiveBoolean"
             },
             "widgets_values": [
-              false
+              true
             ]
           }
         ],
@@ -5516,22 +4595,6 @@
             "target_id": 237,
             "target_slot": 0,
             "type": "INT"
-          },
-          {
-            "id": 648,
-            "origin_id": 251,
-            "origin_slot": 0,
-            "target_id": -20,
-            "target_slot": 1,
-            "type": "IMAGE"
-          },
-          {
-            "id": 649,
-            "origin_id": 220,
-            "origin_slot": 0,
-            "target_id": -20,
-            "target_slot": 2,
-            "type": "AUDIO"
           }
         ],
         "extra": {
@@ -5570,7 +4633,7 @@
         },
         "class_type": "LTXVGemmaCLIPModelLoader",
         "_meta": {
-          "title": "\ud83c\udd5b\ud83c\udd63\ud83c\udd67 Gemma 3 Model Loader"
+          "title": "🅛🅣🅧 Gemma 3 Model Loader"
         }
       },
       "3": {
@@ -5656,7 +4719,7 @@
         },
         "class_type": "LTXVAudioVAELoader",
         "_meta": {
-          "title": "\ud83c\udd5b\ud83c\udd63\ud83c\udd67 LTXV Audio VAE Loader"
+          "title": "🅛🅣🅧 LTXV Audio VAE Loader"
         }
       },
       "14": {
@@ -5672,7 +4735,7 @@
         },
         "class_type": "LTXVAudioVAEDecode",
         "_meta": {
-          "title": "\ud83c\udd5b\ud83c\udd63\ud83c\udd67 LTXV Audio VAE Decode"
+          "title": "🅛🅣🅧 LTXV Audio VAE Decode"
         }
       },
       "15": {
@@ -5701,7 +4764,7 @@
         },
         "class_type": "VHS_VideoCombine",
         "_meta": {
-          "title": "Video Combine \ud83c\udfa5\ud83c\udd65\ud83c\udd57\ud83c\udd62"
+          "title": "Video Combine 🎥🅥🅗🅢"
         }
       },
       "17": {
@@ -5726,7 +4789,7 @@
         },
         "class_type": "MultimodalGuider",
         "_meta": {
-          "title": "\ud83c\udd5b\ud83c\udd63\ud83c\udd67 Multimodal Guider"
+          "title": "🅛🅣🅧 Multimodal Guider"
         }
       },
       "18": {
@@ -5743,7 +4806,7 @@
         },
         "class_type": "GuiderParameters",
         "_meta": {
-          "title": "\ud83c\udd5b\ud83c\udd63\ud83c\udd67 Guider Parameters"
+          "title": "🅛🅣🅧 Guider Parameters"
         }
       },
       "19": {
@@ -5756,7 +4819,7 @@
         },
         "class_type": "GuiderParameters",
         "_meta": {
-          "title": "\ud83c\udd5b\ud83c\udd63\ud83c\udd67 Guider Parameters"
+          "title": "🅛🅣🅧 Guider Parameters"
         }
       },
       "21": {
@@ -5815,7 +4878,7 @@
         },
         "class_type": "LTXVEmptyLatentAudio",
         "_meta": {
-          "title": "\ud83c\udd5b\ud83c\udd63\ud83c\udd67 LTXV Empty Latent Audio"
+          "title": "🅛🅣🅧 LTXV Empty Latent Audio"
         }
       },
       "27": {
@@ -5844,7 +4907,7 @@
         },
         "class_type": "LTXVConcatAVLatent",
         "_meta": {
-          "title": "\ud83c\udd5b\ud83c\udd63\ud83c\udd67 LTXV Concat AV Latent"
+          "title": "🅛🅣🅧 LTXV Concat AV Latent"
         }
       },
       "29": {
@@ -5860,7 +4923,7 @@
         },
         "class_type": "LTXVSeparateAVLatent",
         "_meta": {
-          "title": "\ud83c\udd5b\ud83c\udd63\ud83c\udd67 LTXV Separate AV Latent"
+          "title": "🅛🅣🅧 LTXV Separate AV Latent"
         }
       },
       "41": {

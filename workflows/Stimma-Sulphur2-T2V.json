@@ -76,7 +76,7 @@
         }
       },
       "widgets_values": [
-        "- Huggingface: [Lightricks/LTX-2.3](https://huggingface.co/Lightricks/LTX-2.3/)\n- Github: [LTX-2](https://github.com/Lightricks/LTX-2)\n\n## LTX-2.3 Prompting Tips\n\n1. **Core Actions**: Describe events and actions as they occur over time  \n2. **Visual Details**: Describe all visual details you want to appear in the video  \n3. **Audio**: Describe sounds and dialogue needed for the scene\n\n## Report LTX-2.3 Issues\nTo report any issues when running this workflow, [go to GitHub](https://github.com/Lightricks/ComfyUI-LTXVideo/issues)\n\n## Model Links (for Local Users)\n\n**checkpoints**\n\n- [ltx-2.3-22b-dev-fp8.safetensors](https://huggingface.co/Lightricks/LTX-2.3-fp8/resolve/main/ltx-2.3-22b-dev-fp8.safetensors)\n\n**loras**\n\n- [ltx_2.3_22b_distilled_1.1_lora_dynamic_fro09_avg_rank_111_bf16.safetensors](https://huggingface.co/Comfy-Org/ltx-2.3/resolve/main/split_files/loras/ltx_2.3_22b_distilled_1.1_lora_dynamic_fro09_avg_rank_111_bf16.safetensors)\n- [gemma-3-12b-it-abliterated_lora_rank64_bf16.safetensors](https://huggingface.co/Comfy-Org/ltx-2/resolve/main/split_files/loras/gemma-3-12b-it-abliterated_lora_rank64_bf16.safetensors)\n\n**latent_upscale_models**\n- [ltx-2.3-spatial-upscaler-x2-1.1.safetensors](https://huggingface.co/Lightricks/LTX-2.3/resolve/main/ltx-2.3-spatial-upscaler-x2-1.1.safetensors)\n\n\n## Model Storage Location\n\n```\n\ud83d\udcc2 ComfyUI/\n\u251c\u2500\u2500 \ud83d\udcc2 models/\n\u2502   \u251c\u2500\u2500 \ud83d\udcc2 checkpoints/\n\u2502   \u2502   \u2514\u2500\u2500 ltx-2.3-22b-dev-fp8.safetensors\n\u2502   \u251c\u2500\u2500 \ud83d\udcc2 loras/\n\u2502   \u2502   \u251c\u2500\u2500 ltx_2.3_22b_distilled_1.1_lora_dynamic_fro09_avg_rank_111_bf16.safetensors\n\u2502   \u2502   \u2514\u2500\u2500 gemma-3-12b-it-abliterated_lora_rank64_bf16.safetensors\n\u2502   \u2514\u2500\u2500 \ud83d\udcc2 latent_upscale_models/\n\u2502       \u2514\u2500\u2500 ltx-2.3-spatial-upscaler-x2-1.1.safetensors\n```\n\n## Report Issue\n\nNote: Please update ComfyUI first ([guide](https://docs.comfy.org/installation/update_comfyui)) and prepare required models. Desktop/Cloud updates follow stable releases, so some nightly-supported models may not be available yet.\n\n- Cannot run / runtime errors: [ComfyUI/issues](https://github.com/Comfy-Org/ComfyUI/issues)\n- UI / frontend issues: [ComfyUI_frontend/issues](https://github.com/Comfy-Org/ComfyUI_frontend/issues)\n- Workflow issues: [workflow_templates/issues](https://github.com/Comfy-Org/workflow_templates/issues)\n"
+        "- Huggingface: [Lightricks/LTX-2.3](https://huggingface.co/Lightricks/LTX-2.3/)\n- Github: [LTX-2](https://github.com/Lightricks/LTX-2)\n\n## LTX-2.3 Prompting Tips\n\n1. **Core Actions**: Describe events and actions as they occur over time  \n2. **Visual Details**: Describe all visual details you want to appear in the video  \n3. **Audio**: Describe sounds and dialogue needed for the scene\n\n## Report LTX-2.3 Issues\nTo report any issues when running this workflow, [go to GitHub](https://github.com/Lightricks/ComfyUI-LTXVideo/issues)\n\n## Model Links (for Local Users)\n\n**checkpoints**\n\n- [sulphur_dev_fp8mixed.safetensors](https://huggingface.co/Lightricks/LTX-2.3-fp8/resolve/main/sulphur_dev_fp8mixed.safetensors)\n\n**loras**\n\n- [ltx-2.3-22b-distilled-lora-1.1_fro90_ceil72_condsafe.safetensors](https://huggingface.co/Comfy-Org/ltx-2.3/resolve/main/split_files/loras/ltx-2.3-22b-distilled-lora-1.1_fro90_ceil72_condsafe.safetensors)\n- [gemma-3-12b-it-abliterated_lora_rank64_bf16.safetensors](https://huggingface.co/Comfy-Org/ltx-2/resolve/main/split_files/loras/gemma-3-12b-it-abliterated_lora_rank64_bf16.safetensors)\n\n**latent_upscale_models**\n- [ltx-2.3-spatial-upscaler-x2-1.1.safetensors](https://huggingface.co/Lightricks/LTX-2.3/resolve/main/ltx-2.3-spatial-upscaler-x2-1.1.safetensors)\n\n\n## Model Storage Location\n\n```\n\ud83d\udcc2 ComfyUI/\n\u251c\u2500\u2500 \ud83d\udcc2 models/\n\u2502   \u251c\u2500\u2500 \ud83d\udcc2 checkpoints/\n\u2502   \u2502   \u2514\u2500\u2500 sulphur_dev_fp8mixed.safetensors\n\u2502   \u251c\u2500\u2500 \ud83d\udcc2 loras/\n\u2502   \u2502   \u251c\u2500\u2500 ltx-2.3-22b-distilled-lora-1.1_fro90_ceil72_condsafe.safetensors\n\u2502   \u2502   \u2514\u2500\u2500 gemma-3-12b-it-abliterated_lora_rank64_bf16.safetensors\n\u2502   \u2514\u2500\u2500 \ud83d\udcc2 latent_upscale_models/\n\u2502       \u2514\u2500\u2500 ltx-2.3-spatial-upscaler-x2-1.1.safetensors\n```\n\n## Report Issue\n\nNote: Please update ComfyUI first ([guide](https://docs.comfy.org/installation/update_comfyui)) and prepare required models. Desktop/Cloud updates follow stable releases, so some nightly-supported models may not be available yet.\n\n- Cannot run / runtime errors: [ComfyUI/issues](https://github.com/Comfy-Org/ComfyUI/issues)\n- UI / frontend issues: [ComfyUI_frontend/issues](https://github.com/Comfy-Org/ComfyUI_frontend/issues)\n- Workflow issues: [workflow_templates/issues](https://github.com/Comfy-Org/workflow_templates/issues)\n"
       ],
       "color": "#222",
       "bgcolor": "#000"
@@ -365,13 +365,13 @@
         "Node name for S&R": "StimmaToolInfo"
       },
       "widgets_values": [
-        "ltx23-t2v",
-        "LTX-2.3 Text to Video",
+        "sulphur2-t2v",
+        "Sulphur 2 Text to Video",
         "text-to-video",
         "Open Weights",
-        "Generate video from text using LTX-2.3",
-        "lightricks",
-        "ltx-2.3"
+        "Generate uncensored video from text using Sulphur 2 (an LTX-2.3 finetune)",
+        "seregil13th",
+        "sulphur-2"
       ]
     },
     {
@@ -1375,7 +1375,7 @@
             ]
           },
           {
-            "id": "3a14a1d2-fc40-4a57-82ad-a3b6a1ff7340",
+            "id": "0dceb861-50cd-4b5f-a47c-3b7c34211aa4",
             "name": "frames",
             "type": "IMAGE",
             "linkIds": [
@@ -1387,7 +1387,7 @@
             ]
           },
           {
-            "id": "a3cc34cb-aef0-4b72-acb1-553e1d27bd3d",
+            "id": "4b257204-14ef-4221-8cd0-528cc3f61787",
             "name": "audio",
             "type": "AUDIO",
             "linkIds": [
@@ -1611,8 +1611,8 @@
               "Node name for S&R": "LTXVAudioVAELoader",
               "models": [
                 {
-                  "name": "ltx-2.3-22b-dev-fp8.safetensors",
-                  "url": "https://huggingface.co/Lightricks/LTX-2.3-fp8/resolve/main/ltx-2.3-22b-dev-fp8.safetensors",
+                  "name": "sulphur_dev_fp8mixed.safetensors",
+                  "url": "https://huggingface.co/Lightricks/LTX-2.3-fp8/resolve/main/sulphur_dev_fp8mixed.safetensors",
                   "directory": "checkpoints"
                 }
               ],
@@ -1623,7 +1623,7 @@
               }
             },
             "widgets_values": [
-              "ltx-2.3-22b-dev-fp8.safetensors"
+              "sulphur_dev_fp8mixed.safetensors"
             ]
           },
           {
@@ -1998,8 +1998,8 @@
               "Node name for S&R": "LoraLoaderModelOnly",
               "models": [
                 {
-                  "name": "ltx_2.3_22b_distilled_1.1_lora_dynamic_fro09_avg_rank_111_bf16.safetensors",
-                  "url": "https://huggingface.co/Comfy-Org/ltx-2.3/resolve/main/split_files/loras/ltx_2.3_22b_distilled_1.1_lora_dynamic_fro09_avg_rank_111_bf16.safetensors",
+                  "name": "ltx-2.3-22b-distilled-lora-1.1_fro90_ceil72_condsafe.safetensors",
+                  "url": "https://huggingface.co/Comfy-Org/ltx-2.3/resolve/main/split_files/loras/ltx-2.3-22b-distilled-lora-1.1_fro90_ceil72_condsafe.safetensors",
                   "directory": "loras"
                 }
               ],
@@ -2010,7 +2010,7 @@
               }
             },
             "widgets_values": [
-              "ltx_2.3_22b_distilled_1.1_lora_dynamic_fro09_avg_rank_111_bf16.safetensors",
+              "ltx-2.3-22b-distilled-lora-1.1_fro90_ceil72_condsafe.safetensors",
               0.5
             ]
           },
@@ -3987,8 +3987,8 @@
               "Node name for S&R": "CheckpointLoaderSimple",
               "models": [
                 {
-                  "name": "ltx-2.3-22b-dev-fp8.safetensors",
-                  "url": "https://huggingface.co/Lightricks/LTX-2.3-fp8/resolve/main/ltx-2.3-22b-dev-fp8.safetensors",
+                  "name": "sulphur_dev_fp8mixed.safetensors",
+                  "url": "https://huggingface.co/Lightricks/LTX-2.3-fp8/resolve/main/sulphur_dev_fp8mixed.safetensors",
                   "directory": "checkpoints"
                 }
               ],
@@ -3999,7 +3999,7 @@
               }
             },
             "widgets_values": [
-              "ltx-2.3-22b-dev-fp8.safetensors"
+              "sulphur_dev_fp8mixed.safetensors"
             ]
           },
           {
@@ -4061,8 +4061,8 @@
               "Node name for S&R": "LTXAVTextEncoderLoader",
               "models": [
                 {
-                  "name": "ltx-2.3-22b-dev-fp8.safetensors",
-                  "url": "https://huggingface.co/Lightricks/LTX-2.3-fp8/resolve/main/ltx-2.3-22b-dev-fp8.safetensors",
+                  "name": "sulphur_dev_fp8mixed.safetensors",
+                  "url": "https://huggingface.co/Lightricks/LTX-2.3-fp8/resolve/main/sulphur_dev_fp8mixed.safetensors",
                   "directory": "checkpoints"
                 },
                 {
@@ -4079,7 +4079,7 @@
             },
             "widgets_values": [
               "gemma_3_12B_it_fp4_mixed.safetensors",
-              "ltx-2.3-22b-dev-fp8.safetensors",
+              "sulphur_dev_fp8mixed.safetensors",
               "default"
             ]
           },
