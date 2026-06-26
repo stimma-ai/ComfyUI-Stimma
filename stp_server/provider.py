@@ -43,6 +43,15 @@ class StimmaPluginProvider(Provider):
         self._plugin_config = config
         self._comfy_client = comfy_client
         self._object_info: Optional[Dict[str, Any]] = None
+        # Fingerprint of models/custom_nodes at the time _object_info was last
+        # fetched. /object_info is tens of MB and ComfyUI rebuilds it by
+        # scanning the model dirs on every request, so we only refetch when this
+        # fingerprint actually changes (a model/LoRA/custom-node added/removed).
+        self._object_info_fingerprint: Optional[str] = None
+        # (deps_fingerprint, workflow_snapshot) captured at the last successful
+        # tool build — lets a tools.list short-circuit when nothing changed.
+        self._last_build_wf_snapshot: Optional[Dict[str, float]] = None
+        self._discovery_lock = asyncio.Lock()
         self._discovered_workflows: Dict[str, Any] = {}  # slug → DiscoveredWorkflow
         self._previous_slugs: set = set()
         self._watcher_task: Optional[asyncio.Task] = None
@@ -83,21 +92,58 @@ class StimmaPluginProvider(Provider):
                 pass
         await super().stop()
 
-    async def discover_and_register_tools(self):
-        """Scan for workflows, build tools, and register them."""
-        # Import here to avoid circular imports
+    async def discover_and_register_tools(self, force: bool = False):
+        """Scan for workflows, build tools, and register them.
+
+        Hot-path cost control: ComfyUI's /object_info is tens of MB and is
+        rebuilt server-side (by scanning every model directory) on each request,
+        so fetching it on every tools.list is the single largest source of
+        latency. We avoid it in two ways:
+
+        * Refetch /object_info only when the on-disk model/custom-node
+          fingerprint changes (a model, LoRA, or custom node added/removed).
+        * Skip the whole rebuild when neither the workflow files nor that
+          fingerprint changed since the last successful build — a steady-state
+          tools.list then costs only two cheap local directory walks.
+
+        Freshness is preserved: a new LoRA/model changes the fingerprint, which
+        forces a refetch (and the file watcher independently catches changes
+        within its poll interval). Pass force=True to rebuild unconditionally.
+        """
+        deps_fingerprint = self._snapshot_comfyui_deps()
+        wf_snapshot = self._snapshot_workflow_files()
+
+        async with self._discovery_lock:
+            nothing_changed = (
+                not force
+                and self._initial_discovery_done
+                and self._object_info is not None
+                and deps_fingerprint == self._object_info_fingerprint
+                and wf_snapshot == self._last_build_wf_snapshot
+            )
+            if nothing_changed:
+                return False  # Registry already current — keep it as-is.
+
+            return await self._rebuild_tools(deps_fingerprint, wf_snapshot, force=force)
+
+    async def _rebuild_tools(self, deps_fingerprint, wf_snapshot, force: bool = False):
+        """Refetch object_info if stale, then re-scan and rebuild the registry."""
         from .discovery import discover_workflows
         from .tool_builder import build_tools_from_workflows
 
         # Refresh object_info for dynamic enums (samplers, schedulers, LoRAs)
-        try:
-            self._object_info = await self._comfy_client.get_object_info()
-        except Exception as e:
-            logger.error(
-                f"\033[31m\u2718 Failed to fetch ComfyUI object_info: {e}\033[0m"
-            )
-            if self._object_info is None:
-                self._object_info = {}
+        # only when models/custom_nodes changed (or we've never fetched it, or
+        # an explicit refresh was requested).
+        if force or self._object_info is None or deps_fingerprint != self._object_info_fingerprint:
+            try:
+                self._object_info = await self._comfy_client.get_object_info()
+                self._object_info_fingerprint = deps_fingerprint
+            except Exception as e:
+                logger.error(
+                    f"\033[31m\u2718 Failed to fetch ComfyUI object_info: {e}\033[0m"
+                )
+                if self._object_info is None:
+                    self._object_info = {}
 
         # Discover workflows
         workflows = discover_workflows(self._plugin_config, object_info=self._object_info)
@@ -119,6 +165,8 @@ class StimmaPluginProvider(Provider):
         self._tool_registry.clear()
         for tool in tools:
             self._tool_registry.register(tool)
+
+        self._last_build_wf_snapshot = wf_snapshot
 
         # Check if tool list changed
         current_slugs = {t.slug for t in tools}
@@ -166,7 +214,9 @@ class StimmaPluginProvider(Provider):
 
     async def on_refresh(self):
         """Handle tools.refresh — rescan workflows and update tools."""
-        changed = await self.discover_and_register_tools()
+        # Explicit refresh: rebuild unconditionally (and refetch object_info)
+        # rather than trusting the change-detection short-circuit.
+        changed = await self.discover_and_register_tools(force=True)
         if changed:
             logger.info("Tool list changed during refresh, notifying Stimma")
             await self.notify_tools_changed()

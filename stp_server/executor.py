@@ -237,36 +237,47 @@ async def execute_workflow(
             else:
                 logger.warning("No Stimma output nodes — will fall back to history capture")
 
-            # Step 7: Queue to ComfyUI and monitor
+            # Step 7: Connect the monitoring websocket BEFORE queueing.
+            # ComfyUI broadcasts execution events live; a prompt that finishes
+            # before we connect would have its "complete" signal sent to nobody,
+            # leaving the monitor to hang. Connecting first closes that race and
+            # also overlaps the (localhost) handshake with prompt validation.
             await context.report_progress(0.1)
 
             node_types = {nd.get("class_type") for nd in prompt.values()}
             logger.info(f"Prompt has {len(prompt)} nodes, class_types: {sorted(node_types)}")
 
-            queue_response = await instance.queue_prompt(prompt)
-            queue_node_errors = queue_response.get("node_errors", {}) if isinstance(queue_response, dict) else {}
-            if queue_node_errors:
-                summary = _summarize_queue_node_errors(queue_node_errors, prompt)
-                logger.error("ComfyUI accepted prompt with node_errors: %s", summary)
-                raise RuntimeError(
-                    "ComfyUI prompt has node validation errors (execution may skip outputs): "
-                    f"{summary}"
-                )
-            prompt_id = queue_response["prompt_id"]
-            logger.info(f"Queued prompt {prompt_id} on {instance.addr}")
-
-            # Step 8: Monitor via websocket
             ws = await instance.connect_ws()
             try:
+                queue_response = await instance.queue_prompt(prompt)
+                queue_node_errors = queue_response.get("node_errors", {}) if isinstance(queue_response, dict) else {}
+                if queue_node_errors:
+                    summary = _summarize_queue_node_errors(queue_node_errors, prompt)
+                    logger.error("ComfyUI accepted prompt with node_errors: %s", summary)
+                    raise RuntimeError(
+                        "ComfyUI prompt has node validation errors (execution may skip outputs): "
+                        f"{summary}"
+                    )
+                prompt_id = queue_response["prompt_id"]
+                logger.info(f"Queued prompt {prompt_id} on {instance.addr}")
+
+                # Step 8: Monitor via websocket
+                gen_start = time.time()
                 await _monitor_execution(ws, prompt_id, context)
+                t_gen = time.time() - gen_start
             finally:
-                await ws.close()
-                if hasattr(ws, '_session'):
-                    await ws._session.close()
+                # Tear the monitoring socket down in the background. A graceful
+                # ws close handshake blocks until ComfyUI acks it, and ComfyUI's
+                # event loop is busy with post-execution work for ~0.5s right
+                # after a job finishes — so awaiting the close here would tack
+                # that latency onto every generation. We already have the
+                # completion signal and the output file, so let it close async.
+                _schedule_ws_close(ws)
 
             await context.report_progress(0.9)
 
             # Step 9: Capture output
+            t_cap0 = time.time()
             expected_output_node_ids = [
                 nid for nid, nd in prompt.items()
                 if nd.get("class_type") in {"StimmaImageOutput", "StimmaVideoOutput"}
@@ -279,11 +290,18 @@ async def execute_workflow(
                 prompt_id,
                 expected_output_node_ids=expected_output_node_ids,
             )
+            t_cap = time.time() - t_cap0
 
             await context.report_progress(1.0)
 
             generation_time = time.time() - start_time
-            logger.info(f"Workflow {workflow.tool_info['slug']} completed in {generation_time:.2f}s")
+            # gen = ComfyUI queue->complete; cap = output read+upload; the rest
+            # (inject/queue/ws) is provider overhead and should be ~0.
+            overhead = generation_time - t_gen - t_cap
+            logger.info(
+                f"Workflow {workflow.tool_info['slug']} completed in {generation_time:.2f}s "
+                f"(gen {t_gen:.2f}s, capture {t_cap:.2f}s, overhead {overhead:.2f}s)"
+            )
 
             result["generation_time"] = generation_time
             return result
@@ -1051,9 +1069,44 @@ def _inject_output_dir(
             prompt[node_id]["inputs"]["_stimma_output_dir"] = output_dir
 
 
+def _schedule_ws_close(ws) -> None:
+    """Close a monitoring websocket + its session without blocking the caller.
+
+    The graceful aiohttp close handshake can wait hundreds of ms on ComfyUI's
+    post-execution event loop. We don't need a clean close — fire it off as a
+    background task so the result path returns immediately.
+    """
+    async def _close():
+        try:
+            await ws.close()
+        except Exception:
+            pass
+        session = getattr(ws, "_session", None)
+        if session is not None:
+            try:
+                await session.close()
+            except Exception:
+                pass
+
+    try:
+        asyncio.create_task(_close())
+    except RuntimeError:
+        # No running loop (shouldn't happen in the provider) — best effort.
+        pass
+
+
 async def _monitor_execution(ws, prompt_id: str, context: "ExecutionContext"):
     """Monitor ComfyUI execution progress via websocket."""
     import aiohttp
+
+    # Throttle progress forwarding. ComfyUI emits progress dozens of times per
+    # second; forwarding every one (each an awaited ws send to the client) lets
+    # the monitor fall behind, so a backlog of progress messages sits in the
+    # receive buffer ahead of the completion signal — delaying when we see the
+    # job finish by hundreds of ms after the GPU is actually done. Coalescing to
+    # ~10/s keeps the monitor current so completion is detected immediately.
+    _last_progress_t = 0.0
+    _PROGRESS_MIN_INTERVAL = 0.1
 
     async for message in ws:
         if message.type == aiohttp.WSMsgType.TEXT:
@@ -1065,16 +1118,29 @@ async def _monitor_execution(ws, prompt_id: str, context: "ExecutionContext"):
                 if prog_data.get("prompt_id") == prompt_id:
                     value = prog_data.get("value", 0)
                     max_val = prog_data.get("max", 1)
-                    if max_val > 0:
+                    now = time.time()
+                    # Always forward the terminal tick; throttle the rest.
+                    if max_val > 0 and (
+                        value >= max_val or now - _last_progress_t >= _PROGRESS_MIN_INTERVAL
+                    ):
+                        _last_progress_t = now
                         # Map ComfyUI progress (0-max) to our range (0.1-0.9)
                         progress = 0.1 + (value / max_val) * 0.8
                         await context.report_progress(progress)
+
+            elif msg_type == "execution_success":
+                if data.get("data", {}).get("prompt_id") == prompt_id:
+                    # ComfyUI signals success here, ~0.5s before the queue-idle
+                    # "executing: null" — and the output file is already written
+                    # by this point, so we can proceed to capture immediately.
+                    logger.info(f"Execution complete for prompt {prompt_id}")
+                    return
 
             elif msg_type == "executing":
                 exec_data = data.get("data", {})
                 if exec_data.get("prompt_id") == prompt_id:
                     if exec_data.get("node") is None:
-                        # Execution complete
+                        # Fallback completion signal (queue went idle).
                         logger.info(f"Execution complete for prompt {prompt_id}")
                         return
 
@@ -1128,17 +1194,17 @@ async def _capture_output(
             expected_output_node_ids=expected_output_node_ids or [],
         )
 
-    # Upload the first output file
+    # Upload the first output file. The Stimma output node (StimmaImageOutput)
+    # already writes ComfyUI's prompt + workflow into the PNG's text chunks when
+    # it saves, so we must NOT decode + re-encode here to "add" metadata — that
+    # re-encode cost hundreds of ms (and over a second under event-loop
+    # contention) to duplicate metadata the file already has. Just stream the
+    # bytes straight through. The read runs in a worker thread so a large file
+    # never blocks the shared STP event loop / asset serving.
     output_path = output_files[0]
     ext = output_path.suffix.lower()
 
-    with open(output_path, "rb") as f:
-        output_bytes = f.read()
-
-    # Optionally embed ComfyUI metadata for PNG images
-    if ext == ".png":
-        output_bytes = _embed_metadata(output_bytes, prompt)
-
+    output_bytes = await asyncio.to_thread(output_path.read_bytes)
     asset_id = await context.assets.upload(output_bytes, ext)
     logger.info(f"Uploaded output: {asset_id} ({len(output_bytes)} bytes)")
 
@@ -1238,35 +1304,3 @@ async def _capture_from_history(
     )
 
 
-def _embed_metadata(image_bytes: bytes, prompt: Dict[str, Any]) -> bytes:
-    """Embed ComfyUI-compatible metadata into a PNG image."""
-    try:
-        import io
-        from PIL import Image
-        from PIL.PngImagePlugin import PngInfo
-
-        img = Image.open(io.BytesIO(image_bytes))
-        pnginfo = PngInfo()
-
-        # Clean up Stimma internal fields before embedding
-        clean_prompt = {}
-        for node_id, node_data in prompt.items():
-            if node_id.startswith("stimma_lora_"):
-                clean_prompt[node_id] = node_data
-                continue
-            cleaned = dict(node_data)
-            if "inputs" in cleaned:
-                cleaned_inputs = dict(cleaned["inputs"])
-                cleaned_inputs.pop("_stimma_output_dir", None)
-                cleaned["inputs"] = cleaned_inputs
-            clean_prompt[node_id] = cleaned
-
-        pnginfo.add_text("prompt", json.dumps(clean_prompt, separators=(",", ":")))
-
-        output = io.BytesIO()
-        img.save(output, format="PNG", pnginfo=pnginfo)
-        return output.getvalue()
-
-    except Exception as e:
-        logger.warning(f"Failed to embed metadata: {e}")
-        return image_bytes

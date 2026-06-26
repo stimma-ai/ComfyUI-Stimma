@@ -45,22 +45,35 @@ class SingleComfy:
     def __init__(self, addr: str):
         self.addr = addr
         self.client_id = str(uuid.uuid4())
+        self._session: Optional[aiohttp.ClientSession] = None
+
+    async def _get_session(self) -> aiohttp.ClientSession:
+        """Get (or lazily create) a keep-alive HTTP session for this instance.
+
+        Reusing one session across requests keeps the TCP connection to ComfyUI
+        warm instead of doing a fresh connect/teardown on every /prompt,
+        /history, /object_info and /upload call. Created lazily so it binds to
+        the running STP event loop.
+        """
+        if self._session is None or self._session.closed:
+            self._session = aiohttp.ClientSession(auto_decompress=False)
+        return self._session
 
     async def _request(self, method: str, path: str, **kwargs) -> Any:
         """Make an HTTP request to the ComfyUI server."""
-        async with aiohttp.ClientSession(auto_decompress=False) as session:
-            url = f"http://{self.addr}{path}"
-            async with session.request(method, url, **kwargs) as resp:
-                if resp.status != 200:
-                    error_text = await resp.text()
-                    raise RuntimeError(
-                        f"ComfyUI {method} {path} failed ({resp.status}): {error_text}"
-                    )
-                raw = await resp.read()
-                try:
-                    return json.loads(raw.decode("utf-8"))
-                except (json.JSONDecodeError, UnicodeDecodeError):
-                    return raw
+        session = await self._get_session()
+        url = f"http://{self.addr}{path}"
+        async with session.request(method, url, **kwargs) as resp:
+            if resp.status != 200:
+                error_text = await resp.text()
+                raise RuntimeError(
+                    f"ComfyUI {method} {path} failed ({resp.status}): {error_text}"
+                )
+            raw = await resp.read()
+            try:
+                return json.loads(raw.decode("utf-8"))
+            except (json.JSONDecodeError, UnicodeDecodeError):
+                return raw
 
     async def queue_prompt(self, prompt: Dict[str, Any]) -> Dict[str, Any]:
         """Queue a workflow prompt for execution."""
@@ -114,22 +127,22 @@ class SingleComfy:
 
         filename = Path(image_path).name
 
-        async with aiohttp.ClientSession(auto_decompress=False) as session:
-            with open(image_path, "rb") as f:
-                form_data = aiohttp.FormData()
-                form_data.add_field("image", f, filename=filename, content_type="image/png")
-                form_data.add_field("type", image_type)
-                form_data.add_field("overwrite", str(overwrite).lower())
+        session = await self._get_session()
+        with open(image_path, "rb") as f:
+            form_data = aiohttp.FormData()
+            form_data.add_field("image", f, filename=filename, content_type="image/png")
+            form_data.add_field("type", image_type)
+            form_data.add_field("overwrite", str(overwrite).lower())
 
-                async with session.post(
-                    f"http://{self.addr}/upload/image", data=form_data
-                ) as resp:
-                    if resp.status != 200:
-                        error_text = await resp.text()
-                        raise RuntimeError(f"Image upload failed ({resp.status}): {error_text}")
-                    raw = await resp.read()
-                    response = json.loads(raw.decode("utf-8"))
-                    return response.get("name", filename)
+            async with session.post(
+                f"http://{self.addr}/upload/image", data=form_data
+            ) as resp:
+                if resp.status != 200:
+                    error_text = await resp.text()
+                    raise RuntimeError(f"Image upload failed ({resp.status}): {error_text}")
+                raw = await resp.read()
+                response = json.loads(raw.decode("utf-8"))
+                return response.get("name", filename)
 
     async def upload_video(self, video_path: str, overwrite: bool = True) -> str:
         """Upload a video to ComfyUI's input directory."""
@@ -146,40 +159,40 @@ class SingleComfy:
         }
         content_type = content_type_map.get(ext, "video/mp4")
 
-        async with aiohttp.ClientSession(auto_decompress=False) as session:
-            with open(video_path, "rb") as f:
-                form_data = aiohttp.FormData()
-                form_data.add_field("image", f, filename=filename, content_type=content_type)
-                form_data.add_field("type", "input")
-                form_data.add_field("overwrite", str(overwrite).lower())
+        session = await self._get_session()
+        with open(video_path, "rb") as f:
+            form_data = aiohttp.FormData()
+            form_data.add_field("image", f, filename=filename, content_type=content_type)
+            form_data.add_field("type", "input")
+            form_data.add_field("overwrite", str(overwrite).lower())
 
-                async with session.post(
-                    f"http://{self.addr}/upload/image", data=form_data
-                ) as resp:
-                    if resp.status != 200:
-                        error_text = await resp.text()
-                        raise RuntimeError(f"Video upload failed ({resp.status}): {error_text}")
-                    raw = await resp.read()
-                    response = json.loads(raw.decode("utf-8"))
-                    return response.get("name", filename)
+            async with session.post(
+                f"http://{self.addr}/upload/image", data=form_data
+            ) as resp:
+                if resp.status != 200:
+                    error_text = await resp.text()
+                    raise RuntimeError(f"Video upload failed ({resp.status}): {error_text}")
+                raw = await resp.read()
+                response = json.loads(raw.decode("utf-8"))
+                return response.get("name", filename)
 
     async def interrupt(self) -> bool:
         """Interrupt current execution."""
         try:
-            async with aiohttp.ClientSession(auto_decompress=False) as session:
-                async with session.post(f"http://{self.addr}/interrupt") as resp:
-                    return resp.status == 200
+            session = await self._get_session()
+            async with session.post(f"http://{self.addr}/interrupt") as resp:
+                return resp.status == 200
         except aiohttp.ClientError:
             return False
 
     async def clear_queue(self) -> bool:
         """Clear all pending prompts."""
         try:
-            async with aiohttp.ClientSession(auto_decompress=False) as session:
-                async with session.post(
-                    f"http://{self.addr}/queue", json={"clear": True}
-                ) as resp:
-                    return resp.status == 200
+            session = await self._get_session()
+            async with session.post(
+                f"http://{self.addr}/queue", json={"clear": True}
+            ) as resp:
+                return resp.status == 200
         except aiohttp.ClientError:
             return False
 

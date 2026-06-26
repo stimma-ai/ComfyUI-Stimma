@@ -63,15 +63,19 @@ class ComfyUITransport(Transport):
     async def send(self, message: str) -> None:
         """Send a message to all connected STP clients."""
         async with self._write_lock:
-            # Parse message for logging
+            # Only parse the (potentially large) message when we actually need
+            # the method name — for a debug log, or to describe a dropped send
+            # when no client is connected. The common path (clients present,
+            # debug off) skips the parse entirely.
             method = None
-            try:
-                parsed = json.loads(message)
-                method = parsed.get("method")
-                msg_id = parsed.get("id")
-                logger.debug(f"STP SEND: method={method}, id={msg_id}")
-            except Exception:
-                pass
+            if not self._clients or logger.isEnabledFor(logging.DEBUG):
+                try:
+                    parsed = json.loads(message)
+                    method = parsed.get("method")
+                    msg_id = parsed.get("id")
+                    logger.debug(f"STP SEND: method={method}, id={msg_id}")
+                except Exception:
+                    pass
 
             if not self._clients:
                 if method == "tools.result":

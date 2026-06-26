@@ -127,6 +127,9 @@ class Provider:
         self._queued_jobs: List[Job] = []
         self._running_jobs: Dict[str, Job] = {}
         self._job_semaphore = asyncio.Semaphore(config.max_concurrent)
+        # Signalled whenever a job is enqueued so the processor wakes
+        # immediately instead of polling on a fixed interval.
+        self._job_available = asyncio.Event()
         self._job_processor_task: Optional[asyncio.Task] = None
         self._message_loop_task: Optional[asyncio.Task] = None
 
@@ -371,6 +374,7 @@ class Provider:
             parameters=exec_request.parameters,
         )
         self._queued_jobs.append(job)
+        self._job_available.set()
 
         # Send queue status
         await self._send_queue_status()
@@ -410,7 +414,13 @@ class Provider:
         """Background task to process queued jobs."""
         while not self._shutdown_event.is_set():
             if not self._queued_jobs:
-                await asyncio.sleep(0.1)
+                # Wake the instant a job is enqueued; the timeout just lets us
+                # re-check the shutdown flag periodically.
+                self._job_available.clear()
+                try:
+                    await asyncio.wait_for(self._job_available.wait(), timeout=1.0)
+                except asyncio.TimeoutError:
+                    pass
                 continue
 
             # Get next job
