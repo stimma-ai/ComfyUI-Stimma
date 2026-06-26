@@ -1,8 +1,8 @@
 {
   "id": "fdcfc2b2-168f-4f3d-a1d0-6986b802fce5",
   "revision": 0,
-  "last_node_id": 207,
-  "last_link_id": 10,
+  "last_node_id": 208,
+  "last_link_id": 11,
   "nodes": [
     {
       "id": 200,
@@ -771,7 +771,7 @@
       },
       "widgets_values": [
         "Advanced",
-        "rendering_speed\nloras\nseed",
+        "rendering_speed\nsampler\nloras\nseed",
         true,
         10
       ]
@@ -845,6 +845,14 @@
           "name": "clip_in",
           "type": "CLIP",
           "link": 9
+        },
+        {
+          "name": "sampler",
+          "type": "STRING",
+          "widget": {
+            "name": "sampler"
+          },
+          "link": 11
         }
       ],
       "outputs": [
@@ -920,6 +928,74 @@
         "ver": "0.23.0"
       },
       "widgets_values": []
+    },
+    {
+      "id": 208,
+      "type": "StimmaDropdownParam",
+      "pos": [
+        -300,
+        200
+      ],
+      "size": [
+        384,
+        228
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "name",
+          "type": "STRING",
+          "widget": {
+            "name": "name"
+          },
+          "link": null
+        },
+        {
+          "name": "value",
+          "type": "STRING",
+          "widget": {
+            "name": "value"
+          },
+          "link": null
+        },
+        {
+          "name": "ui_order",
+          "type": "INT",
+          "widget": {
+            "name": "ui_order"
+          },
+          "link": null
+        },
+        {
+          "name": "ui_description",
+          "type": "STRING",
+          "widget": {
+            "name": "ui_description"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "value",
+          "type": "*",
+          "links": [
+            11
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "StimmaDropdownParam"
+      },
+      "widgets_values": [
+        "sampler",
+        "euler",
+        40,
+        "Sampling algorithm. Steps are set by Rendering Speed, not here."
+      ]
     }
   ],
   "links": [
@@ -1002,6 +1078,14 @@
       205,
       0,
       "IMAGE"
+    ],
+    [
+      11,
+      208,
+      0,
+      98,
+      7,
+      "STRING"
     ]
   ],
   "groups": [],
@@ -1013,7 +1097,7 @@
         "state": {
           "lastGroupId": 9,
           "lastNodeId": 176,
-          "lastLinkId": 256,
+          "lastLinkId": 257,
           "lastRerouteId": 0
         },
         "revision": 0,
@@ -1173,6 +1257,18 @@
             "pos": [
               -1230,
               4090
+            ]
+          },
+          {
+            "id": "c9f40014-21e5-4ea0-8151-601fe39ea4b3",
+            "name": "sampler",
+            "type": "COMBO",
+            "linkIds": [
+              257
+            ],
+            "pos": [
+              -1230,
+              4110
             ]
           }
         ],
@@ -1528,7 +1624,16 @@
             "flags": {},
             "order": 0,
             "mode": 0,
-            "inputs": [],
+            "inputs": [
+              {
+                "name": "sampler_name",
+                "type": "COMBO",
+                "widget": {
+                  "name": "sampler_name"
+                },
+                "link": 257
+              }
+            ],
             "outputs": [
               {
                 "localized_name": "SAMPLER",
@@ -3227,6 +3332,14 @@
             "target_id": 24,
             "target_slot": 0,
             "type": "CLIP"
+          },
+          {
+            "id": 257,
+            "origin_id": -10,
+            "origin_slot": 11,
+            "target_id": 16,
+            "target_slot": 0,
+            "type": "COMBO"
           }
         ],
         "extra": {}

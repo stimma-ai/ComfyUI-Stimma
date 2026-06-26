@@ -1,8 +1,8 @@
 {
   "id": "08988737-a544-4ab1-99fb-22d67b7c36e3",
   "revision": 0,
-  "last_node_id": 209,
-  "last_link_id": 9,
+  "last_node_id": 212,
+  "last_link_id": 12,
   "nodes": [
     {
       "id": 200,
@@ -685,7 +685,7 @@
       },
       "widgets_values": [
         "Advanced",
-        "loras\nseed",
+        "steps\nsampler\nscheduler\nloras\nseed",
         true,
         10
       ]
@@ -747,6 +747,30 @@
           "name": "clip_in",
           "type": "CLIP",
           "link": 8
+        },
+        {
+          "name": "steps",
+          "type": "INT",
+          "widget": {
+            "name": "steps"
+          },
+          "link": 10
+        },
+        {
+          "name": "sampler",
+          "type": "STRING",
+          "widget": {
+            "name": "sampler"
+          },
+          "link": 11
+        },
+        {
+          "name": "scheduler",
+          "type": "STRING",
+          "widget": {
+            "name": "scheduler"
+          },
+          "link": 12
         }
       ],
       "outputs": [
@@ -838,6 +862,246 @@
         ]
       },
       "widgets_values": []
+    },
+    {
+      "id": 210,
+      "type": "StimmaIntParam",
+      "pos": [
+        -300,
+        0
+      ],
+      "size": [
+        384,
+        355
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "name",
+          "type": "STRING",
+          "widget": {
+            "name": "name"
+          },
+          "link": null
+        },
+        {
+          "name": "value",
+          "type": "INT",
+          "widget": {
+            "name": "value"
+          },
+          "link": null
+        },
+        {
+          "name": "minimum",
+          "type": "INT",
+          "widget": {
+            "name": "minimum"
+          },
+          "link": null
+        },
+        {
+          "name": "maximum",
+          "type": "INT",
+          "widget": {
+            "name": "maximum"
+          },
+          "link": null
+        },
+        {
+          "name": "step",
+          "type": "INT",
+          "widget": {
+            "name": "step"
+          },
+          "link": null
+        },
+        {
+          "name": "ui_control",
+          "type": "COMBO",
+          "widget": {
+            "name": "ui_control"
+          },
+          "link": null
+        },
+        {
+          "name": "ui_order",
+          "type": "INT",
+          "widget": {
+            "name": "ui_order"
+          },
+          "link": null
+        },
+        {
+          "name": "ui_description",
+          "type": "STRING",
+          "widget": {
+            "name": "ui_description"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "value",
+          "type": "INT",
+          "links": [
+            10
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "StimmaIntParam"
+      },
+      "widgets_values": [
+        "steps",
+        8,
+        1,
+        20,
+        1,
+        "input",
+        20,
+        "Number of sampling steps. Krea-2 Turbo is tuned for low step counts."
+      ]
+    },
+    {
+      "id": 211,
+      "type": "StimmaDropdownParam",
+      "pos": [
+        -300,
+        200
+      ],
+      "size": [
+        384,
+        228
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "name",
+          "type": "STRING",
+          "widget": {
+            "name": "name"
+          },
+          "link": null
+        },
+        {
+          "name": "value",
+          "type": "STRING",
+          "widget": {
+            "name": "value"
+          },
+          "link": null
+        },
+        {
+          "name": "ui_order",
+          "type": "INT",
+          "widget": {
+            "name": "ui_order"
+          },
+          "link": null
+        },
+        {
+          "name": "ui_description",
+          "type": "STRING",
+          "widget": {
+            "name": "ui_description"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "value",
+          "type": "*",
+          "links": [
+            11
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "StimmaDropdownParam"
+      },
+      "widgets_values": [
+        "sampler",
+        "euler",
+        40,
+        "Sampling algorithm."
+      ]
+    },
+    {
+      "id": 212,
+      "type": "StimmaDropdownParam",
+      "pos": [
+        -300,
+        400
+      ],
+      "size": [
+        384,
+        228
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "name",
+          "type": "STRING",
+          "widget": {
+            "name": "name"
+          },
+          "link": null
+        },
+        {
+          "name": "value",
+          "type": "STRING",
+          "widget": {
+            "name": "value"
+          },
+          "link": null
+        },
+        {
+          "name": "ui_order",
+          "type": "INT",
+          "widget": {
+            "name": "ui_order"
+          },
+          "link": null
+        },
+        {
+          "name": "ui_description",
+          "type": "STRING",
+          "widget": {
+            "name": "ui_description"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "value",
+          "type": "*",
+          "links": [
+            12
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "StimmaDropdownParam"
+      },
+      "widgets_values": [
+        "scheduler",
+        "simple",
+        45,
+        "Noise schedule."
+      ]
     }
   ],
   "links": [
@@ -912,6 +1176,30 @@
       208,
       0,
       "IMAGE"
+    ],
+    [
+      10,
+      210,
+      0,
+      30,
+      6,
+      "INT"
+    ],
+    [
+      11,
+      211,
+      0,
+      30,
+      7,
+      "STRING"
+    ],
+    [
+      12,
+      212,
+      0,
+      30,
+      8,
+      "STRING"
     ]
   ],
   "groups": [],
@@ -923,7 +1211,7 @@
         "state": {
           "lastGroupId": 10,
           "lastNodeId": 50,
-          "lastLinkId": 75,
+          "lastLinkId": 78,
           "lastRerouteId": 0
         },
         "revision": 0,
@@ -1132,6 +1420,42 @@
               -1230,
               4170
             ]
+          },
+          {
+            "id": "f1b353d4-47fb-4953-a61f-f0e3a5e24b49",
+            "name": "steps",
+            "type": "INT",
+            "linkIds": [
+              76
+            ],
+            "pos": [
+              -1230,
+              4190
+            ]
+          },
+          {
+            "id": "7865fb63-e101-4090-ad25-ea85590422f5",
+            "name": "sampler",
+            "type": "COMBO",
+            "linkIds": [
+              77
+            ],
+            "pos": [
+              -1230,
+              4210
+            ]
+          },
+          {
+            "id": "947d966e-b0a1-4327-b608-3b3223aeae6b",
+            "name": "scheduler",
+            "type": "COMBO",
+            "linkIds": [
+              78
+            ],
+            "pos": [
+              -1230,
+              4230
+            ]
           }
         ],
         "outputs": [
@@ -1332,6 +1656,30 @@
                   "name": "seed"
                 },
                 "link": 56
+              },
+              {
+                "name": "steps",
+                "type": "INT",
+                "widget": {
+                  "name": "steps"
+                },
+                "link": 76
+              },
+              {
+                "name": "sampler_name",
+                "type": "COMBO",
+                "widget": {
+                  "name": "sampler_name"
+                },
+                "link": 77
+              },
+              {
+                "name": "scheduler",
+                "type": "COMBO",
+                "widget": {
+                  "name": "scheduler"
+                },
+                "link": 78
               }
             ],
             "outputs": [
@@ -2700,6 +3048,30 @@
             "target_id": 6,
             "target_slot": 0,
             "type": "CLIP"
+          },
+          {
+            "id": 76,
+            "origin_id": -10,
+            "origin_slot": 15,
+            "target_id": 3,
+            "target_slot": 5,
+            "type": "INT"
+          },
+          {
+            "id": 77,
+            "origin_id": -10,
+            "origin_slot": 16,
+            "target_id": 3,
+            "target_slot": 6,
+            "type": "COMBO"
+          },
+          {
+            "id": 78,
+            "origin_id": -10,
+            "origin_slot": 17,
+            "target_id": 3,
+            "target_slot": 7,
+            "type": "COMBO"
           }
         ],
         "extra": {}
