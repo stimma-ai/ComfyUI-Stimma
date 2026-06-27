@@ -58,8 +58,11 @@ class StimmaImageParam:
                 "controlnet_types": ("STRING", {"default": "", "multiline": False}),
                 "ui_control": (["image_picker", "video_frame_picker"],),
                 "ui_order": ("INT", {"default": 0, "min": 0, "max": 100}),
+            },
+            "optional": {
                 # Show the Stimma prep controls (Scale / Extend Canvas / Paint)
-                # on this input. Independent of controlnet support.
+                # on this input. Independent of controlnet support. Optional so
+                # workflows saved before this widget existed still validate.
                 "allow_prep": ("BOOLEAN", {"default": True}),
             },
         }
@@ -190,10 +193,11 @@ class StimmaImagesParam:
                 "controlnet_types": ("STRING", {"default": "", "multiline": False}),
                 "ui_control": (["image_picker", "video_frame_picker"],),
                 "ui_order": ("INT", {"default": 0, "min": 0, "max": 100}),
-                # Show the Stimma prep controls (Scale / Extend Canvas / Paint).
-                "allow_prep": ("BOOLEAN", {"default": True}),
             },
             "optional": {
+                # Show the Stimma prep controls (Scale / Extend Canvas / Paint).
+                # Optional so pre-existing workflows still validate.
+                "allow_prep": ("BOOLEAN", {"default": True}),
                 "_stimma_images": ("STRING", {"default": "", "multiline": False}),
             },
         }
