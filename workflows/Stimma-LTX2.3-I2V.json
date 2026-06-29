@@ -1,8 +1,8 @@
 {
   "id": "07824bbb-6672-4bb0-ac36-4313a519e35b",
   "revision": 0,
-  "last_node_id": 340,
-  "last_link_id": 657,
+  "last_node_id": 341,
+  "last_link_id": 658,
   "nodes": [
     {
       "id": 103,
@@ -178,7 +178,7 @@
           "widget": {
             "name": "value_2"
           },
-          "link": 649
+          "link": 650
         },
         {
           "label": "height",
@@ -187,7 +187,7 @@
           "widget": {
             "name": "value_3"
           },
-          "link": 650
+          "link": 651
         },
         {
           "label": "duration",
@@ -196,7 +196,7 @@
           "widget": {
             "name": "value_4"
           },
-          "link": 652
+          "link": 653
         },
         {
           "label": "fps",
@@ -205,7 +205,7 @@
           "widget": {
             "name": "value_5"
           },
-          "link": 653
+          "link": 654
         },
         {
           "label": "seed",
@@ -214,7 +214,7 @@
           "widget": {
             "name": "noise_seed"
           },
-          "link": 651
+          "link": 652
         },
         {
           "label": "distilled_lora",
@@ -251,6 +251,14 @@
             "name": "lora_name_1"
           },
           "link": null
+        },
+        {
+          "name": "last_frame",
+          "type": "IMAGE",
+          "widget": {
+            "name": "last_frame"
+          },
+          "link": 649
         }
       ],
       "outputs": [
@@ -265,7 +273,7 @@
           "name": "frames",
           "type": "IMAGE",
           "links": [
-            654
+            655
           ],
           "slot_index": 1
         },
@@ -273,7 +281,7 @@
           "name": "audio",
           "type": "AUDIO",
           "links": [
-            656
+            657
           ],
           "slot_index": 2
         }
@@ -437,7 +445,7 @@
         "LTX-2.3 Image to Video",
         "image-to-video",
         "Open Weights",
-        "Animate a still image into video using LTX-2.3",
+        "Animate a still image into video using LTX-2.3. Add an optional end frame to interpolate between two frames (loops, transitions, stitching clips).",
         "lightricks",
         "ltx-2.3"
       ]
@@ -597,13 +605,96 @@
       "widgets_values": [
         "example.png",
         "",
-        "image_picker",
+        "video_frame_picker",
         5,
         true
       ]
     },
     {
       "id": 333,
+      "type": "StimmaImageParam",
+      "pos": [
+        -800,
+        -200
+      ],
+      "size": [
+        384,
+        200
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "image",
+          "type": "COMBO",
+          "widget": {
+            "name": "image"
+          },
+          "link": null
+        },
+        {
+          "name": "controlnet_types",
+          "type": "STRING",
+          "widget": {
+            "name": "controlnet_types"
+          },
+          "link": null
+        },
+        {
+          "name": "ui_control",
+          "type": "COMBO",
+          "widget": {
+            "name": "ui_control"
+          },
+          "link": null
+        },
+        {
+          "name": "ui_order",
+          "type": "INT",
+          "widget": {
+            "name": "ui_order"
+          },
+          "link": null
+        },
+        {
+          "name": "allow_prep",
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "allow_prep"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "links": [
+            649
+          ],
+          "slot_index": 0
+        },
+        {
+          "name": "mask",
+          "type": "MASK",
+          "links": [],
+          "slot_index": 1
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "StimmaImageParam"
+      },
+      "widgets_values": [
+        "example.png",
+        "",
+        "video_frame_picker",
+        6,
+        true
+      ]
+    },
+    {
+      "id": 334,
       "type": "StimmaResolutionParam",
       "pos": [
         -800,
@@ -679,7 +770,7 @@
           "name": "width",
           "type": "INT",
           "links": [
-            649
+            650
           ],
           "slot_index": 0
         },
@@ -687,7 +778,7 @@
           "name": "height",
           "type": "INT",
           "links": [
-            650
+            651
           ],
           "slot_index": 1
         }
@@ -706,7 +797,7 @@
       ]
     },
     {
-      "id": 334,
+      "id": 335,
       "type": "StimmaSeedParam",
       "pos": [
         -800,
@@ -750,7 +841,7 @@
           "name": "seed",
           "type": "INT",
           "links": [
-            651
+            652
           ],
           "slot_index": 0
         }
@@ -762,110 +853,6 @@
         "seed",
         0,
         80
-      ]
-    },
-    {
-      "id": 335,
-      "type": "StimmaIntParam",
-      "pos": [
-        -300,
-        0
-      ],
-      "size": [
-        384,
-        355
-      ],
-      "flags": {},
-      "order": 0,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "name",
-          "type": "STRING",
-          "widget": {
-            "name": "name"
-          },
-          "link": null
-        },
-        {
-          "name": "value",
-          "type": "INT",
-          "widget": {
-            "name": "value"
-          },
-          "link": null
-        },
-        {
-          "name": "minimum",
-          "type": "INT",
-          "widget": {
-            "name": "minimum"
-          },
-          "link": null
-        },
-        {
-          "name": "maximum",
-          "type": "INT",
-          "widget": {
-            "name": "maximum"
-          },
-          "link": null
-        },
-        {
-          "name": "step",
-          "type": "INT",
-          "widget": {
-            "name": "step"
-          },
-          "link": null
-        },
-        {
-          "name": "ui_control",
-          "type": "COMBO",
-          "widget": {
-            "name": "ui_control"
-          },
-          "link": null
-        },
-        {
-          "name": "ui_order",
-          "type": "INT",
-          "widget": {
-            "name": "ui_order"
-          },
-          "link": null
-        },
-        {
-          "name": "ui_description",
-          "type": "STRING",
-          "widget": {
-            "name": "ui_description"
-          },
-          "link": null
-        }
-      ],
-      "outputs": [
-        {
-          "name": "value",
-          "type": "INT",
-          "links": [
-            652
-          ],
-          "slot_index": 0
-        }
-      ],
-      "properties": {
-        "Node name for S&R": "StimmaIntParam"
-      },
-      "widgets_values": [
-        "duration",
-        5,
-        1,
-        20,
-        1,
-        "slider",
-        20,
-        "Video duration in seconds"
       ]
     },
     {
@@ -953,8 +940,112 @@
           "name": "value",
           "type": "INT",
           "links": [
-            653,
-            655
+            653
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "StimmaIntParam"
+      },
+      "widgets_values": [
+        "duration",
+        5,
+        1,
+        20,
+        1,
+        "slider",
+        20,
+        "Video duration in seconds"
+      ]
+    },
+    {
+      "id": 337,
+      "type": "StimmaIntParam",
+      "pos": [
+        -300,
+        0
+      ],
+      "size": [
+        384,
+        355
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "name",
+          "type": "STRING",
+          "widget": {
+            "name": "name"
+          },
+          "link": null
+        },
+        {
+          "name": "value",
+          "type": "INT",
+          "widget": {
+            "name": "value"
+          },
+          "link": null
+        },
+        {
+          "name": "minimum",
+          "type": "INT",
+          "widget": {
+            "name": "minimum"
+          },
+          "link": null
+        },
+        {
+          "name": "maximum",
+          "type": "INT",
+          "widget": {
+            "name": "maximum"
+          },
+          "link": null
+        },
+        {
+          "name": "step",
+          "type": "INT",
+          "widget": {
+            "name": "step"
+          },
+          "link": null
+        },
+        {
+          "name": "ui_control",
+          "type": "COMBO",
+          "widget": {
+            "name": "ui_control"
+          },
+          "link": null
+        },
+        {
+          "name": "ui_order",
+          "type": "INT",
+          "widget": {
+            "name": "ui_order"
+          },
+          "link": null
+        },
+        {
+          "name": "ui_description",
+          "type": "STRING",
+          "widget": {
+            "name": "ui_description"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "value",
+          "type": "INT",
+          "links": [
+            654,
+            656
           ],
           "slot_index": 0
         }
@@ -974,7 +1065,7 @@
       ]
     },
     {
-      "id": 337,
+      "id": 338,
       "type": "StimmaBoolParam",
       "pos": [
         -300,
@@ -1026,7 +1117,7 @@
           "name": "value",
           "type": "BOOLEAN",
           "links": [
-            657
+            658
           ],
           "slot_index": 0
         }
@@ -1042,7 +1133,7 @@
       ]
     },
     {
-      "id": 338,
+      "id": 339,
       "type": "StimmaVideoOutput",
       "pos": [
         800,
@@ -1059,7 +1150,7 @@
         {
           "name": "frames",
           "type": "IMAGE",
-          "link": 654
+          "link": 655
         },
         {
           "name": "fps",
@@ -1067,7 +1158,7 @@
           "widget": {
             "name": "fps"
           },
-          "link": 655
+          "link": 656
         },
         {
           "name": "filename_prefix",
@@ -1080,7 +1171,7 @@
         {
           "name": "audio",
           "type": "AUDIO",
-          "link": 656
+          "link": 657
         },
         {
           "name": "generate_audio",
@@ -1088,7 +1179,7 @@
           "widget": {
             "name": "generate_audio"
           },
-          "link": 657,
+          "link": 658,
           "shape": 7
         },
         {
@@ -1113,7 +1204,7 @@
       ]
     },
     {
-      "id": 339,
+      "id": 340,
       "type": "StimmaLayoutGroup",
       "pos": [
         -1400,
@@ -1172,7 +1263,7 @@
       ]
     },
     {
-      "id": 340,
+      "id": 341,
       "type": "StimmaLayoutGroup",
       "pos": [
         -1400,
@@ -1269,23 +1360,23 @@
       333,
       0,
       320,
-      3,
-      "INT"
+      12,
+      "IMAGE"
     ],
     [
       650,
-      333,
-      1,
+      334,
+      0,
       320,
-      4,
+      3,
       "INT"
     ],
     [
       651,
       334,
-      0,
+      1,
       320,
-      7,
+      4,
       "INT"
     ],
     [
@@ -1293,7 +1384,7 @@
       335,
       0,
       320,
-      5,
+      7,
       "INT"
     ],
     [
@@ -1301,38 +1392,46 @@
       336,
       0,
       320,
-      6,
+      5,
       "INT"
     ],
     [
       654,
+      337,
+      0,
+      320,
+      6,
+      "INT"
+    ],
+    [
+      655,
       320,
       1,
-      338,
+      339,
       0,
       "IMAGE"
     ],
     [
-      655,
-      336,
+      656,
+      337,
       0,
-      338,
+      339,
       1,
       "INT"
     ],
     [
-      656,
+      657,
       320,
       2,
-      338,
+      339,
       3,
       "AUDIO"
     ],
     [
-      657,
-      337,
-      0,
+      658,
       338,
+      0,
+      339,
       4,
       "BOOLEAN"
     ]
@@ -1541,6 +1640,19 @@
               876.162109375,
               4374
             ]
+          },
+          {
+            "id": "last-frame-9d25d9ad4aa426babae532cf",
+            "name": "last_frame",
+            "type": "IMAGE,MASK",
+            "linkIds": [
+              100001
+            ],
+            "label": "last_frame",
+            "pos": [
+              866,
+              4504
+            ]
           }
         ],
         "outputs": [
@@ -1558,7 +1670,7 @@
             ]
           },
           {
-            "id": "626f4fed-679f-4204-995c-3573d7cfd891",
+            "id": "0388bc82-096e-4b6e-821a-51c103c98250",
             "name": "frames",
             "type": "IMAGE",
             "linkIds": [
@@ -1570,7 +1682,7 @@
             ]
           },
           {
-            "id": "c7ffe009-2739-418a-b405-d6658e22f333",
+            "id": "29fc476f-aea4-420b-b956-7b8c9e7782b9",
             "name": "audio",
             "type": "AUDIO",
             "linkIds": [
@@ -4799,6 +4911,295 @@
             "widgets_values": [
               false
             ]
+          },
+          {
+            "id": 329,
+            "type": "ResizeImageMaskNode",
+            "pos": [
+              600,
+              5200
+            ],
+            "size": [
+              270,
+              200
+            ],
+            "flags": {},
+            "order": 0,
+            "mode": 0,
+            "inputs": [
+              {
+                "name": "input",
+                "type": "IMAGE,MASK",
+                "link": 100001
+              },
+              {
+                "name": "resize_type.width",
+                "type": "INT",
+                "link": 100002,
+                "widget": {
+                  "name": "resize_type.width"
+                }
+              },
+              {
+                "name": "resize_type.height",
+                "type": "INT",
+                "link": 100003,
+                "widget": {
+                  "name": "resize_type.height"
+                }
+              }
+            ],
+            "outputs": [
+              {
+                "name": "IMAGE",
+                "type": "IMAGE",
+                "links": []
+              }
+            ],
+            "properties": {
+              "Node name for S&R": "ResizeImageMaskNode"
+            },
+            "widgets_values": [
+              "scale dimensions",
+              1920,
+              1088,
+              "center",
+              "lanczos"
+            ]
+          },
+          {
+            "id": 330,
+            "type": "ResizeImagesByLongerEdge",
+            "pos": [
+              900,
+              5200
+            ],
+            "size": [
+              270,
+              200
+            ],
+            "flags": {},
+            "order": 0,
+            "mode": 0,
+            "inputs": [
+              {
+                "name": "images",
+                "type": "IMAGE",
+                "link": 100004
+              }
+            ],
+            "outputs": [
+              {
+                "name": "IMAGE",
+                "type": "IMAGE",
+                "links": []
+              }
+            ],
+            "properties": {
+              "Node name for S&R": "ResizeImagesByLongerEdge"
+            },
+            "widgets_values": [
+              1536
+            ]
+          },
+          {
+            "id": 331,
+            "type": "LTXVPreprocess",
+            "pos": [
+              1200,
+              5200
+            ],
+            "size": [
+              270,
+              200
+            ],
+            "flags": {},
+            "order": 0,
+            "mode": 0,
+            "inputs": [
+              {
+                "name": "image",
+                "type": "IMAGE",
+                "link": 100005
+              }
+            ],
+            "outputs": [
+              {
+                "name": "IMAGE",
+                "type": "IMAGE",
+                "links": []
+              }
+            ],
+            "properties": {
+              "Node name for S&R": "LTXVPreprocess"
+            },
+            "widgets_values": [
+              18
+            ]
+          },
+          {
+            "id": 332,
+            "type": "LTXVAddGuide",
+            "pos": [
+              1500,
+              5500
+            ],
+            "size": [
+              270,
+              200
+            ],
+            "flags": {},
+            "order": 0,
+            "mode": 0,
+            "inputs": [
+              {
+                "name": "positive",
+                "type": "CONDITIONING",
+                "link": 100006
+              },
+              {
+                "name": "negative",
+                "type": "CONDITIONING",
+                "link": 100007
+              },
+              {
+                "name": "vae",
+                "type": "VAE",
+                "link": 100008
+              },
+              {
+                "name": "latent",
+                "type": "LATENT",
+                "link": 100009
+              },
+              {
+                "name": "image",
+                "type": "IMAGE",
+                "link": 100010
+              },
+              {
+                "name": "frame_idx",
+                "type": "INT",
+                "link": null,
+                "widget": {
+                  "name": "frame_idx"
+                }
+              },
+              {
+                "name": "strength",
+                "type": "FLOAT",
+                "link": null,
+                "widget": {
+                  "name": "strength"
+                }
+              }
+            ],
+            "outputs": [
+              {
+                "name": "positive",
+                "type": "CONDITIONING",
+                "links": []
+              },
+              {
+                "name": "negative",
+                "type": "CONDITIONING",
+                "links": []
+              },
+              {
+                "name": "latent",
+                "type": "LATENT",
+                "links": []
+              }
+            ],
+            "properties": {
+              "Node name for S&R": "LTXVAddGuide"
+            },
+            "widgets_values": [
+              -1,
+              1.0
+            ]
+          },
+          {
+            "id": 333,
+            "type": "LTXVAddGuide",
+            "pos": [
+              1800,
+              5500
+            ],
+            "size": [
+              270,
+              200
+            ],
+            "flags": {},
+            "order": 0,
+            "mode": 0,
+            "inputs": [
+              {
+                "name": "positive",
+                "type": "CONDITIONING",
+                "link": 100011
+              },
+              {
+                "name": "negative",
+                "type": "CONDITIONING",
+                "link": 100012
+              },
+              {
+                "name": "vae",
+                "type": "VAE",
+                "link": 100013
+              },
+              {
+                "name": "latent",
+                "type": "LATENT",
+                "link": 100014
+              },
+              {
+                "name": "image",
+                "type": "IMAGE",
+                "link": 100015
+              },
+              {
+                "name": "frame_idx",
+                "type": "INT",
+                "link": null,
+                "widget": {
+                  "name": "frame_idx"
+                }
+              },
+              {
+                "name": "strength",
+                "type": "FLOAT",
+                "link": null,
+                "widget": {
+                  "name": "strength"
+                }
+              }
+            ],
+            "outputs": [
+              {
+                "name": "positive",
+                "type": "CONDITIONING",
+                "links": []
+              },
+              {
+                "name": "negative",
+                "type": "CONDITIONING",
+                "links": []
+              },
+              {
+                "name": "latent",
+                "type": "LATENT",
+                "links": []
+              }
+            ],
+            "properties": {
+              "Node name for S&R": "LTXVAddGuide"
+            },
+            "widgets_values": [
+              -1,
+              1.0
+            ]
           }
         ],
         "groups": [
@@ -4926,8 +5327,8 @@
         "links": [
           {
             "id": 512,
-            "origin_id": 288,
-            "origin_slot": 0,
+            "origin_id": 333,
+            "origin_slot": 2,
             "target_id": 278,
             "target_slot": 0,
             "type": "LATENT"
@@ -4950,7 +5351,7 @@
           },
           {
             "id": 479,
-            "origin_id": 284,
+            "origin_id": 333,
             "origin_slot": 0,
             "target_id": 282,
             "target_slot": 1,
@@ -4958,7 +5359,7 @@
           },
           {
             "id": 480,
-            "origin_id": 284,
+            "origin_id": 333,
             "origin_slot": 1,
             "target_id": 282,
             "target_slot": 2,
@@ -4974,7 +5375,7 @@
           },
           {
             "id": 518,
-            "origin_id": 304,
+            "origin_id": 332,
             "origin_slot": 0,
             "target_id": 314,
             "target_slot": 1,
@@ -4982,7 +5383,7 @@
           },
           {
             "id": 519,
-            "origin_id": 304,
+            "origin_id": 332,
             "origin_slot": 1,
             "target_id": 314,
             "target_slot": 2,
@@ -5270,8 +5671,8 @@
           },
           {
             "id": 497,
-            "origin_id": 296,
-            "origin_slot": 0,
+            "origin_id": 332,
+            "origin_slot": 2,
             "target_id": 318,
             "target_slot": 0,
             "type": "LATENT"
@@ -5643,6 +6044,126 @@
             "target_id": 277,
             "target_slot": 0,
             "type": "INT"
+          },
+          {
+            "id": 100001,
+            "origin_id": -10,
+            "origin_slot": 13,
+            "target_id": 329,
+            "target_slot": 0,
+            "type": "IMAGE,MASK"
+          },
+          {
+            "id": 100002,
+            "origin_id": 312,
+            "origin_slot": 0,
+            "target_id": 329,
+            "target_slot": 1,
+            "type": "INT"
+          },
+          {
+            "id": 100003,
+            "origin_id": 299,
+            "origin_slot": 0,
+            "target_id": 329,
+            "target_slot": 2,
+            "type": "INT"
+          },
+          {
+            "id": 100004,
+            "origin_id": 329,
+            "origin_slot": 0,
+            "target_id": 330,
+            "target_slot": 0,
+            "type": "IMAGE"
+          },
+          {
+            "id": 100005,
+            "origin_id": 330,
+            "origin_slot": 0,
+            "target_id": 331,
+            "target_slot": 0,
+            "type": "IMAGE"
+          },
+          {
+            "id": 100006,
+            "origin_id": 304,
+            "origin_slot": 0,
+            "target_id": 332,
+            "target_slot": 0,
+            "type": "CONDITIONING"
+          },
+          {
+            "id": 100007,
+            "origin_id": 304,
+            "origin_slot": 1,
+            "target_id": 332,
+            "target_slot": 1,
+            "type": "CONDITIONING"
+          },
+          {
+            "id": 100008,
+            "origin_id": 316,
+            "origin_slot": 2,
+            "target_id": 332,
+            "target_slot": 2,
+            "type": "VAE"
+          },
+          {
+            "id": 100009,
+            "origin_id": 296,
+            "origin_slot": 0,
+            "target_id": 332,
+            "target_slot": 3,
+            "type": "LATENT"
+          },
+          {
+            "id": 100010,
+            "origin_id": 331,
+            "origin_slot": 0,
+            "target_id": 332,
+            "target_slot": 4,
+            "type": "IMAGE"
+          },
+          {
+            "id": 100011,
+            "origin_id": 284,
+            "origin_slot": 0,
+            "target_id": 333,
+            "target_slot": 0,
+            "type": "CONDITIONING"
+          },
+          {
+            "id": 100012,
+            "origin_id": 284,
+            "origin_slot": 1,
+            "target_id": 333,
+            "target_slot": 1,
+            "type": "CONDITIONING"
+          },
+          {
+            "id": 100013,
+            "origin_id": 316,
+            "origin_slot": 2,
+            "target_id": 333,
+            "target_slot": 2,
+            "type": "VAE"
+          },
+          {
+            "id": 100014,
+            "origin_id": 288,
+            "origin_slot": 0,
+            "target_id": 333,
+            "target_slot": 3,
+            "type": "LATENT"
+          },
+          {
+            "id": 100015,
+            "origin_id": 331,
+            "origin_slot": 0,
+            "target_id": 333,
+            "target_slot": 4,
+            "type": "IMAGE"
           },
           {
             "id": 647,

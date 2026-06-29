@@ -998,6 +998,47 @@ def _is_input_required(
     return True
 
 
+# Guide nodes that degrade to identity (pass-through) when an optional guide
+# input is absent, instead of being cascade-removed. This lets a workflow keep
+# an optional conditioning guide (e.g. an end frame for first-last-frame video)
+# wired into the critical path: when the guide media isn't provided, the node is
+# bypassed and its main inputs flow straight to its outputs.
+#
+# {class_type: {guide_input_name: [(output_slot, passthrough_input_name), ...]}}
+# When guide_input_name's source is stripped, each consumer of output_slot is
+# rewired to the source of passthrough_input_name.
+_BYPASS_ON_MISSING_GUIDE: Dict[str, Dict[str, List[tuple]]] = {
+    # LTXVAddGuide(positive, negative, vae, latent, image, ...) -> (positive, negative, latent).
+    # With no guide image it is identity over (positive, negative, latent).
+    "LTXVAddGuide": {"image": [(0, "positive"), (1, "negative"), (2, "latent")]},
+}
+
+
+def _bypass_guide_node(
+    prompt: Dict[str, Any], node_id: str, mapping: List[tuple],
+) -> bool:
+    """Rewire consumers of node_id's outputs to its pass-through input sources, then drop it.
+
+    Returns False (and changes nothing) if a pass-through source is unavailable,
+    so the caller can fall back to cascade removal.
+    """
+    inputs = prompt[node_id].get("inputs", {})
+    rewire = {}
+    for out_slot, in_name in mapping:
+        src = inputs.get(in_name)
+        if not (isinstance(src, list) and len(src) == 2):
+            return False  # no clean pass-through source — let the caller cascade-remove
+        rewire[out_slot] = src
+    for other_id, other in prompt.items():
+        if other_id == node_id:
+            continue
+        for k, v in other.get("inputs", {}).items():
+            if isinstance(v, list) and len(v) == 2 and v[0] == node_id and v[1] in rewire:
+                other["inputs"][k] = rewire[v[1]]
+    del prompt[node_id]
+    return True
+
+
 def _strip_unprovided_input_chains(
     prompt: Dict[str, Any],
     unprovided_node_ids: List[str],
@@ -1006,7 +1047,9 @@ def _strip_unprovided_input_chains(
     """Remove unprovided optional input nodes and cascade-remove dependents.
 
     For each node that references a removed node:
-    - If the referencing input is required (per object_info) → cascade-remove that node too
+    - If the node is a registered guide node and the missing input is its guide
+      input → bypass it (pass main inputs through to outputs) instead of removing
+    - If the referencing input is required (per object_info) → cascade-remove
     - If the referencing input is optional → just delete that input entry
 
     Repeats until stable (no more removals).
@@ -1039,6 +1082,19 @@ def _strip_unprovided_input_chains(
 
                 # This input references a removed node
                 if _is_input_required(ct, inp_name, object_info):
+                    # Guide node whose optional guide input vanished → bypass
+                    # (pass through) rather than cascade-remove the pipeline.
+                    bypass_map = _BYPASS_ON_MISSING_GUIDE.get(ct, {})
+                    if inp_name in bypass_map and _bypass_guide_node(
+                        prompt, nid, bypass_map[inp_name]
+                    ):
+                        logger.info(
+                            f"Bypassing guide node '{ct}' (#{nid}) — guide input "
+                            f"'{inp_name}' not provided; passing inputs through"
+                        )
+                        removed.add(nid)
+                        changed = True
+                        break
                     # Required input → cascade: remove this node too
                     logger.info(
                         f"Cascade-removing '{ct}' (#{nid}) — "
