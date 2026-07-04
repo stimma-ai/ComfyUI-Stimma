@@ -12,7 +12,7 @@ Users save ComfyUI workflows containing special Stimma nodes (fields, params, ou
 ComfyUI-Stimma/
   __init__.py          # Entry point — exports NODE_CLASS_MAPPINGS, hooks STP server into ComfyUI
   nodes/               # Custom ComfyUI node definitions
-    tool_info.py       #   StimmaToolInfo — metadata (slug, task_type, display_name)
+    tool_info.py       #   StimmaToolInfo — metadata (slug, task_types, display_name)
     fields.py          #   StimmaPromptParam, StimmaImageParam, StimmaVideoParam, etc.
     params.py          #   StimmaIntParam, StimmaFloatParam, StimmaStringParam, etc.
     loras.py           #   StimmaLoraLoader, StimmaPairedLoraLoader
@@ -84,6 +84,9 @@ Protocol reference: `../stimma/docs/TOOLS_PROTOCOL.md`
 | `StimmaImageOutput` | Output image | `_stimma_output_dir` (hidden) |
 | `StimmaVideoOutput` | Output video | `_stimma_output_dir` (hidden) |
 | `StimmaLayoutGroup` | UI layout group | `group_label`, `param_names`, `collapsed` |
+
+Standard STP task types include `text-to-image`, `image-to-image`, `text-to-video`,
+`image-to-video`, `video-to-video`, `upscale-image`, and `upscale-video`.
 
 ## Important Patterns
 

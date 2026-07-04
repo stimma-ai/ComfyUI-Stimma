@@ -10,6 +10,24 @@ import inspect
 from stimma_tools_protocol.protocol import ToolDescriptor
 
 
+# Standard STP task type registry. Providers may still declare custom task types
+# using the x-<vendor>-<task> extension convention from the STP spec.
+STANDARD_TASK_TYPES = [
+    "text-to-image",
+    "image-to-image",
+    "image-to-video",
+    "text-to-video",
+    "video-to-video",
+    "video-stitch",
+    "video-extend",
+    "lip-sync",
+    "upscale-image",
+    "upscale-video",
+    "inpaint-image",
+    "remove-background",
+]
+
+
 # --- Layout DSL ---
 
 @dataclass

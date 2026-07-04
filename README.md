@@ -30,7 +30,10 @@ Restart ComfyUI. The plugin registers its nodes and starts the STP server automa
 
 | Node | Purpose |
 |------|---------|
-| **StimmaToolInfo** | Marks a workflow as a Stimma tool. Set the `slug` (unique ID), `display_name`, `task_type`, and `description`. |
+| **StimmaToolInfo** | Marks a workflow as a Stimma tool. Set the `slug` (unique ID), `display_name`, `task_types`, and `description`. |
+
+Common STP task types include `text-to-image`, `image-to-image`, `text-to-video`,
+`image-to-video`, `video-to-video`, `upscale-image`, and `upscale-video`.
 
 ### Fields
 
