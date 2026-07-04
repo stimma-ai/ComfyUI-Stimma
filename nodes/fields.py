@@ -291,6 +291,26 @@ class StimmaImagesParam:
         return True
 
 
+def _load_video_audio(video_path):
+    """Extract the source audio track from a video as a ComfyUI AUDIO dict.
+
+    Reuses ComfyUI's own av-based loader (the same one LoadAudio uses), which
+    decodes the audio stream from any container including mp4. Returns a short
+    silent stereo clip if the file has no audio stream or decoding fails, so the
+    node always produces a valid AUDIO output. AudioConcat downstream reconciles
+    sample rates, so we keep the source rate as-is.
+    """
+    import torch
+
+    try:
+        from comfy_extras.nodes_audio import load as _load_audio
+        waveform, sample_rate = _load_audio(video_path)
+        return {"waveform": waveform.unsqueeze(0), "sample_rate": int(sample_rate)}
+    except Exception:
+        # No audio stream (or no torchaudio/av) — emit a valid silent placeholder.
+        return {"waveform": torch.zeros((1, 2, 1), dtype=torch.float32), "sample_rate": 44100}
+
+
 class StimmaVideoParam:
     """Video input — loads video frames as an IMAGE batch."""
 
@@ -308,8 +328,8 @@ class StimmaVideoParam:
             },
         }
 
-    RETURN_TYPES = ("IMAGE", "INT")
-    RETURN_NAMES = ("frames", "fps")
+    RETURN_TYPES = ("IMAGE", "INT", "AUDIO")
+    RETURN_NAMES = ("frames", "fps", "audio")
     FUNCTION = "execute"
     CATEGORY = "Stimma/Params"
 
@@ -317,6 +337,7 @@ class StimmaVideoParam:
         import torch
 
         video_path = folder_paths.get_annotated_filepath(video)
+        audio = _load_video_audio(video_path)
 
         # Decode video frames with OpenCV
         try:
@@ -334,7 +355,7 @@ class StimmaVideoParam:
             cap.release()
             if frames:
                 arr = np.stack(frames, axis=0).astype(np.float32) / 255.0
-                return (torch.from_numpy(arr), source_fps)
+                return (torch.from_numpy(arr), source_fps, audio)
         except Exception:
             pass
 
@@ -343,7 +364,7 @@ class StimmaVideoParam:
         img = img.convert("RGB")
         image_np = np.array(img).astype(np.float32) / 255.0
         image_tensor = torch.from_numpy(image_np)[None,]
-        return (image_tensor, 30)
+        return (image_tensor, 30, audio)
 
     @classmethod
     def IS_CHANGED(cls, video, ui_control="video_picker", ui_order=0, **kwargs):

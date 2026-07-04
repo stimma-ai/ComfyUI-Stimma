@@ -392,6 +392,7 @@ def _convert_inner_node_widgets(
     connected_names = {inp.get("name") for inp in node_inputs if inp.get("name")}
 
     specs = _get_input_specs(class_type, object_info)
+    _CAG_STRINGS = frozenset(("randomize", "fixed", "increment", "decrement"))
 
     def _consume(inp_name, inp_spec):
         """Map one widget-type input spec, consuming widgets_values slots.
@@ -431,6 +432,11 @@ def _convert_inner_node_widgets(
         # control_after_generate adds a frontend-only widget that occupies
         # the next slot in widgets_values but is not a backend input
         if _has_control_after_generate(inp_spec):
+            widget_idx += 1
+        elif (widget_idx < len(widget_values)
+              and widget_values[widget_idx] in _CAG_STRINGS):
+            # Unlabeled control_after_generate slot (present in widgets_values
+            # but omitted from object_info).
             widget_idx += 1
 
     widget_idx = 0
@@ -1320,48 +1326,18 @@ def _convert_ui_to_api(ui_data: Dict[str, Any], object_info: Optional[Dict[str, 
                 if wname not in connected_input_names:
                     inputs[wname] = wval
         else:
-            input_names = []
-            if object_info and class_type not in object_info:
-                if class_type in ALL_STIMMA_TYPES:
-                    logger.warning(
-                        f"object_info missing for Stimma node type '{class_type}' "
-                        f"(node {node_id}) — widget values cannot be mapped"
-                    )
-            if object_info and class_type in object_info:
-                node_info = object_info[class_type]
-                input_def = node_info.get("input", {})
-                for category in ["required", "optional"]:
-                    if category in input_def:
-                        for inp_name in input_def[category]:
-                            input_names.append((inp_name, input_def[category][inp_name]))
-
-            _CAG_STRINGS = frozenset(("randomize", "fixed", "increment", "decrement"))
-
-            widget_idx = 0
-            for inp_name, inp_spec in input_names:
-                inp_type = inp_spec[0] if isinstance(inp_spec, (list, tuple)) else inp_spec
-                if _is_connection_type(inp_type):
-                    continue
-                # Connected inputs still consume a widgets_values slot
-                if inp_name in connected_input_names:
-                    widget_idx += 1
-                    if _has_control_after_generate(inp_spec):
-                        widget_idx += 1
-                    elif (widget_idx < len(widget_values)
-                          and widget_values[widget_idx] in _CAG_STRINGS):
-                        # Heuristic: detect unlabeled control_after_generate slot
-                        # (e.g. nodes that add it in the UI but omit it from object_info)
-                        widget_idx += 1
-                    continue
-                if widget_idx < len(widget_values):
-                    inputs[inp_name] = widget_values[widget_idx]
-                    widget_idx += 1
-                # Skip the frontend-only control_after_generate slot
-                if _has_control_after_generate(inp_spec):
-                    widget_idx += 1
-                elif (widget_idx < len(widget_values)
-                      and widget_values[widget_idx] in _CAG_STRINGS):
-                    widget_idx += 1
+            if (object_info and class_type not in object_info
+                    and class_type in ALL_STIMMA_TYPES):
+                logger.warning(
+                    f"object_info missing for Stimma node type '{class_type}' "
+                    f"(node {node_id}) — widget values cannot be mapped"
+                )
+            # Positional widget mapping — shared with subgraph inner nodes so
+            # dynamic combos (COMFY_DYNAMICCOMBO_V3, e.g. ResizeImageMaskNode),
+            # converted widgets, and control_after_generate are handled the same.
+            for wname, wval in _convert_inner_node_widgets(node, class_type, object_info).items():
+                if wname not in connected_input_names:
+                    inputs[wname] = wval
 
         api_prompt[node_id] = {
             "class_type": class_type,

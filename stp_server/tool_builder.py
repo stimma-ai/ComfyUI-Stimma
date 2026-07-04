@@ -228,7 +228,7 @@ def _build_field_parameter(node: Dict[str, Any]) -> Optional[ToolParameter]:
         return ToolParameter(
             name="input_videos",
             type="array",
-            description="Video asset IDs",
+            description="",
             required=True,
             items={"type": "string"},
             ui_hints={
@@ -244,7 +244,7 @@ def _build_field_parameter(node: Dict[str, Any]) -> Optional[ToolParameter]:
         return ToolParameter(
             name="input_videos",
             type="array",
-            description="Video asset IDs",
+            description="",
             required=int(min_videos) > 0,
             items={"type": "string"},
             ui_hints={
@@ -650,16 +650,21 @@ def _merge_media_parameters(params: List[ToolParameter]) -> List[ToolParameter]:
         else:
             control = "video_picker"
 
+        # Images are a single multi-upload field ("1 primary + optional extras"),
+        # so min is max(mins). Video params are distinct positional slots (e.g. the
+        # two clips of a stitch), each independently required, so min is sum(mins).
+        min_items = sum(mins) if name == "input_videos" else max(mins)
+
         merged.append(
             ToolParameter(
                 name=name,
                 type="array",
                 description="",
-                required=max(mins) > 0,
+                required=min_items > 0,
                 items={"type": "string"},
                 ui_hints={
                     "control": control,
-                    "min-items": max(mins),
+                    "min-items": min_items,
                     "max-items": sum(maxs),
                     **({"controlnet": controlnet_types} if controlnet_types and name == "input_images" else {}),
                 },
