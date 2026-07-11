@@ -161,20 +161,24 @@ class StimmaVideoOutput:
         import folder_paths
         import tempfile
         import subprocess
-
-        # Convert frames to individual PNGs in a temp dir, then encode with ffmpeg
-        temp_dir = tempfile.mkdtemp(prefix="stimma_video_")
+        import shutil
 
         try:
-            for i, frame in enumerate(frames):
-                img_np = 255.0 * frame.cpu().numpy()
-                img = Image.fromarray(np.clip(img_np, 0, 255).astype(np.uint8))
-                img.save(os.path.join(temp_dir, f"frame_{i:06d}.png"))
+            import torch
+        except ImportError:
+            torch = None
 
+        num_frames = int(frames.shape[0])
+        height = int(frames.shape[1])
+        width = int(frames.shape[2])
+
+        temp_dir = None
+        try:
             # Optionally write the audio track to a WAV for muxing. Disabled when
             # generate_audio is False or no audio is connected.
             audio_path = None
             if generate_audio and audio is not None:
+                temp_dir = tempfile.mkdtemp(prefix="stimma_video_")
                 audio_path = _write_audio_wav(audio, os.path.join(temp_dir, "audio.wav"))
 
             if _stimma_output_dir:
@@ -193,11 +197,15 @@ class StimmaVideoOutput:
                         break
                     counter += 1
 
-            # Encode with ffmpeg, muxing the audio track when present.
+            # Stream raw RGB frames straight into ffmpeg over stdin — no
+            # intermediate PNG round-trip through the filesystem.
             cmd = [
                 "ffmpeg", "-y",
-                "-framerate", str(fps),
-                "-i", os.path.join(temp_dir, "frame_%06d.png"),
+                "-f", "rawvideo",
+                "-pix_fmt", "rgb24",
+                "-s", f"{width}x{height}",
+                "-r", str(fps),
+                "-i", "pipe:0",
             ]
             if audio_path:
                 cmd += ["-i", audio_path]
@@ -212,9 +220,34 @@ class StimmaVideoOutput:
                 # Map the video stream + audio stream; end at the shorter input.
                 cmd += ["-c:a", "aac", "-b:a", "192k", "-shortest"]
             cmd += [output_path]
-            result = subprocess.run(cmd, capture_output=True)
-            if result.returncode != 0:
-                raise RuntimeError(f"ffmpeg encoding failed: {result.stderr.decode()}")
+
+            # stderr goes to a temp file (not a pipe) so ffmpeg can never block
+            # on a full stderr buffer while we're blocked writing frames.
+            with tempfile.TemporaryFile() as stderr_file:
+                proc = subprocess.Popen(
+                    cmd, stdin=subprocess.PIPE,
+                    stdout=subprocess.DEVNULL, stderr=stderr_file,
+                )
+                try:
+                    chunk = 64
+                    for start in range(0, num_frames, chunk):
+                        batch = frames[start:start + chunk]
+                        if batch.shape[-1] > 3:
+                            batch = batch[..., :3]
+                        if torch is not None and isinstance(batch, torch.Tensor):
+                            arr = batch.mul(255.0).clamp(0, 255).to(torch.uint8).cpu().numpy()
+                        else:
+                            arr = np.clip(np.asarray(batch) * 255.0, 0, 255).astype(np.uint8)
+                        proc.stdin.write(arr.tobytes())
+                    proc.stdin.close()
+                except BrokenPipeError:
+                    pass
+                finally:
+                    returncode = proc.wait()
+                if returncode != 0:
+                    stderr_file.seek(0)
+                    err = stderr_file.read().decode(errors="replace")
+                    raise RuntimeError(f"ffmpeg encoding failed: {err[-4000:]}")
 
             filename = os.path.basename(output_path)
             if _stimma_output_dir:
@@ -223,6 +256,5 @@ class StimmaVideoOutput:
                 return {"ui": {"videos": [{"filename": filename, "subfolder": "", "type": "output"}]}}
 
         finally:
-            # Clean up temp frame PNGs
-            import shutil
-            shutil.rmtree(temp_dir, ignore_errors=True)
+            if temp_dir is not None:
+                shutil.rmtree(temp_dir, ignore_errors=True)
