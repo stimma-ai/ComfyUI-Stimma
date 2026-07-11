@@ -121,7 +121,7 @@ Stimma automatically scans the default user's workflows directory in ComfyUI loo
 
 ## Smoke-testing the bundled workflows
 
-The [`stp`](https://github.com/stimma-ai/stimma-tools-protocol-cli) CLI can sweep every workflow this plugin exposes — running the cheapest valid generation of each and checking the output is a plausible asset. It's a fast way to surveil that the bundled workflows still work end-to-end after a ComfyUI/model update. Point it at a ComfyUI instance with this plugin loaded:
+The [`stp`](https://github.com/stimma-ai/stimma-tools-protocol-cli) CLI can sweep every workflow this plugin exposes — running the cheapest valid generation of each and checking the output is a plausible asset. It's a fast way to verify that the bundled workflows still work end-to-end after a ComfyUI/model update. Point it at a ComfyUI instance with this plugin loaded:
 
 ```
 stp --url ws://<comfyui-host>:8188/stp-v1 sweep --report sweep.json -o sweep-out/
