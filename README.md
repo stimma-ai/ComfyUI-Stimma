@@ -3,7 +3,7 @@
 </p>
 <h1 align="center">ComfyUI-Stimma</h1>
 
-A ComfyUI plugin that exposes saved workflows as [Stimma](https://stimma.ai) tools via the Stimma Tools Protocol (STP). Stimma is built for the ComfyUI community — we know custom workflows are the heart of what makes ComfyUI powerful, and this plugin is designed to bring those workflows into the Stimma environment without compromise. Drop Stimma nodes into any ComfyUI workflow, save it, and it becomes a remotely callable tool.
+A ComfyUI plugin that exposes saved workflows as [Stimma](https://stimma.ai) tools via the [Stimma Tools Protocol (STP)](https://github.com/stimma-ai/stimma-tools-protocol). Stimma is built for the ComfyUI community — we know custom workflows are the heart of what makes ComfyUI powerful, and this plugin is designed to bring those workflows into the Stimma environment without compromise. Drop Stimma nodes into any ComfyUI workflow, save it, and it becomes a remotely callable tool.
 
 ## How It Works
 
@@ -18,7 +18,7 @@ Clone into your ComfyUI `custom_nodes` directory:
 
 ```bash
 cd ComfyUI/custom_nodes
-git clone https://github.com/stimma/ComfyUI-Stimma.git
+git clone https://github.com/stimma-ai/ComfyUI-Stimma.git
 pip install -r ComfyUI-Stimma/requirements.txt
 ```
 
@@ -163,4 +163,4 @@ Tell it the path to the workflow file. It will create a new Stimmafy'd one in wo
 
 The skill knows the Stimma nodes, tool building practices, and wiring patterns. It will analyze the workflow, prepare it for stimma and test it against your ComfyUI. If you want changes, discuss with Claude and you can iterate. All of the samples in workflows/ were built this way.
 
-We are happy to take pull requests for further reference workflows if they are broadly of interest to the community. Most of the workflows so far are based on ComfyUI's stock workflows and nodes.
+We are happy to take pull requests for further reference workflows if they are broadly of interest to the community. The bundled workflows combine stock and community ComfyUI workflows with workflows developed or adapted by the Stimma team.

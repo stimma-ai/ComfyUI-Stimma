@@ -42,7 +42,8 @@ When you see imports like `from stimma_tools_protocol.provider import Provider` 
 
 ## Protocol Reference
 
-The Stimma Tools Protocol (STP) spec lives at `../stimma/docs/TOOLS_PROTOCOL.md`. Key points:
+The Stimma Tools Protocol (STP) specification lives in the public
+[`stimma-tools-protocol`](https://github.com/stimma-ai/stimma-tools-protocol) repository. Key points:
 
 - JSON-RPC 2.0 over WebSocket at `/stp-v1`
 - Provider registers → Stimma calls `tools.list` → `tools.execute` / `tools.cancel`
@@ -51,7 +52,7 @@ The Stimma Tools Protocol (STP) spec lives at `../stimma/docs/TOOLS_PROTOCOL.md`
 - Assets transferred out-of-band via HTTP endpoints, never embedded in JSON
 - Progress via `tools.progress` notifications, results via `tools.result`
 
-Protocol reference: `../stimma/docs/TOOLS_PROTOCOL.md`
+Protocol reference: https://github.com/stimma-ai/stimma-tools-protocol
 
 ## How It Works (end to end)
 
