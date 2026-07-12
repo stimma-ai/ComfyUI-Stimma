@@ -166,15 +166,18 @@ def setup_stp_server():
         except OSError:
             pass
 
-    # Privacy: sweep orphaned job uploads from ComfyUI's input directory.
-    # The executor deletes its uploads after each job, but a hard crash can
-    # leave them behind. 24h threshold — jobs can legitimately run for hours.
+    # Privacy: sweep artifacts orphaned by a hard crash (the executor cleans
+    # up after every job, including failures, but a process death mid-job
+    # skips those finally blocks). 24h threshold — jobs can legitimately run
+    # for hours, and other ComfyUI instances on this machine share these dirs.
     try:
         import time as _time
         import folder_paths
-        input_dir = folder_paths.get_input_directory()
         cutoff = _time.time() - 24 * 3600
         swept = 0
+
+        # Job uploads left in ComfyUI's input directory
+        input_dir = folder_paths.get_input_directory()
         for pattern in ("stimma_upload_*", "comfy_input_*"):
             for path in glob.glob(os.path.join(input_dir, pattern)):
                 try:
@@ -183,10 +186,25 @@ def setup_stp_server():
                         swept += 1
                 except OSError:
                     pass
+
+        # Per-job temp output dirs and upload staging files in /tmp
+        for pattern in ("stimma_output_*", "stimma_upload_*"):
+            for path in glob.glob(os.path.join(tempfile.gettempdir(), pattern)):
+                try:
+                    if os.path.getmtime(path) >= cutoff:
+                        continue
+                    if os.path.isdir(path):
+                        shutil.rmtree(path, ignore_errors=True)
+                    else:
+                        os.remove(path)
+                    swept += 1
+                except OSError:
+                    pass
+
         if swept:
-            logger.info(f"Swept {swept} orphaned Stimma upload(s) from ComfyUI input dir")
+            logger.info(f"Swept {swept} orphaned Stimma artifact(s) from previous sessions")
     except Exception as e:
-        logger.warning(f"Stale upload sweep failed: {e}")
+        logger.warning(f"Stale artifact sweep failed: {e}")
 
     # Create asset server and add routes to ComfyUI's app
     asset_server = LocalAssetServer()
