@@ -651,9 +651,11 @@ def _merge_media_parameters(params: List[ToolParameter]) -> List[ToolParameter]:
             control = "video_picker"
 
         # Images are a single multi-upload field ("1 primary + optional extras"),
-        # so min is max(mins). Video params are distinct positional slots (e.g. the
-        # two clips of a stitch), each independently required, so min is sum(mins).
-        min_items = sum(mins) if name == "input_videos" else max(mins)
+        # so min is max(mins). Video params are distinct positional slots; a stitch
+        # needs at least two clips but accepts up to the number of slots, so min is 2
+        # and max is the slot count (sum of per-node maxes).
+        min_items = 2 if name == "input_videos" and len(items) >= 2 else (
+            sum(mins) if name == "input_videos" else max(mins))
 
         merged.append(
             ToolParameter(

@@ -23,6 +23,7 @@ from .loras import StimmaLoraLoader, StimmaPairedLoraLoader
 from .checkpoints import StimmaCheckpointLoader
 from .outputs import StimmaImageOutput, StimmaVideoOutput
 from .layout import StimmaLayoutGroup
+from .stitch_assembler import StimmaVideoStitchAssembler
 
 NODE_CLASS_MAPPINGS = {
     "StimmaToolInfo": StimmaToolInfo,
@@ -46,6 +47,7 @@ NODE_CLASS_MAPPINGS = {
     "StimmaImageOutput": StimmaImageOutput,
     "StimmaVideoOutput": StimmaVideoOutput,
     "StimmaLayoutGroup": StimmaLayoutGroup,
+    "StimmaVideoStitchAssembler": StimmaVideoStitchAssembler,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
@@ -70,4 +72,5 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "StimmaImageOutput": "Stimma Image Output",
     "StimmaVideoOutput": "Stimma Video Output",
     "StimmaLayoutGroup": "Stimma Layout Group",
+    "StimmaVideoStitchAssembler": "Stimma Video Stitch Assembler",
 }
