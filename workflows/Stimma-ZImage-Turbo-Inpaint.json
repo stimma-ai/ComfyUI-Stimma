@@ -1,8 +1,8 @@
 {
   "id": "stimma-z-image-turbo-inpaint",
   "revision": 0,
-  "last_node_id": 32,
-  "last_link_id": 35,
+  "last_node_id": 34,
+  "last_link_id": 37,
   "nodes": [
     {
       "id": 1,
@@ -53,7 +53,7 @@
           "name": "text",
           "type": "STRING",
           "links": [
-            19
+            21
           ],
           "slot_index": 0
         }
@@ -66,7 +66,7 @@
         "",
         true,
         0,
-        "Describe what should appear in the masked area"
+        "Describe what should appear in the masked area, including lighting direction when it matters for blending"
       ]
     },
     {
@@ -169,7 +169,7 @@
           "name": "seed",
           "type": "INT",
           "links": [
-            22
+            24
           ],
           "slot_index": 0
         }
@@ -320,7 +320,7 @@
           "name": "value",
           "type": "INT",
           "links": [
-            23
+            25
           ],
           "slot_index": 0
         }
@@ -359,7 +359,7 @@
           "name": "value",
           "type": "*",
           "links": [
-            24
+            26
           ],
           "slot_index": 0
         }
@@ -394,7 +394,7 @@
           "name": "value",
           "type": "*",
           "links": [
-            25
+            27
           ],
           "slot_index": 0
         }
@@ -429,7 +429,7 @@
           "name": "value",
           "type": "FLOAT",
           "links": [
-            26
+            28
           ],
           "slot_index": 0
         }
@@ -445,7 +445,7 @@
         0.05,
         "slider",
         42,
-        "How strongly to repaint the masked area (1.0 = fully regenerate)"
+        "1.0 replaces the masked content entirely; lower to 0.6-0.8 to restyle what's already there"
       ]
     },
     {
@@ -722,7 +722,7 @@
           "name": "stitcher",
           "type": "STITCHER",
           "links": [
-            32
+            34
           ],
           "slot_index": 0
         },
@@ -730,7 +730,7 @@
           "name": "cropped_image",
           "type": "IMAGE",
           "links": [
-            14
+            15
           ],
           "slot_index": 1
         },
@@ -861,8 +861,8 @@
           "name": "VAE",
           "type": "VAE",
           "links": [
-            15,
-            31
+            16,
+            33
           ],
           "slot_index": 0
         }
@@ -913,8 +913,8 @@
           "name": "clip",
           "type": "CLIP",
           "links": [
-            18,
-            20
+            20,
+            22
           ],
           "slot_index": 1
         }
@@ -973,7 +973,7 @@
           "name": "MODEL",
           "type": "MODEL",
           "links": [
-            21
+            14
           ],
           "slot_index": 0
         }
@@ -987,6 +987,44 @@
     },
     {
       "id": 24,
+      "type": "DifferentialDiffusion",
+      "pos": [
+        220,
+        -250
+      ],
+      "size": [
+        280,
+        80
+      ],
+      "flags": {},
+      "order": 23,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "model",
+          "type": "MODEL",
+          "link": 14
+        }
+      ],
+      "outputs": [
+        {
+          "name": "MODEL",
+          "type": "MODEL",
+          "links": [
+            23
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "DifferentialDiffusion"
+      },
+      "widgets_values": [
+        1.0
+      ]
+    },
+    {
+      "id": 25,
       "type": "VAEEncode",
       "pos": [
         320,
@@ -997,18 +1035,18 @@
         80
       ],
       "flags": {},
-      "order": 23,
+      "order": 24,
       "mode": 0,
       "inputs": [
         {
           "name": "pixels",
           "type": "IMAGE",
-          "link": 14
+          "link": 15
         },
         {
           "name": "vae",
           "type": "VAE",
-          "link": 15
+          "link": 16
         }
       ],
       "outputs": [
@@ -1016,7 +1054,7 @@
           "name": "LATENT",
           "type": "LATENT",
           "links": [
-            16
+            18
           ],
           "slot_index": 0
         }
@@ -1028,25 +1066,20 @@
       "title": "Encode crop"
     },
     {
-      "id": 25,
-      "type": "SetLatentNoiseMask",
+      "id": 26,
+      "type": "GrowMaskWithBlur",
       "pos": [
-        600,
-        700
+        320,
+        860
       ],
       "size": [
-        240,
-        80
+        300,
+        220
       ],
       "flags": {},
-      "order": 24,
+      "order": 25,
       "mode": 0,
       "inputs": [
-        {
-          "name": "samples",
-          "type": "LATENT",
-          "link": 16
-        },
         {
           "name": "mask",
           "type": "MASK",
@@ -1055,10 +1088,67 @@
       ],
       "outputs": [
         {
+          "name": "mask",
+          "type": "MASK",
+          "links": [
+            19
+          ],
+          "slot_index": 0
+        },
+        {
+          "name": "mask_inverted",
+          "type": "MASK",
+          "links": [],
+          "slot_index": 1
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "GrowMaskWithBlur"
+      },
+      "widgets_values": [
+        0,
+        0.0,
+        true,
+        false,
+        12.0,
+        1.0,
+        1.0,
+        false
+      ],
+      "title": "Soften mask edge"
+    },
+    {
+      "id": 27,
+      "type": "SetLatentNoiseMask",
+      "pos": [
+        660,
+        700
+      ],
+      "size": [
+        240,
+        80
+      ],
+      "flags": {},
+      "order": 26,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "samples",
+          "type": "LATENT",
+          "link": 18
+        },
+        {
+          "name": "mask",
+          "type": "MASK",
+          "link": 19
+        }
+      ],
+      "outputs": [
+        {
           "name": "LATENT",
           "type": "LATENT",
           "links": [
-            29
+            31
           ],
           "slot_index": 0
         }
@@ -1069,7 +1159,7 @@
       "widgets_values": []
     },
     {
-      "id": 26,
+      "id": 28,
       "type": "CLIPTextEncode",
       "pos": [
         -100,
@@ -1080,13 +1170,13 @@
         140
       ],
       "flags": {},
-      "order": 25,
+      "order": 27,
       "mode": 0,
       "inputs": [
         {
           "name": "text",
           "type": "STRING",
-          "link": 19,
+          "link": 21,
           "widget": {
             "name": "text"
           }
@@ -1094,7 +1184,7 @@
         {
           "name": "clip",
           "type": "CLIP",
-          "link": 18
+          "link": 20
         }
       ],
       "outputs": [
@@ -1102,7 +1192,7 @@
           "name": "CONDITIONING",
           "type": "CONDITIONING",
           "links": [
-            27
+            29
           ],
           "slot_index": 0
         }
@@ -1116,7 +1206,7 @@
       "title": "Positive Prompt"
     },
     {
-      "id": 27,
+      "id": 29,
       "type": "CLIPTextEncode",
       "pos": [
         -100,
@@ -1127,13 +1217,13 @@
         120
       ],
       "flags": {},
-      "order": 26,
+      "order": 28,
       "mode": 0,
       "inputs": [
         {
           "name": "clip",
           "type": "CLIP",
-          "link": 20
+          "link": 22
         }
       ],
       "outputs": [
@@ -1141,7 +1231,7 @@
           "name": "CONDITIONING",
           "type": "CONDITIONING",
           "links": [
-            28
+            30
           ],
           "slot_index": 0
         }
@@ -1155,7 +1245,7 @@
       "title": "Negative Prompt"
     },
     {
-      "id": 28,
+      "id": 30,
       "type": "KSampler",
       "pos": [
         920,
@@ -1166,18 +1256,18 @@
         280
       ],
       "flags": {},
-      "order": 27,
+      "order": 29,
       "mode": 0,
       "inputs": [
         {
           "name": "model",
           "type": "MODEL",
-          "link": 21
+          "link": 23
         },
         {
           "name": "seed",
           "type": "INT",
-          "link": 22,
+          "link": 24,
           "widget": {
             "name": "seed"
           }
@@ -1185,7 +1275,7 @@
         {
           "name": "steps",
           "type": "INT",
-          "link": 23,
+          "link": 25,
           "widget": {
             "name": "steps"
           }
@@ -1193,7 +1283,7 @@
         {
           "name": "sampler_name",
           "type": "COMBO",
-          "link": 24,
+          "link": 26,
           "widget": {
             "name": "sampler_name"
           }
@@ -1201,7 +1291,7 @@
         {
           "name": "scheduler",
           "type": "COMBO",
-          "link": 25,
+          "link": 27,
           "widget": {
             "name": "scheduler"
           }
@@ -1209,22 +1299,22 @@
         {
           "name": "positive",
           "type": "CONDITIONING",
-          "link": 27
+          "link": 29
         },
         {
           "name": "negative",
           "type": "CONDITIONING",
-          "link": 28
+          "link": 30
         },
         {
           "name": "latent_image",
           "type": "LATENT",
-          "link": 29
+          "link": 31
         },
         {
           "name": "denoise",
           "type": "FLOAT",
-          "link": 26,
+          "link": 28,
           "widget": {
             "name": "denoise"
           }
@@ -1235,7 +1325,7 @@
           "name": "LATENT",
           "type": "LATENT",
           "links": [
-            30
+            32
           ],
           "slot_index": 0
         }
@@ -1250,11 +1340,11 @@
         1.0,
         "euler",
         "simple",
-        1.0
+        0.8
       ]
     },
     {
-      "id": 29,
+      "id": 31,
       "type": "VAEDecode",
       "pos": [
         1620,
@@ -1265,18 +1355,18 @@
         80
       ],
       "flags": {},
-      "order": 28,
+      "order": 30,
       "mode": 0,
       "inputs": [
         {
           "name": "samples",
           "type": "LATENT",
-          "link": 30
+          "link": 32
         },
         {
           "name": "vae",
           "type": "VAE",
-          "link": 31
+          "link": 33
         }
       ],
       "outputs": [
@@ -1284,7 +1374,7 @@
           "name": "IMAGE",
           "type": "IMAGE",
           "links": [
-            33
+            35
           ],
           "slot_index": 0
         }
@@ -1295,7 +1385,7 @@
       "widgets_values": []
     },
     {
-      "id": 30,
+      "id": 32,
       "type": "InpaintStitchImproved",
       "pos": [
         1900,
@@ -1306,18 +1396,18 @@
         90
       ],
       "flags": {},
-      "order": 29,
+      "order": 31,
       "mode": 0,
       "inputs": [
         {
           "name": "stitcher",
           "type": "STITCHER",
-          "link": 32
+          "link": 34
         },
         {
           "name": "inpainted_image",
           "type": "IMAGE",
-          "link": 33
+          "link": 35
         }
       ],
       "outputs": [
@@ -1325,8 +1415,8 @@
           "name": "image",
           "type": "IMAGE",
           "links": [
-            34,
-            35
+            36,
+            37
           ],
           "slot_index": 0
         }
@@ -1338,7 +1428,7 @@
       "title": "\u2702\ufe0f Inpaint Stitch"
     },
     {
-      "id": 31,
+      "id": 33,
       "type": "SaveImage",
       "pos": [
         2240,
@@ -1349,13 +1439,13 @@
         300
       ],
       "flags": {},
-      "order": 30,
+      "order": 32,
       "mode": 0,
       "inputs": [
         {
           "name": "images",
           "type": "IMAGE",
-          "link": 34
+          "link": 36
         }
       ],
       "outputs": [
@@ -1374,7 +1464,7 @@
       ]
     },
     {
-      "id": 32,
+      "id": 34,
       "type": "StimmaImageOutput",
       "pos": [
         2240,
@@ -1385,13 +1475,13 @@
         120
       ],
       "flags": {},
-      "order": 31,
+      "order": 33,
       "mode": 0,
       "inputs": [
         {
           "name": "images",
           "type": "IMAGE",
-          "link": 35
+          "link": 37
         }
       ],
       "outputs": [],
@@ -1511,177 +1601,193 @@
     ],
     [
       14,
+      23,
+      0,
+      24,
+      0,
+      "MODEL"
+    ],
+    [
+      15,
       18,
       1,
-      24,
+      25,
       0,
       "IMAGE"
     ],
     [
-      15,
+      16,
       21,
       0,
-      24,
+      25,
       1,
       "VAE"
-    ],
-    [
-      16,
-      24,
-      0,
-      25,
-      0,
-      "LATENT"
     ],
     [
       17,
       18,
       2,
-      25,
-      1,
+      26,
+      0,
       "MASK"
     ],
     [
       18,
-      22,
-      1,
-      26,
-      1,
-      "CLIP"
+      25,
+      0,
+      27,
+      0,
+      "LATENT"
     ],
     [
       19,
-      2,
-      0,
       26,
       0,
-      "STRING"
+      27,
+      1,
+      "MASK"
     ],
     [
       20,
       22,
       1,
-      27,
-      0,
+      28,
+      1,
       "CLIP"
     ],
     [
       21,
-      23,
+      2,
       0,
       28,
+      0,
+      "STRING"
+    ],
+    [
+      22,
+      22,
+      1,
+      29,
+      0,
+      "CLIP"
+    ],
+    [
+      23,
+      24,
+      0,
+      30,
       0,
       "MODEL"
     ],
     [
-      22,
+      24,
       5,
       0,
-      28,
+      30,
       1,
       "INT"
     ],
     [
-      23,
+      25,
       9,
       0,
-      28,
+      30,
       2,
       "INT"
     ],
     [
-      24,
+      26,
       10,
       0,
-      28,
+      30,
       3,
       "*"
     ],
     [
-      25,
+      27,
       11,
       0,
-      28,
+      30,
       4,
       "*"
     ],
     [
-      26,
+      28,
       12,
       0,
-      28,
+      30,
       8,
       "FLOAT"
     ],
     [
-      27,
-      26,
-      0,
+      29,
       28,
+      0,
+      30,
       5,
       "CONDITIONING"
     ],
     [
-      28,
-      27,
+      30,
+      29,
       0,
-      28,
+      30,
       6,
       "CONDITIONING"
     ],
     [
-      29,
-      25,
+      31,
+      27,
       0,
-      28,
+      30,
       7,
       "LATENT"
     ],
     [
+      32,
       30,
-      28,
       0,
-      29,
+      31,
       0,
       "LATENT"
     ],
     [
-      31,
+      33,
       21,
       0,
-      29,
+      31,
       1,
       "VAE"
     ],
     [
-      32,
+      34,
       18,
       0,
-      30,
+      32,
       0,
       "STITCHER"
     ],
     [
-      33,
-      29,
+      35,
+      31,
       0,
-      30,
+      32,
       1,
       "IMAGE"
     ],
     [
-      34,
-      30,
+      36,
+      32,
       0,
-      31,
+      33,
       0,
       "IMAGE"
     ],
     [
-      35,
-      30,
-      0,
+      37,
       32,
+      0,
+      34,
       0,
       "IMAGE"
     ]
