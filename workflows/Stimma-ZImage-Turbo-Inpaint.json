@@ -1,8 +1,8 @@
 {
   "id": "stimma-z-image-turbo-inpaint",
   "revision": 0,
-  "last_node_id": 34,
-  "last_link_id": 37,
+  "last_node_id": 36,
+  "last_link_id": 39,
   "nodes": [
     {
       "id": 1,
@@ -169,7 +169,7 @@
           "name": "seed",
           "type": "INT",
           "links": [
-            24
+            25
           ],
           "slot_index": 0
         }
@@ -320,7 +320,7 @@
           "name": "value",
           "type": "INT",
           "links": [
-            25
+            26
           ],
           "slot_index": 0
         }
@@ -359,7 +359,7 @@
           "name": "value",
           "type": "*",
           "links": [
-            26
+            28
           ],
           "slot_index": 0
         }
@@ -394,7 +394,7 @@
           "name": "value",
           "type": "*",
           "links": [
-            27
+            29
           ],
           "slot_index": 0
         }
@@ -429,7 +429,7 @@
           "name": "value",
           "type": "FLOAT",
           "links": [
-            28
+            30
           ],
           "slot_index": 0
         }
@@ -495,7 +495,7 @@
       },
       "widgets_values": [
         "Advanced",
-        "steps\nsampler\nscheduler\ndenoise\nloras\nseed",
+        "steps\nsampler\nscheduler\ndenoise\ncfg\nnegative_prompt\nloras\nseed",
         true,
         10
       ]
@@ -722,7 +722,7 @@
           "name": "stitcher",
           "type": "STITCHER",
           "links": [
-            34
+            36
           ],
           "slot_index": 0
         },
@@ -862,7 +862,7 @@
           "type": "VAE",
           "links": [
             16,
-            33
+            35
           ],
           "slot_index": 0
         }
@@ -1011,7 +1011,7 @@
           "name": "MODEL",
           "type": "MODEL",
           "links": [
-            23
+            24
           ],
           "slot_index": 0
         }
@@ -1148,7 +1148,7 @@
           "name": "LATENT",
           "type": "LATENT",
           "links": [
-            31
+            33
           ],
           "slot_index": 0
         }
@@ -1160,6 +1160,82 @@
     },
     {
       "id": 28,
+      "type": "StimmaFloatParam",
+      "pos": [
+        -950,
+        1300
+      ],
+      "size": [
+        360,
+        200
+      ],
+      "flags": {},
+      "order": 27,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "value",
+          "type": "FLOAT",
+          "links": [
+            27
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "StimmaFloatParam"
+      },
+      "widgets_values": [
+        "cfg",
+        5.0,
+        1.0,
+        8.0,
+        0.5,
+        "slider",
+        43,
+        "Prompt strength. High values force the prompt through (needed to change objects or clothing); lower toward 1 for subtle fills that just blend with the surroundings"
+      ]
+    },
+    {
+      "id": 29,
+      "type": "StimmaStringParam",
+      "pos": [
+        -950,
+        1550
+      ],
+      "size": [
+        360,
+        160
+      ],
+      "flags": {},
+      "order": 28,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "value",
+          "type": "STRING",
+          "links": [
+            23
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "StimmaStringParam"
+      },
+      "widgets_values": [
+        "negative_prompt",
+        "blurry ugly bad",
+        "",
+        "textarea",
+        44,
+        "What to avoid in the inpainted area (active when Prompt Strength > 1)"
+      ]
+    },
+    {
+      "id": 30,
       "type": "CLIPTextEncode",
       "pos": [
         -100,
@@ -1170,7 +1246,7 @@
         140
       ],
       "flags": {},
-      "order": 27,
+      "order": 29,
       "mode": 0,
       "inputs": [
         {
@@ -1192,7 +1268,7 @@
           "name": "CONDITIONING",
           "type": "CONDITIONING",
           "links": [
-            29
+            31
           ],
           "slot_index": 0
         }
@@ -1206,7 +1282,7 @@
       "title": "Positive Prompt"
     },
     {
-      "id": 29,
+      "id": 31,
       "type": "CLIPTextEncode",
       "pos": [
         -100,
@@ -1217,9 +1293,17 @@
         120
       ],
       "flags": {},
-      "order": 28,
+      "order": 30,
       "mode": 0,
       "inputs": [
+        {
+          "name": "text",
+          "type": "STRING",
+          "link": 23,
+          "widget": {
+            "name": "text"
+          }
+        },
         {
           "name": "clip",
           "type": "CLIP",
@@ -1231,7 +1315,7 @@
           "name": "CONDITIONING",
           "type": "CONDITIONING",
           "links": [
-            30
+            32
           ],
           "slot_index": 0
         }
@@ -1245,7 +1329,7 @@
       "title": "Negative Prompt"
     },
     {
-      "id": 30,
+      "id": 32,
       "type": "KSampler",
       "pos": [
         920,
@@ -1256,18 +1340,18 @@
         280
       ],
       "flags": {},
-      "order": 29,
+      "order": 31,
       "mode": 0,
       "inputs": [
         {
           "name": "model",
           "type": "MODEL",
-          "link": 23
+          "link": 24
         },
         {
           "name": "seed",
           "type": "INT",
-          "link": 24,
+          "link": 25,
           "widget": {
             "name": "seed"
           }
@@ -1275,15 +1359,23 @@
         {
           "name": "steps",
           "type": "INT",
-          "link": 25,
+          "link": 26,
           "widget": {
             "name": "steps"
           }
         },
         {
+          "name": "cfg",
+          "type": "FLOAT",
+          "link": 27,
+          "widget": {
+            "name": "cfg"
+          }
+        },
+        {
           "name": "sampler_name",
           "type": "COMBO",
-          "link": 26,
+          "link": 28,
           "widget": {
             "name": "sampler_name"
           }
@@ -1291,7 +1383,7 @@
         {
           "name": "scheduler",
           "type": "COMBO",
-          "link": 27,
+          "link": 29,
           "widget": {
             "name": "scheduler"
           }
@@ -1299,22 +1391,22 @@
         {
           "name": "positive",
           "type": "CONDITIONING",
-          "link": 29
+          "link": 31
         },
         {
           "name": "negative",
           "type": "CONDITIONING",
-          "link": 30
+          "link": 32
         },
         {
           "name": "latent_image",
           "type": "LATENT",
-          "link": 31
+          "link": 33
         },
         {
           "name": "denoise",
           "type": "FLOAT",
-          "link": 28,
+          "link": 30,
           "widget": {
             "name": "denoise"
           }
@@ -1325,7 +1417,7 @@
           "name": "LATENT",
           "type": "LATENT",
           "links": [
-            32
+            34
           ],
           "slot_index": 0
         }
@@ -1337,14 +1429,14 @@
         0,
         "randomize",
         9,
-        1.0,
+        5.0,
         "euler",
         "simple",
-        0.8
+        1.0
       ]
     },
     {
-      "id": 31,
+      "id": 33,
       "type": "VAEDecode",
       "pos": [
         1620,
@@ -1355,18 +1447,18 @@
         80
       ],
       "flags": {},
-      "order": 30,
+      "order": 32,
       "mode": 0,
       "inputs": [
         {
           "name": "samples",
           "type": "LATENT",
-          "link": 32
+          "link": 34
         },
         {
           "name": "vae",
           "type": "VAE",
-          "link": 33
+          "link": 35
         }
       ],
       "outputs": [
@@ -1374,7 +1466,7 @@
           "name": "IMAGE",
           "type": "IMAGE",
           "links": [
-            35
+            37
           ],
           "slot_index": 0
         }
@@ -1385,7 +1477,7 @@
       "widgets_values": []
     },
     {
-      "id": 32,
+      "id": 34,
       "type": "InpaintStitchImproved",
       "pos": [
         1900,
@@ -1396,18 +1488,18 @@
         90
       ],
       "flags": {},
-      "order": 31,
+      "order": 33,
       "mode": 0,
       "inputs": [
         {
           "name": "stitcher",
           "type": "STITCHER",
-          "link": 34
+          "link": 36
         },
         {
           "name": "inpainted_image",
           "type": "IMAGE",
-          "link": 35
+          "link": 37
         }
       ],
       "outputs": [
@@ -1415,8 +1507,8 @@
           "name": "image",
           "type": "IMAGE",
           "links": [
-            36,
-            37
+            38,
+            39
           ],
           "slot_index": 0
         }
@@ -1428,7 +1520,7 @@
       "title": "\u2702\ufe0f Inpaint Stitch"
     },
     {
-      "id": 33,
+      "id": 35,
       "type": "SaveImage",
       "pos": [
         2240,
@@ -1439,13 +1531,13 @@
         300
       ],
       "flags": {},
-      "order": 32,
+      "order": 34,
       "mode": 0,
       "inputs": [
         {
           "name": "images",
           "type": "IMAGE",
-          "link": 36
+          "link": 38
         }
       ],
       "outputs": [
@@ -1464,7 +1556,7 @@
       ]
     },
     {
-      "id": 34,
+      "id": 36,
       "type": "StimmaImageOutput",
       "pos": [
         2240,
@@ -1475,13 +1567,13 @@
         120
       ],
       "flags": {},
-      "order": 33,
+      "order": 35,
       "mode": 0,
       "inputs": [
         {
           "name": "images",
           "type": "IMAGE",
-          "link": 37
+          "link": 39
         }
       ],
       "outputs": [],
@@ -1651,7 +1743,7 @@
       20,
       22,
       1,
-      28,
+      30,
       1,
       "CLIP"
     ],
@@ -1659,7 +1751,7 @@
       21,
       2,
       0,
-      28,
+      30,
       0,
       "STRING"
     ],
@@ -1667,127 +1759,143 @@
       22,
       22,
       1,
-      29,
-      0,
+      31,
+      1,
       "CLIP"
     ],
     [
       23,
+      29,
+      0,
+      31,
+      0,
+      "STRING"
+    ],
+    [
+      24,
       24,
       0,
-      30,
+      32,
       0,
       "MODEL"
     ],
     [
-      24,
+      25,
       5,
       0,
-      30,
+      32,
       1,
-      "INT"
-    ],
-    [
-      25,
-      9,
-      0,
-      30,
-      2,
       "INT"
     ],
     [
       26,
-      10,
+      9,
       0,
-      30,
-      3,
-      "*"
+      32,
+      2,
+      "INT"
     ],
     [
       27,
-      11,
+      28,
       0,
-      30,
+      32,
+      3,
+      "FLOAT"
+    ],
+    [
+      28,
+      10,
+      0,
+      32,
       4,
       "*"
     ],
     [
-      28,
+      29,
+      11,
+      0,
+      32,
+      5,
+      "*"
+    ],
+    [
+      30,
       12,
       0,
-      30,
-      8,
+      32,
+      9,
       "FLOAT"
     ],
     [
-      29,
-      28,
+      31,
+      30,
       0,
-      30,
-      5,
-      "CONDITIONING"
-    ],
-    [
-      30,
-      29,
-      0,
-      30,
+      32,
       6,
       "CONDITIONING"
     ],
     [
-      31,
-      27,
-      0,
-      30,
-      7,
-      "LATENT"
-    ],
-    [
       32,
-      30,
-      0,
       31,
       0,
-      "LATENT"
+      32,
+      7,
+      "CONDITIONING"
     ],
     [
       33,
+      27,
+      0,
+      32,
+      8,
+      "LATENT"
+    ],
+    [
+      34,
+      32,
+      0,
+      33,
+      0,
+      "LATENT"
+    ],
+    [
+      35,
       21,
       0,
-      31,
+      33,
       1,
       "VAE"
     ],
     [
-      34,
+      36,
       18,
       0,
-      32,
+      34,
       0,
       "STITCHER"
     ],
     [
-      35,
-      31,
+      37,
+      33,
       0,
-      32,
+      34,
       1,
       "IMAGE"
     ],
     [
-      36,
-      32,
+      38,
+      34,
       0,
-      33,
+      35,
       0,
       "IMAGE"
     ],
     [
-      37,
-      32,
-      0,
+      39,
       34,
+      0,
+      36,
       0,
       "IMAGE"
     ]
