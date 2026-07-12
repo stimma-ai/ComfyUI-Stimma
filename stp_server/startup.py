@@ -166,6 +166,28 @@ def setup_stp_server():
         except OSError:
             pass
 
+    # Privacy: sweep orphaned job uploads from ComfyUI's input directory.
+    # The executor deletes its uploads after each job, but a hard crash can
+    # leave them behind. 24h threshold — jobs can legitimately run for hours.
+    try:
+        import time as _time
+        import folder_paths
+        input_dir = folder_paths.get_input_directory()
+        cutoff = _time.time() - 24 * 3600
+        swept = 0
+        for pattern in ("stimma_upload_*", "comfy_input_*"):
+            for path in glob.glob(os.path.join(input_dir, pattern)):
+                try:
+                    if os.path.isfile(path) and os.path.getmtime(path) < cutoff:
+                        os.remove(path)
+                        swept += 1
+                except OSError:
+                    pass
+        if swept:
+            logger.info(f"Swept {swept} orphaned Stimma upload(s) from ComfyUI input dir")
+    except Exception as e:
+        logger.warning(f"Stale upload sweep failed: {e}")
+
     # Create asset server and add routes to ComfyUI's app
     asset_server = LocalAssetServer()
     transport.add_routes(asset_server.get_aiohttp_routes("/stp-v1/assets"))

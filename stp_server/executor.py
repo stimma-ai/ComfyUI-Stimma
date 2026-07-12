@@ -38,6 +38,19 @@ _PARAM_DATA_FIELDS = {
     "StimmaBoolParam": "value",
 }
 
+# Pure output sinks with no downstream consumers. Stripped from STP jobs (when
+# the workflow has Stimma output nodes) so generations leave no copies in
+# ComfyUI's output directory.
+_SINK_SAVE_TYPES = {
+    "SaveImage",
+    "SaveVideo",
+    "SaveAnimatedWEBP",
+    "SaveAnimatedPNG",
+    "SaveAudio",
+    "SaveAudioMP3",
+    "SaveAudioOpus",
+}
+
 
 def _raise_preflight_error(workflow: "DiscoveredWorkflow") -> None:
     """Raise a clear, actionable error when a workflow has missing dependencies.
@@ -192,6 +205,11 @@ async def execute_workflow(
     # Step 2: Create temp output directory
     output_dir = tempfile.mkdtemp(prefix="stimma_output_")
 
+    # Files this job uploads into ComfyUI's input directory — removed after the
+    # job so user assets don't accumulate on the ComfyUI side.
+    uploaded_files: List[str] = []
+    context._stimma_uploaded_files = uploaded_files
+
     try:
         # Acquire a ComfyUI instance for the full job lifecycle. The worker
         # holds the instance until output capture completes, so the next job
@@ -230,6 +248,21 @@ async def execute_workflow(
             if workflow.lora_nodes:
                 _inject_loras(prompt, workflow, parameters, provider)
 
+            # Step 5.6: Strip plain save-sink nodes (SaveImage/SaveVideo etc.).
+            # They exist for in-editor use; on STP jobs they would leave a copy
+            # of every generation in ComfyUI's output directory. Stimma output
+            # nodes capture the real result, so only strip when those exist —
+            # workflows without them rely on history capture from these sinks.
+            if workflow.output_nodes:
+                sink_ids = [nid for nid, nd in prompt.items()
+                            if nd.get("class_type") in _SINK_SAVE_TYPES]
+                for nid in sink_ids:
+                    logger.info(
+                        f"Stripping save-sink node '{prompt[nid].get('class_type')}' (#{nid}) — "
+                        "no residue in ComfyUI output dir"
+                    )
+                    del prompt[nid]
+
             # Step 6: Inject output directory
             _inject_output_dir(prompt, workflow, output_dir)
             if workflow.output_nodes:
@@ -247,50 +280,63 @@ async def execute_workflow(
             node_types = {nd.get("class_type") for nd in prompt.values()}
             logger.info(f"Prompt has {len(prompt)} nodes, class_types: {sorted(node_types)}")
 
-            ws = await instance.connect_ws()
+            prompt_id = None
             try:
-                queue_response = await instance.queue_prompt(prompt)
-                queue_node_errors = queue_response.get("node_errors", {}) if isinstance(queue_response, dict) else {}
-                if queue_node_errors:
-                    summary = _summarize_queue_node_errors(queue_node_errors, prompt)
-                    logger.error("ComfyUI accepted prompt with node_errors: %s", summary)
-                    raise RuntimeError(
-                        "ComfyUI prompt has node validation errors (execution may skip outputs): "
-                        f"{summary}"
-                    )
-                prompt_id = queue_response["prompt_id"]
-                logger.info(f"Queued prompt {prompt_id} on {instance.addr}")
+                ws = await instance.connect_ws()
+                try:
+                    queue_response = await instance.queue_prompt(prompt)
+                    queue_node_errors = queue_response.get("node_errors", {}) if isinstance(queue_response, dict) else {}
+                    if queue_node_errors:
+                        summary = _summarize_queue_node_errors(queue_node_errors, prompt)
+                        logger.error("ComfyUI accepted prompt with node_errors: %s", summary)
+                        raise RuntimeError(
+                            "ComfyUI prompt has node validation errors (execution may skip outputs): "
+                            f"{summary}"
+                        )
+                    prompt_id = queue_response["prompt_id"]
+                    logger.info(f"Queued prompt {prompt_id} on {instance.addr}")
 
-                # Step 8: Monitor via websocket
-                gen_start = time.time()
-                await _monitor_execution(ws, prompt_id, context)
-                t_gen = time.time() - gen_start
+                    # Step 8: Monitor via websocket
+                    gen_start = time.time()
+                    await _monitor_execution(ws, prompt_id, context)
+                    t_gen = time.time() - gen_start
+                finally:
+                    # Tear the monitoring socket down in the background. A graceful
+                    # ws close handshake blocks until ComfyUI acks it, and ComfyUI's
+                    # event loop is busy with post-execution work for ~0.5s right
+                    # after a job finishes — so awaiting the close here would tack
+                    # that latency onto every generation. We already have the
+                    # completion signal and the output file, so let it close async.
+                    _schedule_ws_close(ws)
+
+                await context.report_progress(0.9)
+
+                # Step 9: Capture output
+                t_cap0 = time.time()
+                expected_output_node_ids = [
+                    nid for nid, nd in prompt.items()
+                    if nd.get("class_type") in {"StimmaImageOutput", "StimmaVideoOutput"}
+                ]
+                result = await _capture_output(
+                    output_dir,
+                    prompt,
+                    context,
+                    instance,
+                    prompt_id,
+                    expected_output_node_ids=expected_output_node_ids,
+                )
+                t_cap = time.time() - t_cap0
             finally:
-                # Tear the monitoring socket down in the background. A graceful
-                # ws close handshake blocks until ComfyUI acks it, and ComfyUI's
-                # event loop is busy with post-execution work for ~0.5s right
-                # after a job finishes — so awaiting the close here would tack
-                # that latency onto every generation. We already have the
-                # completion signal and the output file, so let it close async.
-                _schedule_ws_close(ws)
-
-            await context.report_progress(0.9)
-
-            # Step 9: Capture output
-            t_cap0 = time.time()
-            expected_output_node_ids = [
-                nid for nid, nd in prompt.items()
-                if nd.get("class_type") in {"StimmaImageOutput", "StimmaVideoOutput"}
-            ]
-            result = await _capture_output(
-                output_dir,
-                prompt,
-                context,
-                instance,
-                prompt_id,
-                expected_output_node_ids=expected_output_node_ids,
-            )
-            t_cap = time.time() - t_cap0
+                # Privacy: drop the job's ComfyUI history entry (it holds the
+                # full prompt, including user text). Runs after capture — the
+                # history-fallback capture path and error reporters have already
+                # read what they need by now.
+                if prompt_id:
+                    try:
+                        await instance.delete_history(prompt_id)
+                        logger.debug(f"Deleted ComfyUI history entry {prompt_id}")
+                    except Exception as e:
+                        logger.warning(f"Could not delete history entry {prompt_id}: {e}")
 
             await context.report_progress(1.0)
 
@@ -309,6 +355,37 @@ async def execute_workflow(
     finally:
         # Cleanup output directory
         shutil.rmtree(output_dir, ignore_errors=True)
+        # Privacy: remove this job's uploaded assets from ComfyUI's input dir
+        _cleanup_uploaded_inputs(uploaded_files)
+
+
+def _cleanup_uploaded_inputs(uploaded_files: List[str]) -> None:
+    """Delete this job's uploaded assets from ComfyUI's input directory.
+
+    Uploads are uniquely named per request (stimma_upload_<request>_<hex>), so
+    nothing else can reference them; removing them keeps user media from
+    accumulating on the ComfyUI side.
+    """
+    if not uploaded_files:
+        return
+    try:
+        import folder_paths  # ComfyUI runtime module
+        input_dir = folder_paths.get_input_directory()
+    except Exception:
+        return
+
+    for name in uploaded_files:
+        base = os.path.basename(str(name))
+        if not base.startswith("stimma_upload_"):
+            # Only ever delete files we know we created
+            continue
+        path = os.path.join(input_dir, base)
+        try:
+            if os.path.isfile(path):
+                os.remove(path)
+                logger.debug(f"Removed uploaded input {base}")
+        except OSError as e:
+            logger.warning(f"Could not remove uploaded input {base}: {e}")
 
 
 async def _inject_fields(
@@ -772,6 +849,7 @@ async def _download_and_upload_image(
             with open(temp_path, "wb") as f:
                 f.write(image_data)
             uploaded_name = await instance.upload_image(temp_path)
+            _track_upload(context, uploaded_name)
             return uploaded_name
         finally:
             if os.path.exists(temp_path):
@@ -780,6 +858,13 @@ async def _download_and_upload_image(
     if last_err is not None:
         raise FileNotFoundError(f"Asset not found for any candidate: {tried}") from last_err
     raise FileNotFoundError(f"No valid image input candidates: {tried}")
+
+
+def _track_upload(context: "ExecutionContext", uploaded_name: str) -> None:
+    """Record an uploaded input file for post-job cleanup."""
+    files = getattr(context, "_stimma_uploaded_files", None)
+    if files is not None:
+        files.append(uploaded_name)
 
 
 async def _download_and_upload_video(
@@ -816,6 +901,7 @@ async def _download_and_upload_video(
             with open(temp_path, "wb") as f:
                 f.write(video_data)
             uploaded_name = await instance.upload_video(temp_path)
+            _track_upload(context, uploaded_name)
             return uploaded_name
         finally:
             if os.path.exists(temp_path):

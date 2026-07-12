@@ -112,6 +112,10 @@ class SingleComfy:
         """Get execution history for a prompt."""
         return await self._request("GET", f"/history/{prompt_id}")
 
+    async def delete_history(self, prompt_id: str) -> None:
+        """Delete a prompt's history entry (holds prompt text + output refs)."""
+        await self._request("POST", "/history", json={"delete": [prompt_id]})
+
     async def get_object_info(self) -> Dict[str, Any]:
         """Get available nodes, models, samplers, etc."""
         return await self._request("GET", "/object_info")
