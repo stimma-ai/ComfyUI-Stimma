@@ -56,6 +56,7 @@ def _inject_test_defaults(
     api_prompt: dict,
     uploaded_image: str | None = None,
     uploaded_video: str | None = None,
+    uploaded_mask: str | None = None,
 ) -> None:
     """Inject test values into Stimma nodes.
 
@@ -63,6 +64,7 @@ def _inject_test_defaults(
     - Text prompts: use the workflow default (already in the node)
     - Image inputs: use uploaded_image if provided
     - Video inputs: use uploaded_video if provided
+    - Mask inputs: use uploaded_mask (an RGBA PNG; transparent = inpaint region)
     - All other params: use workflow defaults (already set from widget values)
     """
     for nid, nd in api_prompt.items():
@@ -72,8 +74,11 @@ def _inject_test_defaults(
         if ct == "StimmaSeedParam":
             inp["value"] = random.randint(0, 2**32 - 1)
 
-        elif ct == "StimmaImageParam" and uploaded_image:
+        elif ct in ("StimmaImageParam", "StimmaImagesParam") and uploaded_image:
             inp["image"] = uploaded_image
+
+        elif ct == "StimmaMaskParam" and uploaded_mask:
+            inp["image"] = uploaded_mask
 
         elif ct == "StimmaVideoParam" and uploaded_video:
             inp["video"] = uploaded_video
@@ -133,6 +138,7 @@ async def run_test(
     timeout: int = 120,
     test_image: str | None = None,
     test_video: str | None = None,
+    test_mask: str | None = None,
 ) -> dict:
     """Run a workflow through the full executor pipeline and return results."""
     import aiohttp
@@ -184,8 +190,16 @@ async def run_test(
         uploaded_video = await comfy.upload_image(test_video)
         logger.info(f"Uploaded: {uploaded_video}")
 
-    # Inject defaults (randomize seeds, set uploaded image/video)
-    _inject_test_defaults(api_prompt, uploaded_image=uploaded_image, uploaded_video=uploaded_video)
+    # Upload test mask if provided (RGBA PNG; transparent = inpaint region)
+    uploaded_mask = None
+    if test_mask:
+        logger.info(f"Uploading test mask: {test_mask}")
+        uploaded_mask = await comfy.upload_image(test_mask)
+        logger.info(f"Uploaded: {uploaded_mask}")
+
+    # Inject defaults (randomize seeds, set uploaded image/video/mask)
+    _inject_test_defaults(api_prompt, uploaded_image=uploaded_image, uploaded_video=uploaded_video,
+                          uploaded_mask=uploaded_mask)
 
     # Resolve Stimma links: replace link refs to Stimma nodes with literal values.
     # This is the same step the executor does before stripping unknown nodes, so
@@ -323,6 +337,8 @@ def main():
                         help="Test image path for image-input workflows")
     parser.add_argument("--test-video", default=None,
                         help="Test video path for video-input workflows")
+    parser.add_argument("--test-mask", default=None,
+                        help="Test mask path (RGBA PNG, transparent = inpaint region) for inpaint workflows")
     parser.add_argument("--json", action="store_true",
                         help="Output results as JSON")
     args = parser.parse_args()
@@ -333,6 +349,7 @@ def main():
         timeout=args.timeout,
         test_image=args.test_image,
         test_video=args.test_video,
+        test_mask=args.test_mask,
     ))
 
     if args.json:
