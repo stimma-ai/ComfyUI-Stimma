@@ -148,6 +148,9 @@ class StimmaVideoOutput:
                 "audio": ("AUDIO",),
                 "generate_audio": ("BOOLEAN", {"default": True}),
                 "_stimma_output_dir": ("STRING", {"default": ""}),
+                # Appended after _stimma_output_dir so existing workflows'
+                # widgets_values stay aligned with the input order.
+                "remove_audio": ("BOOLEAN", {"default": False}),
             },
         }
 
@@ -157,7 +160,7 @@ class StimmaVideoOutput:
     CATEGORY = "Stimma/Outputs"
 
     def execute(self, frames, fps=16, filename_prefix="Stimma", audio=None,
-                generate_audio=True, _stimma_output_dir=""):
+                generate_audio=True, _stimma_output_dir="", remove_audio=False):
         import folder_paths
         import tempfile
         import subprocess
@@ -175,9 +178,9 @@ class StimmaVideoOutput:
         temp_dir = None
         try:
             # Optionally write the audio track to a WAV for muxing. Disabled when
-            # generate_audio is False or no audio is connected.
+            # generate_audio is False, remove_audio is True, or no audio is connected.
             audio_path = None
-            if generate_audio and audio is not None:
+            if generate_audio and not remove_audio and audio is not None:
                 temp_dir = tempfile.mkdtemp(prefix="stimma_video_")
                 audio_path = _write_audio_wav(audio, os.path.join(temp_dir, "audio.wav"))
 
