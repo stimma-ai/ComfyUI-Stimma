@@ -386,10 +386,16 @@ def _convert_inner_node_widgets(
         return {}
 
     result = {}
-    # Determine which inputs from the inner node's serialized inputs array
-    # are connected (these should not consume widget_values positions)
+    # Names of inputs that carry an actual link. A widget-type input may appear
+    # in the serialized `inputs` array as a socket while still unconnected
+    # (link is None) — that is a plain widget and must emit its value. Only a
+    # genuinely linked input takes its value from the connection instead.
     node_inputs = inner_node.get("inputs", [])
-    connected_names = {inp.get("name") for inp in node_inputs if inp.get("name")}
+    linked_names = {
+        inp.get("name")
+        for inp in node_inputs
+        if inp.get("name") and inp.get("link") is not None
+    }
 
     specs = _get_input_specs(class_type, object_info)
     _CAG_STRINGS = frozenset(("randomize", "fixed", "increment", "decrement"))
@@ -418,16 +424,18 @@ def _convert_inner_node_widgets(
 
         if _is_connection_type(inp_type):
             return
-        if inp_name in connected_names:
-            # Converted widget — still consumes a widgets_values slot
-            is_converted = any(
-                inp.get("name") == inp_name and inp.get("widget")
-                for inp in node_inputs
-            )
-            if not is_converted:
-                return
+        # A widget-type input that is currently connected still occupies a
+        # placeholder slot in widgets_values — ComfyUI keeps the widget's value
+        # when it is rendered as a socket, whether or not the serialized input
+        # carries a `widget` marker key (it often doesn't). We must advance past
+        # that slot so later widgets stay aligned, but we don't emit a value:
+        # the connection provides it. (Failing to advance mis-shifts every
+        # following widget, e.g. StimmaDurationToFrames.frame_step reading the
+        # stale duration placeholder 0.0 and tripping min=1 validation.)
+        emit = inp_name not in linked_names
         if widget_idx < len(widget_values):
-            result[inp_name] = widget_values[widget_idx]
+            if emit:
+                result[inp_name] = widget_values[widget_idx]
             widget_idx += 1
         # control_after_generate adds a frontend-only widget that occupies
         # the next slot in widgets_values but is not a backend input
