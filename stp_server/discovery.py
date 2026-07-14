@@ -386,15 +386,29 @@ def _convert_inner_node_widgets(
         return {}
 
     result = {}
-    # Names of inputs that carry an actual link. A widget-type input may appear
-    # in the serialized `inputs` array as a socket while still unconnected
-    # (link is None) — that is a plain widget and must emit its value. Only a
-    # genuinely linked input takes its value from the connection instead.
+    # Classify each serialized input. Every widget-type input occupies a
+    # widgets_values slot (ComfyUI keeps the widget value as a placeholder even
+    # when a link is attached), so slots must ALWAYS be advanced to keep later
+    # widgets aligned. Whether the stored value is EMITTED depends on how the
+    # input is connected:
+    #   - not linked            → plain widget; emit its value.
+    #   - linked + `widget` key  → converted widget whose stored value is the
+    #     real value (e.g. subgraph inner loaders whose internal socket may be
+    #     externally unwired); emit it — the expansion overrides it if the link
+    #     actually resolves.
+    #   - linked, no `widget` key → a genuine external widget-socket link
+    #     supplies the value and the slot holds a stale placeholder; advance
+    #     past it but do NOT emit (e.g. StimmaDurationToFrames.duration/fps).
     node_inputs = inner_node.get("inputs", [])
     linked_names = {
         inp.get("name")
         for inp in node_inputs
         if inp.get("name") and inp.get("link") is not None
+    }
+    converted_names = {
+        inp.get("name")
+        for inp in node_inputs
+        if inp.get("name") and inp.get("link") is not None and inp.get("widget")
     }
 
     specs = _get_input_specs(class_type, object_info)
@@ -424,15 +438,9 @@ def _convert_inner_node_widgets(
 
         if _is_connection_type(inp_type):
             return
-        # A widget-type input that is currently connected still occupies a
-        # placeholder slot in widgets_values — ComfyUI keeps the widget's value
-        # when it is rendered as a socket, whether or not the serialized input
-        # carries a `widget` marker key (it often doesn't). We must advance past
-        # that slot so later widgets stay aligned, but we don't emit a value:
-        # the connection provides it. (Failing to advance mis-shifts every
-        # following widget, e.g. StimmaDurationToFrames.frame_step reading the
-        # stale duration placeholder 0.0 and tripping min=1 validation.)
-        emit = inp_name not in linked_names
+        # Always advance past this widget's slot (see classification above);
+        # emit its value unless a bare external link supplies it.
+        emit = (inp_name not in linked_names) or (inp_name in converted_names)
         if widget_idx < len(widget_values):
             if emit:
                 result[inp_name] = widget_values[widget_idx]
