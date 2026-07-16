@@ -291,24 +291,30 @@ class StimmaImagesParam:
         return True
 
 
-def _load_video_audio(video_path):
+def _load_video_audio(video_path, fallback_duration_s=0.0):
     """Extract the source audio track from a video as a ComfyUI AUDIO dict.
 
     Reuses ComfyUI's own av-based loader (the same one LoadAudio uses), which
-    decodes the audio stream from any container including mp4. Returns a short
-    silent stereo clip if the file has no audio stream or decoding fails, so the
-    node always produces a valid AUDIO output. AudioConcat downstream reconciles
-    sample rates, so we keep the source rate as-is.
+    decodes the audio stream from any container including mp4. When the file has
+    no audio stream (or decoding fails), returns silence spanning
+    ``fallback_duration_s`` so downstream audio nodes (TrimAudioDuration,
+    AudioConcat) see a track on the same timeline as the frames — a 1-sample
+    placeholder makes any trim window fall outside the audio and error out.
+    AudioConcat downstream reconciles sample rates, so we keep the source rate
+    as-is.
     """
     import torch
 
     try:
         from comfy_extras.nodes_audio import load as _load_audio
         waveform, sample_rate = _load_audio(video_path)
-        return {"waveform": waveform.unsqueeze(0), "sample_rate": int(sample_rate)}
+        if waveform.shape[-1] > 0:
+            return {"waveform": waveform.unsqueeze(0), "sample_rate": int(sample_rate)}
     except Exception:
-        # No audio stream (or no torchaudio/av) — emit a valid silent placeholder.
-        return {"waveform": torch.zeros((1, 2, 1), dtype=torch.float32), "sample_rate": 44100}
+        pass
+    # No audio stream (or no torchaudio/av) — emit video-length silence.
+    n_samples = max(1, int(round(fallback_duration_s * 44100)))
+    return {"waveform": torch.zeros((1, 2, n_samples), dtype=torch.float32), "sample_rate": 44100}
 
 
 class StimmaVideoParam:
@@ -337,9 +343,11 @@ class StimmaVideoParam:
         import torch
 
         video_path = folder_paths.get_annotated_filepath(video)
-        audio = _load_video_audio(video_path)
 
-        # Decode video frames with OpenCV
+        # Decode video frames with OpenCV first — the frame count sizes the
+        # silent-audio fallback for videos without an audio track.
+        frames_tensor = None
+        source_fps = 30
         try:
             import cv2
             cap = cv2.VideoCapture(video_path)
@@ -355,16 +363,21 @@ class StimmaVideoParam:
             cap.release()
             if frames:
                 arr = np.stack(frames, axis=0).astype(np.float32) / 255.0
-                return (torch.from_numpy(arr), source_fps, audio)
+                frames_tensor = torch.from_numpy(arr)
         except Exception:
             pass
 
-        # Fallback: load as single image frame
-        img = Image.open(video_path)
-        img = img.convert("RGB")
-        image_np = np.array(img).astype(np.float32) / 255.0
-        image_tensor = torch.from_numpy(image_np)[None,]
-        return (image_tensor, 30, audio)
+        if frames_tensor is None:
+            # Fallback: load as single image frame
+            img = Image.open(video_path)
+            img = img.convert("RGB")
+            image_np = np.array(img).astype(np.float32) / 255.0
+            frames_tensor = torch.from_numpy(image_np)[None,]
+            source_fps = 30
+
+        duration_s = frames_tensor.shape[0] / float(source_fps)
+        audio = _load_video_audio(video_path, fallback_duration_s=duration_s)
+        return (frames_tensor, source_fps, audio)
 
     @classmethod
     def IS_CHANGED(cls, video, ui_control="video_picker", ui_order=0, **kwargs):
