@@ -636,11 +636,13 @@ def _merge_media_parameters(params: List[ToolParameter]) -> List[ToolParameter]:
         maxs = []
         controls = []
         controlnet_types = []
+        allow_prep = False
         for p in items:
             hints = p.ui_hints or {}
             mins.append(int(hints.get("min-items", 1)))
             maxs.append(int(hints.get("max-items", 1)))
             controls.append(hints.get("control"))
+            allow_prep = allow_prep or bool(hints.get("allow-prep"))
             for ctype in hints.get("controlnet", []) or []:
                 if ctype not in controlnet_types:
                     controlnet_types.append(ctype)
@@ -669,6 +671,7 @@ def _merge_media_parameters(params: List[ToolParameter]) -> List[ToolParameter]:
                     "min-items": min_items,
                     "max-items": sum(maxs),
                     **({"controlnet": controlnet_types} if controlnet_types and name == "input_images" else {}),
+                    **({"allow-prep": True} if allow_prep else {}),
                 },
             )
         )
