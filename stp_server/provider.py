@@ -305,8 +305,18 @@ class StimmaPluginProvider(Provider):
                     # organized in subdirs (matching path_filter like "flux/**").
                     # os.walk uses os.scandir and we never read/stat files, so
                     # this stays cheap even on large model libraries.
+                    # followlinks=True to match ComfyUI's own folder scan —
+                    # training-output dirs symlinked into loras/ must count
+                    # toward the fingerprint or new checkpoints never trigger
+                    # tools.changed. The visited set breaks symlink cycles.
                     names = []
-                    for root, _subdirs, files in os.walk(d):
+                    visited = set()
+                    for root, subdirs_, files in os.walk(d, followlinks=True):
+                        real = os.path.realpath(root)
+                        if real in visited:
+                            subdirs_[:] = []
+                            continue
+                        visited.add(real)
                         rel_root = os.path.relpath(root, d)
                         for f in files:
                             names.append(
