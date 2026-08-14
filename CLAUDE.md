@@ -86,8 +86,6 @@ Protocol reference: https://github.com/stimma-ai/stimma-tools-protocol
 | `StimmaImageOutput` | Output image | `_stimma_output_dir` (hidden) |
 | `StimmaVideoOutput` | Output video | `_stimma_output_dir` (hidden) |
 | `StimmaLayoutGroup` | UI layout group | `group_label`, `param_names`, `collapsed` |
-| `StimmaMiniMaxH3ModelLoader` | H3 FP8/INT8 ConvRot selector | `precision` |
-| `StimmaMiniMaxH3SageAttention` | H3 SageAttention with optional Spectrum bridge | `model`, optional Spectrum controls |
 
 Standard STP task types include `text-to-image`, `image-to-image`, `text-to-video`,
 `image-to-video`, `video-to-video`, `upscale-image`, and `upscale-video`.

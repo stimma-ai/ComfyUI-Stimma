@@ -213,11 +213,24 @@ class TestReferenceToVideoWorkflow(unittest.TestCase):
 
         loader = next(
             node for node in workflow["nodes"]
-            if node["type"] == "StimmaMiniMaxH3ReferenceModelLoader"
+            if node["type"] == "UNETLoader"
+            and node["widgets_values"][0] == "minimax_h3_ref2va_pruned_int8_convrot.safetensors"
+        )
+        precision_compare = next(
+            node for node in workflow["nodes"]
+            if node["type"] == "StringCompare"
+        )
+        model_switch = next(
+            node for node in workflow["nodes"]
+            if node["type"] == "ComfySwitchNode"
         )
         sage = next(
             node for node in workflow["nodes"]
-            if node["type"] == "StimmaMiniMaxH3SageAttention"
+            if node["type"] == "MiniMaxH3MemoryEfficientSageAttentionPatch"
+        )
+        spectrum = next(
+            node for node in workflow["nodes"]
+            if node["type"] == "SpectrumApplyMiniMaxH3"
         )
         lora = next(
             node for node in workflow["nodes"]
@@ -232,6 +245,7 @@ class TestReferenceToVideoWorkflow(unittest.TestCase):
                 "StimmaDropdownParam",
                 "StimmaFloatParam",
                 "StimmaIntParam",
+                "StimmaStringParam",
             }
         }
         expected_parameters = {
@@ -249,30 +263,41 @@ class TestReferenceToVideoWorkflow(unittest.TestCase):
             "spectrum_debug",
         }
         self.assertTrue(expected_parameters.issubset(parameter_nodes))
-        self.assertEqual(parameter_nodes["model_precision"]["widgets_values"][1], "INT8 ConvRot")
+        self.assertEqual(
+            parameter_nodes["model_precision"]["widgets_values"][1],
+            "INT8 ConvRot",
+        )
         self.assertIs(parameter_nodes["spectrum"]["widgets_values"][1], False)
 
-        precision_link = links[loader["inputs"][0]["link"]]
+        precision_link = links[precision_compare["inputs"][0]["link"]]
         self.assertEqual(precision_link[1], parameter_nodes["model_precision"]["id"])
-        self.assertEqual(precision_link[3], loader["id"])
+        self.assertEqual(precision_link[3], precision_compare["id"])
 
         lora_input_link = links[lora["inputs"][0]["link"]]
-        self.assertEqual(lora_input_link[1], loader["id"])
+        self.assertEqual(lora_input_link[1], model_switch["id"])
         self.assertEqual(lora_input_link[3], lora["id"])
         self.assertEqual(lora["widgets_values"][0], "minimax-h3/**")
+
+        int8_switch_link = links[model_switch["inputs"][0]["link"]]
+        self.assertEqual(int8_switch_link[1], loader["id"])
+        self.assertEqual(int8_switch_link[3], model_switch["id"])
 
         model_link = links[sage["inputs"][0]["link"]]
         self.assertEqual(model_link[1], lora["id"])
         self.assertEqual(model_link[3], sage["id"])
 
+        spectrum_model_link = links[spectrum["inputs"][0]["link"]]
+        self.assertEqual(spectrum_model_link[1], sage["id"])
+        self.assertEqual(spectrum_model_link[3], spectrum["id"])
+
         consumer_types = {
             nodes[links[link_id][3]]["type"]
-            for link_id in sage["outputs"][0]["links"]
+            for link_id in spectrum["outputs"][0]["links"]
         }
         self.assertEqual(consumer_types, {"BasicScheduler", "BasicGuider"})
 
         spectrum_inputs = {
-            "spectrum_enabled": "spectrum",
+            "enabled": "spectrum",
             "blend_weight": "spectrum_blend",
             "degree": "spectrum_degree",
             "ridge_lambda": "spectrum_ridge",
@@ -282,15 +307,15 @@ class TestReferenceToVideoWorkflow(unittest.TestCase):
             "tail_actual_steps": "spectrum_tail_steps",
             "max_history": "spectrum_max_history",
             "history_storage": "spectrum_history_storage",
-            "spectrum_debug": "spectrum_debug",
+            "debug": "spectrum_debug",
         }
-        for sage_input, parameter_name in spectrum_inputs.items():
+        for spectrum_input, parameter_name in spectrum_inputs.items():
             input_slot = next(
-                item for item in sage["inputs"] if item["name"] == sage_input
+                item for item in spectrum["inputs"] if item["name"] == spectrum_input
             )
             link = links[input_slot["link"]]
             self.assertEqual(link[1], parameter_nodes[parameter_name]["id"])
-            self.assertEqual(link[3], sage["id"])
+            self.assertEqual(link[3], spectrum["id"])
 
 
 class TestMiniMaxH3TurboWorkflows(unittest.TestCase):
@@ -340,7 +365,7 @@ class TestMiniMaxH3TurboWorkflows(unittest.TestCase):
                 )
                 sage = next(
                     node for node in graph["nodes"]
-                    if node["type"] == "StimmaMiniMaxH3SageAttention"
+                    if node["type"] == "MiniMaxH3MemoryEfficientSageAttentionPatch"
                 )
                 self.assertEqual(
                     turbo_lora["widgets_values"],

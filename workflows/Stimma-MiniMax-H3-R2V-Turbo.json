@@ -1,8 +1,8 @@
 {
   "id": "a8cfe4e6-31ad-4315-8450-b0be6a1a52b4",
   "revision": 0,
-  "last_node_id": 185,
-  "last_link_id": 327,
+  "last_node_id": 189,
+  "last_link_id": 331,
   "nodes": [
     {
       "id": 116,
@@ -401,27 +401,36 @@
     },
     {
       "id": 127,
-      "type": "StimmaMiniMaxH3ReferenceModelLoader",
+      "type": "UNETLoader",
       "pos": [
         -1490,
         4940
       ],
       "size": [
-        640,
-        90
+        500,
+        110
       ],
       "flags": {},
       "order": 1,
       "mode": 0,
       "inputs": [
         {
-          "localized_name": "precision",
-          "name": "precision",
+          "localized_name": "unet_name",
+          "name": "unet_name",
           "type": "COMBO",
           "widget": {
-            "name": "precision"
+            "name": "unet_name"
           },
-          "link": 312
+          "link": null
+        },
+        {
+          "localized_name": "weight_dtype",
+          "name": "weight_dtype",
+          "type": "COMBO",
+          "widget": {
+            "name": "weight_dtype"
+          },
+          "link": null
         }
       ],
       "outputs": [
@@ -430,27 +439,28 @@
           "name": "MODEL",
           "type": "MODEL",
           "links": [
-            324
+            328
           ]
         }
       ],
       "properties": {
-        "Node name for S&R": "StimmaMiniMaxH3ReferenceModelLoader",
+        "cnr_id": "comfy-core",
+        "ver": "0.32.0",
+        "Node name for S&R": "UNETLoader",
         "models": [
           {
             "name": "minimax_h3_ref2va_pruned_int8_convrot.safetensors",
-            "url": "https://huggingface.co/Comfy-Org/MiniMax-H3/resolve/main/diffusion_models/minimax_h3_ref2va_pruned_int8_convrot.safetensors",
             "directory": "diffusion_models"
           },
           {
             "name": "minimax_h3_ref2va_pruned_fp8_scaled.safetensors",
-            "url": "https://huggingface.co/Comfy-Org/MiniMax-H3/resolve/main/diffusion_models/minimax_h3_ref2va_pruned_fp8_scaled.safetensors",
             "directory": "diffusion_models"
           }
         ]
       },
       "widgets_values": [
-        "INT8 ConvRot"
+        "minimax_h3_ref2va_pruned_int8_convrot.safetensors",
+        "default"
       ]
     },
     {
@@ -3172,7 +3182,7 @@
     },
     {
       "id": 169,
-      "type": "StimmaDropdownParam",
+      "type": "StimmaStringParam",
       "pos": [
         200,
         6500
@@ -3202,6 +3212,22 @@
           "link": null
         },
         {
+          "name": "enum_values",
+          "type": "STRING",
+          "widget": {
+            "name": "enum_values"
+          },
+          "link": null
+        },
+        {
+          "name": "ui_control",
+          "type": "COMBO",
+          "widget": {
+            "name": "ui_control"
+          },
+          "link": null
+        },
+        {
           "name": "ui_order",
           "type": "INT",
           "widget": {
@@ -3221,7 +3247,7 @@
       "outputs": [
         {
           "name": "value",
-          "type": "*",
+          "type": "STRING",
           "links": [
             312
           ],
@@ -3229,11 +3255,13 @@
         }
       ],
       "properties": {
-        "Node name for S&R": "StimmaDropdownParam"
+        "Node name for S&R": "StimmaStringParam"
       },
       "widgets_values": [
         "model_precision",
         "INT8 ConvRot",
+        "INT8 ConvRot\nFP8",
+        "dropdown",
         22,
         "Diffusion-model precision. INT8 ConvRot is the default; FP8 is the quality-reference alternative."
       ]
@@ -4394,13 +4422,13 @@
     },
     {
       "id": 183,
-      "type": "StimmaMiniMaxH3SageAttention",
+      "type": "MiniMaxH3MemoryEfficientSageAttentionPatch",
       "pos": [
         -800,
         4810
       ],
       "size": [
-        410,
+        470,
         60
       ],
       "flags": {},
@@ -4412,105 +4440,6 @@
           "name": "model",
           "type": "MODEL",
           "link": 327
-        },
-        {
-          "localized_name": "spectrum_enabled",
-          "name": "spectrum_enabled",
-          "type": "BOOLEAN",
-          "widget": {
-            "name": "spectrum_enabled"
-          },
-          "link": 313
-        },
-        {
-          "localized_name": "blend_weight",
-          "name": "blend_weight",
-          "type": "FLOAT",
-          "widget": {
-            "name": "blend_weight"
-          },
-          "link": 314
-        },
-        {
-          "localized_name": "degree",
-          "name": "degree",
-          "type": "INT",
-          "widget": {
-            "name": "degree"
-          },
-          "link": 315
-        },
-        {
-          "localized_name": "ridge_lambda",
-          "name": "ridge_lambda",
-          "type": "FLOAT",
-          "widget": {
-            "name": "ridge_lambda"
-          },
-          "link": 316
-        },
-        {
-          "localized_name": "window_size",
-          "name": "window_size",
-          "type": "FLOAT",
-          "widget": {
-            "name": "window_size"
-          },
-          "link": 317
-        },
-        {
-          "localized_name": "flex_window",
-          "name": "flex_window",
-          "type": "FLOAT",
-          "widget": {
-            "name": "flex_window"
-          },
-          "link": 318
-        },
-        {
-          "localized_name": "warmup_steps",
-          "name": "warmup_steps",
-          "type": "INT",
-          "widget": {
-            "name": "warmup_steps"
-          },
-          "link": 319
-        },
-        {
-          "localized_name": "tail_actual_steps",
-          "name": "tail_actual_steps",
-          "type": "INT",
-          "widget": {
-            "name": "tail_actual_steps"
-          },
-          "link": 320
-        },
-        {
-          "localized_name": "max_history",
-          "name": "max_history",
-          "type": "INT",
-          "widget": {
-            "name": "max_history"
-          },
-          "link": 321
-        },
-        {
-          "localized_name": "history_storage",
-          "name": "history_storage",
-          "type": "COMBO",
-          "widget": {
-            "name": "history_storage"
-          },
-          "link": 322
-        },
-        {
-          "localized_name": "spectrum_debug",
-          "name": "spectrum_debug",
-          "type": "BOOLEAN",
-          "widget": {
-            "name": "spectrum_debug"
-          },
-          "link": 323
         }
       ],
       "outputs": [
@@ -4519,13 +4448,13 @@
           "name": "model",
           "type": "MODEL",
           "links": [
-            252,
-            257
+            331
           ]
         }
       ],
       "properties": {
-        "Node name for S&R": "StimmaMiniMaxH3SageAttention"
+        "cnr_id": "ComfyUI-KJNodes",
+        "Node name for S&R": "MiniMaxH3MemoryEfficientSageAttentionPatch"
       },
       "widgets_values": []
     },
@@ -4899,6 +4828,350 @@
         1,
         false
       ]
+    },
+    {
+      "id": 186,
+      "type": "UNETLoader",
+      "pos": [
+        -1490,
+        5080
+      ],
+      "size": [
+        500,
+        110
+      ],
+      "flags": {},
+      "order": 1,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "unet_name",
+          "name": "unet_name",
+          "type": "COMBO",
+          "widget": {
+            "name": "unet_name"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "weight_dtype",
+          "name": "weight_dtype",
+          "type": "COMBO",
+          "widget": {
+            "name": "weight_dtype"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "MODEL",
+          "name": "MODEL",
+          "type": "MODEL",
+          "links": [
+            329
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.32.0",
+        "Node name for S&R": "UNETLoader",
+        "models": [
+          {
+            "name": "minimax_h3_ref2va_pruned_int8_convrot.safetensors",
+            "directory": "diffusion_models"
+          },
+          {
+            "name": "minimax_h3_ref2va_pruned_fp8_scaled.safetensors",
+            "directory": "diffusion_models"
+          }
+        ]
+      },
+      "widgets_values": [
+        "minimax_h3_ref2va_pruned_fp8_scaled.safetensors",
+        "default"
+      ]
+    },
+    {
+      "id": 187,
+      "type": "StringCompare",
+      "pos": [
+        -950,
+        4940
+      ],
+      "size": [
+        320,
+        150
+      ],
+      "flags": {},
+      "order": 1,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "string_a",
+          "name": "string_a",
+          "type": "STRING",
+          "widget": {
+            "name": "string_a"
+          },
+          "link": 312
+        },
+        {
+          "localized_name": "string_b",
+          "name": "string_b",
+          "type": "STRING",
+          "widget": {
+            "name": "string_b"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "mode",
+          "name": "mode",
+          "type": "COMBO",
+          "widget": {
+            "name": "mode"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "case_sensitive",
+          "name": "case_sensitive",
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "case_sensitive"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "BOOLEAN",
+          "name": "BOOLEAN",
+          "type": "BOOLEAN",
+          "links": [
+            330
+          ]
+        }
+      ],
+      "widgets_values": [
+        "INT8 ConvRot",
+        "FP8",
+        "Equal",
+        true
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.32.0",
+        "Node name for S&R": "StringCompare"
+      }
+    },
+    {
+      "id": 188,
+      "type": "ComfySwitchNode",
+      "pos": [
+        -590,
+        4940
+      ],
+      "size": [
+        320,
+        150
+      ],
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "on_false",
+          "name": "on_false",
+          "type": "MODEL",
+          "link": 328
+        },
+        {
+          "localized_name": "on_true",
+          "name": "on_true",
+          "type": "MODEL",
+          "link": 329
+        },
+        {
+          "localized_name": "switch",
+          "name": "switch",
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "switch"
+          },
+          "link": 330
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "output",
+          "name": "output",
+          "type": "MODEL",
+          "links": [
+            324
+          ]
+        }
+      ],
+      "widgets_values": [
+        false
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.32.0",
+        "Node name for S&R": "ComfySwitchNode"
+      }
+    },
+    {
+      "id": 189,
+      "type": "SpectrumApplyMiniMaxH3",
+      "pos": [
+        -290,
+        4810
+      ],
+      "size": [
+        430,
+        300
+      ],
+      "flags": {},
+      "order": 16,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "model",
+          "name": "model",
+          "type": "MODEL",
+          "link": 331
+        },
+        {
+          "localized_name": "enabled",
+          "name": "enabled",
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "enabled"
+          },
+          "link": 313
+        },
+        {
+          "localized_name": "blend_weight",
+          "name": "blend_weight",
+          "type": "FLOAT",
+          "widget": {
+            "name": "blend_weight"
+          },
+          "link": 314
+        },
+        {
+          "localized_name": "degree",
+          "name": "degree",
+          "type": "INT",
+          "widget": {
+            "name": "degree"
+          },
+          "link": 315
+        },
+        {
+          "localized_name": "ridge_lambda",
+          "name": "ridge_lambda",
+          "type": "FLOAT",
+          "widget": {
+            "name": "ridge_lambda"
+          },
+          "link": 316
+        },
+        {
+          "localized_name": "window_size",
+          "name": "window_size",
+          "type": "FLOAT",
+          "widget": {
+            "name": "window_size"
+          },
+          "link": 317
+        },
+        {
+          "localized_name": "flex_window",
+          "name": "flex_window",
+          "type": "FLOAT",
+          "widget": {
+            "name": "flex_window"
+          },
+          "link": 318
+        },
+        {
+          "localized_name": "warmup_steps",
+          "name": "warmup_steps",
+          "type": "INT",
+          "widget": {
+            "name": "warmup_steps"
+          },
+          "link": 319
+        },
+        {
+          "localized_name": "tail_actual_steps",
+          "name": "tail_actual_steps",
+          "type": "INT",
+          "widget": {
+            "name": "tail_actual_steps"
+          },
+          "link": 320
+        },
+        {
+          "localized_name": "max_history",
+          "name": "max_history",
+          "type": "INT",
+          "widget": {
+            "name": "max_history"
+          },
+          "link": 321
+        },
+        {
+          "localized_name": "debug",
+          "name": "debug",
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "debug"
+          },
+          "link": 323
+        },
+        {
+          "localized_name": "history_storage",
+          "name": "history_storage",
+          "type": "COMBO",
+          "widget": {
+            "name": "history_storage"
+          },
+          "link": 322
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "model",
+          "name": "model",
+          "type": "MODEL",
+          "links": [
+            252,
+            257
+          ]
+        }
+      ],
+      "widgets_values": [
+        true,
+        0.5,
+        4,
+        0.1,
+        2,
+        0.75,
+        5,
+        1,
+        8,
+        false,
+        "system_ram"
+      ],
+      "properties": {
+        "cnr_id": "ComfyUI-Spectrum-MiniMax-H3",
+        "Node name for S&R": "SpectrumApplyMiniMaxH3"
+      }
     }
   ],
   "links": [
@@ -4920,7 +5193,7 @@
     ],
     [
       252,
-      183,
+      189,
       0,
       124,
       0,
@@ -4960,7 +5233,7 @@
     ],
     [
       257,
-      183,
+      189,
       0,
       126,
       0,
@@ -5266,7 +5539,7 @@
       312,
       169,
       0,
-      127,
+      187,
       0,
       "STRING"
     ],
@@ -5274,7 +5547,7 @@
       313,
       170,
       0,
-      183,
+      189,
       1,
       "BOOLEAN"
     ],
@@ -5282,7 +5555,7 @@
       314,
       171,
       0,
-      183,
+      189,
       2,
       "FLOAT"
     ],
@@ -5290,7 +5563,7 @@
       315,
       172,
       0,
-      183,
+      189,
       3,
       "INT"
     ],
@@ -5298,7 +5571,7 @@
       316,
       173,
       0,
-      183,
+      189,
       4,
       "FLOAT"
     ],
@@ -5306,7 +5579,7 @@
       317,
       174,
       0,
-      183,
+      189,
       5,
       "FLOAT"
     ],
@@ -5314,7 +5587,7 @@
       318,
       175,
       0,
-      183,
+      189,
       6,
       "FLOAT"
     ],
@@ -5322,7 +5595,7 @@
       319,
       176,
       0,
-      183,
+      189,
       7,
       "INT"
     ],
@@ -5330,7 +5603,7 @@
       320,
       177,
       0,
-      183,
+      189,
       8,
       "INT"
     ],
@@ -5338,7 +5611,7 @@
       321,
       178,
       0,
-      183,
+      189,
       9,
       "INT"
     ],
@@ -5346,21 +5619,21 @@
       322,
       179,
       0,
-      183,
-      10,
+      189,
+      11,
       "STRING"
     ],
     [
       323,
       180,
       0,
-      183,
-      11,
+      189,
+      10,
       "BOOLEAN"
     ],
     [
       324,
-      127,
+      188,
       0,
       184,
       0,
@@ -5387,6 +5660,38 @@
       185,
       0,
       183,
+      0,
+      "MODEL"
+    ],
+    [
+      328,
+      127,
+      0,
+      188,
+      0,
+      "MODEL"
+    ],
+    [
+      329,
+      186,
+      0,
+      188,
+      1,
+      "MODEL"
+    ],
+    [
+      330,
+      187,
+      0,
+      188,
+      2,
+      "BOOLEAN"
+    ],
+    [
+      331,
+      183,
+      0,
+      189,
       0,
       "MODEL"
     ]
