@@ -137,6 +137,76 @@ def _extract_combo_values_for_validation(spec) -> Optional[list]:
     return None
 
 
+def _default_optional_switch_nodes(api_prompt: Dict[str, Any]) -> set:
+    """Return nodes used only by an inactive default ComfySwitchNode branch.
+
+    A workflow may expose a model choice while defaulting to one variant. The
+    inactive variant is a valid optional dependency, but it must not prevent
+    the default workflow from becoming ready or be downloaded during setup.
+    """
+    consumers: Dict[str, list] = {}
+    for target_id, node in api_prompt.items():
+        for input_name, value in (node.get("inputs") or {}).items():
+            if isinstance(value, list) and len(value) == 2:
+                consumers.setdefault(str(value[0]), []).append((str(target_id), input_name))
+
+    def static_value(value, seen=None):
+        if not (isinstance(value, list) and len(value) == 2):
+            return value
+        node_id = str(value[0])
+        seen = set(seen or ())
+        if node_id in seen:
+            return None
+        seen.add(node_id)
+        node = api_prompt.get(node_id) or {}
+        inputs = node.get("inputs") or {}
+        class_type = node.get("class_type")
+        if class_type in {
+            "StimmaStringParam", "StimmaDropdownParam", "StimmaBoolParam",
+            "StimmaIntParam", "StimmaFloatParam",
+        }:
+            return inputs.get("value")
+        if class_type == "StringCompare":
+            left = static_value(inputs.get("string_a"), seen)
+            right = static_value(inputs.get("string_b"), seen)
+            if left is None or right is None:
+                return None
+            if not inputs.get("case_sensitive", True):
+                left, right = str(left).casefold(), str(right).casefold()
+            mode = inputs.get("mode", "Equal")
+            if mode == "Equal":
+                return left == right
+            if mode == "Not Equal":
+                return left != right
+        return None
+
+    optional = set()
+    for switch_id, node in api_prompt.items():
+        if node.get("class_type") != "ComfySwitchNode":
+            continue
+        inputs = node.get("inputs") or {}
+        selected = static_value(inputs.get("switch"))
+        if not isinstance(selected, bool):
+            continue
+        inactive_name = "on_false" if selected else "on_true"
+        inactive = inputs.get(inactive_name)
+        if not (isinstance(inactive, list) and len(inactive) == 2):
+            continue
+        frontier = [(str(inactive[0]), (str(switch_id), inactive_name))]
+        while frontier:
+            node_id, allowed_edge = frontier.pop()
+            if node_id in optional:
+                continue
+            uses = consumers.get(node_id, [])
+            if any(edge != allowed_edge and edge[0] not in optional for edge in uses):
+                continue
+            optional.add(node_id)
+            for input_name, value in (api_prompt.get(node_id, {}).get("inputs") or {}).items():
+                if isinstance(value, list) and len(value) == 2:
+                    frontier.append((str(value[0]), (node_id, input_name)))
+    return optional
+
+
 def _portable_model_name(path: str) -> str:
     """Return a model basename regardless of the host/path separator.
 
@@ -314,6 +384,7 @@ def _validate_workflow(
     issues = issues_out if issues_out is not None else []
     seen_missing_nodes = set()
     seen_missing_models = set()
+    optional_nodes = _default_optional_switch_nodes(api_prompt)
 
     for node_id, node_data in api_prompt.items():
         class_type = node_data.get("class_type", "")
@@ -367,15 +438,19 @@ def _validate_workflow(
 
         # Missing custom node check
         if class_type not in object_info:
-            if class_type not in seen_missing_nodes:
-                seen_missing_nodes.add(class_type)
-                warnings.append(f"missing node: {class_type}")
+            optional = str(node_id) in optional_nodes
+            key = (class_type, optional)
+            if key not in seen_missing_nodes:
+                seen_missing_nodes.add(key)
+                if not optional:
+                    warnings.append(f"missing node: {class_type}")
                 issues.append({
                     "kind": "missing_node",
                     "name": class_type,
                     "class_type": class_type,
                     "input": None,
                     "folder": None,
+                    "optional": optional,
                 })
             continue
 
@@ -410,16 +485,18 @@ def _validate_workflow(
                                     input_value, resolved, class_type, input_name,
                                 )
                         else:
-                            key = (input_value, class_type, input_name)
+                            optional = str(node_id) in optional_nodes
+                            key = (input_value, class_type, input_name, optional)
                             if key not in seen_missing_models:
                                 seen_missing_models.add(key)
                                 detail = ""
                                 if ambiguous:
                                     detail = "; ambiguous matches: " + ", ".join(ambiguous)
-                                warnings.append(
-                                    f"missing model: {input_value} "
-                                    f"({class_type}.{input_name}{detail})"
-                                )
+                                if not optional:
+                                    warnings.append(
+                                        f"missing model: {input_value} "
+                                        f"({class_type}.{input_name}{detail})"
+                                    )
                                 issues.append({
                                     "kind": "missing_model",
                                     "name": input_value,
@@ -429,6 +506,7 @@ def _validate_workflow(
                                         class_type, input_name, combo_values
                                     ),
                                     "ambiguous": list(ambiguous) if ambiguous else [],
+                                    "optional": optional,
                                 })
                     break
 

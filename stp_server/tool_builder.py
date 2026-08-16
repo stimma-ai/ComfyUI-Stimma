@@ -920,7 +920,7 @@ def _build_single_tool(
                 "name": i.get("name", ""),
                 "detail": i.get("folder") or i.get("class_type") or "",
             }
-            for i in (workflow.issues or [])
+            for i in (workflow.issues or []) if not i.get("optional")
         ] or [{"kind": "other", "name": w, "detail": ""} for w in workflow.warnings]
 
     return tool

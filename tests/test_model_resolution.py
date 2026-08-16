@@ -7,6 +7,7 @@ import unittest
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from stp_server.discovery import (
+    _default_optional_switch_nodes,
     _match_path_filter,
     _resolve_model_combo_value,
     _validate_workflow,
@@ -187,6 +188,44 @@ class TestModelResolution(unittest.TestCase):
         self.assertEqual(len(warnings), 1)
         self.assertIn("ambiguous matches", warnings[0])
         self.assertEqual(prompt["1"]["inputs"]["vae_name"], "vae.safetensors")
+
+    def test_inactive_default_model_variant_is_optional(self):
+        prompt = {
+            "int8": {"class_type": "UNETLoader", "inputs": {
+                "unet_name": "model_int8.safetensors",
+            }},
+            "fp8": {"class_type": "UNETLoader", "inputs": {
+                "unet_name": "model_fp8.safetensors",
+            }},
+            "precision": {"class_type": "StimmaStringParam", "inputs": {
+                "value": "INT8 ConvRot",
+            }},
+            "compare": {"class_type": "StringCompare", "inputs": {
+                "string_a": ["precision", 0], "string_b": "FP8",
+                "mode": "Equal", "case_sensitive": True,
+            }},
+            "switch": {"class_type": "ComfySwitchNode", "inputs": {
+                "switch": ["compare", 0], "on_false": ["int8", 0],
+                "on_true": ["fp8", 0],
+            }},
+        }
+        object_info = {
+            "UNETLoader": {"input": {"required": {
+                "unet_name": (["some_installed_model.safetensors"],),
+            }}},
+            "StringCompare": {"input": {}},
+            "ComfySwitchNode": {"input": {}},
+        }
+        issues = []
+
+        warnings = _validate_workflow(prompt, object_info, issues)
+
+        self.assertEqual(_default_optional_switch_nodes(prompt), {"fp8"})
+        self.assertEqual(len(warnings), 1)
+        self.assertIn("model_int8.safetensors", warnings[0])
+        by_name = {issue["name"]: issue for issue in issues}
+        self.assertFalse(by_name["model_int8.safetensors"]["optional"])
+        self.assertTrue(by_name["model_fp8.safetensors"]["optional"])
 
 
 if __name__ == "__main__":

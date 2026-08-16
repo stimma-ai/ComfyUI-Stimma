@@ -33,6 +33,10 @@ def _fmt_gb(n: Optional[float]) -> str:
     return f"{gb:.0f} GB" if gb >= 10 else f"{gb:.1f} GB"
 
 
+def _required_issues(workflow) -> list:
+    return [issue for issue in (workflow.issues or []) if not issue.get("optional")]
+
+
 class Manager:
     def __init__(self, provider, config):
         self.provider = provider
@@ -279,7 +283,7 @@ class Manager:
                 "path": w.file_path,
                 "bundled": os.sep + "Stimma" + os.sep in w.file_path,
                 "state": state,
-                "issues": w.issues or [{"kind": "other", "name": x} for x in w.warnings],
+                "issues": _required_issues(w) or [{"kind": "other", "name": x} for x in w.warnings],
                 "summary": summary,
                 "in_progress": f"setup:{slug}" in active_groups,
             })
@@ -306,7 +310,8 @@ class Manager:
         unresolved = 0
         gated = False
         node_count = 0
-        for i in (w.issues or []):
+        required_issues = _required_issues(w)
+        for i in required_issues:
             if i["kind"] == "missing_node":
                 node_count += 1
             elif i["kind"] == "missing_model":
@@ -320,7 +325,7 @@ class Manager:
                 unresolved += 1
         if total:
             parts.append(f"{_fmt_gb(total)} to download")
-        elif any(i["kind"] == "missing_model" for i in (w.issues or [])) and not unresolved:
+        elif any(i["kind"] == "missing_model" for i in required_issues) and not unresolved:
             parts.append("downloads")
         if gated:
             parts.append("Hugging Face license")
@@ -342,7 +347,7 @@ class Manager:
             raise KeyError(slug)
         downloads, packs, blockers = [], [], []
         seen_files = set()
-        for i in (w.issues or []):
+        for i in _required_issues(w):
             if i["kind"] == "missing_model":
                 fname = i["name"]
                 if fname in seen_files:
@@ -647,9 +652,10 @@ class Manager:
             raise KeyError(slug)
         oi = self.provider.object_info or {}
         missing_names = {i.get("name") for i in (w.issues or []) if i.get("kind") in ("missing_model", "missing_checkpoint")}
+        optional_nodes = discovery._default_optional_switch_nodes(w.api_prompt)
         models = []
         seen = set()
-        for node_data in w.api_prompt.values():
+        for node_id, node_data in w.api_prompt.items():
             ct = node_data.get("class_type", "")
             if ct in discovery.ALL_STIMMA_TYPES or ct in discovery._ANNOTATION_NODE_TYPES:
                 continue
@@ -670,7 +676,8 @@ class Manager:
                         break
                 installed = bool(combo) and val in combo and val not in missing_names
                 folder = discovery._guess_folder(ct, name, combo)
-                entry = {"filename": val, "folder": folder, "installed": installed}
+                entry = {"filename": val, "folder": folder, "installed": installed,
+                         "optional": str(node_id) in optional_nodes}
                 if installed:
                     try:
                         import folder_paths
@@ -693,7 +700,8 @@ class Manager:
             if i.get("kind") != "missing_node":
                 continue
             pack = await nodepacks.lookup_pack(i["name"])
-            entry = {"class_type": i["name"], "installed": False}
+            entry = {"class_type": i["name"], "installed": False,
+                     "optional": bool(i.get("optional"))}
             if pack:
                 entry.update({"title": pack["title"], "url": pack["url"]})
             packs.append(entry)

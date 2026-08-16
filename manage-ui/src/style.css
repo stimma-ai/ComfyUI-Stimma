@@ -83,6 +83,8 @@ a:hover { text-decoration: underline; }
 .capability .cap-detail { margin-top: 1px; overflow: hidden; color: var(--text3); font-size: 11px; text-overflow: ellipsis; white-space: nowrap; }
 .capability .lnk { color: var(--accent-hi); white-space: nowrap; }
 .capability.red .lnk { color: var(--red-t); }
+.dependency-intro { padding: 11px 14px 9px; border-bottom: 1px solid var(--edge-subtle); color: var(--text3); font-size: 11.5px; line-height: 1.45; }
+.dependency-title { margin-bottom: 2px; color: var(--text); font-size: 12.5px; font-weight: 500; }
 
 /* rows */
 .grp { padding: 10px 14px 4px; }

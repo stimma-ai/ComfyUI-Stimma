@@ -9,9 +9,13 @@
     <div class="body">
       <div v-if="detail.loading" class="empty"><span class="spin"></span></div>
       <template v-else>
-        <div class="grp" v-if="detail.models && detail.models.length">
-          <h4>Models</h4>
-          <div v-for="m in detail.models" :key="m.filename" class="li" style="min-height:32px;padding:6px 0">
+        <div v-if="!detail.error && (requiredModels.length || requiredPacks.length)" class="dependency-intro">
+          <div class="dependency-title">Dependencies</div>
+          <div>Get ready downloads missing models and installs the custom nodes this workflow requires.</div>
+        </div>
+        <div class="grp" v-if="requiredModels.length">
+          <h4>Required models</h4>
+          <div v-for="m in requiredModels" :key="m.filename" class="li" style="min-height:32px;padding:6px 0">
             <span class="dot" :class="m.installed ? 'g' : 'z'"></span>
             <div class="t">
               <div class="a mono" :title="m.filename">{{ m.filename }}</div>
@@ -20,12 +24,23 @@
             <div class="r mono">{{ m.size ? fmtBytes(m.size) : '' }}</div>
           </div>
         </div>
-        <div class="grp" v-if="detail.packs && detail.packs.length">
-          <h4>Node packs</h4>
-          <div v-for="pk in detail.packs" :key="pk.class_type" class="li" style="min-height:32px;padding:6px 0">
+        <div class="grp" v-if="requiredPacks.length">
+          <h4>Required custom nodes</h4>
+          <div v-for="pk in requiredPacks" :key="pk.class_type" class="li" style="min-height:32px;padding:6px 0">
             <span class="dot z"></span>
             <div class="t"><div class="a">{{ pk.title || pk.class_type }}</div><div class="b mono">{{ pk.class_type }}</div></div>
             <div class="r">missing</div>
+          </div>
+        </div>
+        <div class="grp" v-if="optionalModels.length">
+          <h4>Optional model variants <span class="n">not included in setup</span></h4>
+          <div v-for="m in optionalModels" :key="m.filename" class="li dim" style="min-height:32px;padding:6px 0">
+            <span class="dot" :class="m.installed ? 'g' : 'z'"></span>
+            <div class="t">
+              <div class="a mono" :title="m.filename">{{ m.filename }}</div>
+              <div class="b">{{ modelSub(m) }}</div>
+            </div>
+            <div class="r mono">{{ m.size ? fmtBytes(m.size) : '' }}</div>
           </div>
         </div>
         <div class="grp" v-if="!detail.error && !(detail.models || []).length && !(detail.packs || []).length"><div class="empty">No dependencies</div></div>
@@ -33,10 +48,10 @@
       </template>
     </div>
     <div class="foot" v-if="detail.state === 'needs_setup'">
-      <span class="mono">{{ detail.file }}</span>
+      <span>{{ missingSummary }}</span>
       <span class="sp"></span>
       <button v-if="detail.in_progress" style="color:var(--accent-hi)" @click="detail = null; $emit('activity')">Activity</button>
-      <button v-else class="btn sm" @click="openPlanFromDetail">Get ready</button>
+      <button v-else class="btn sm primary" @click="openPlanFromDetail">Get ready</button>
     </div>
     <div class="foot" v-else><span class="mono">{{ detail.file }}</span></div>
   </template>
@@ -152,6 +167,17 @@ const filters = computed(() => [
 ])
 const rows = computed(() => all.value.filter(w =>
   filter.value === 'all' ? true : filter.value === 'other' ? w.kind === 'other' : w.state === filter.value))
+const requiredModels = computed(() => (detail.value?.models || []).filter(m => !m.optional))
+const optionalModels = computed(() => (detail.value?.models || []).filter(m => m.optional))
+const requiredPacks = computed(() => (detail.value?.packs || []).filter(p => !p.optional))
+const missingSummary = computed(() => {
+  const models = requiredModels.value.filter(m => !m.installed).length
+  const packs = requiredPacks.value.filter(p => !p.installed).length
+  const parts = []
+  if (models) parts.push(`${models} model${models === 1 ? '' : 's'}`)
+  if (packs) parts.push(`${packs} node pack${packs === 1 ? '' : 's'}`)
+  return parts.length ? `${parts.join(' · ')} missing` : ''
+})
 
 function dotFor(w) {
   if (w.in_progress) return 'b'
