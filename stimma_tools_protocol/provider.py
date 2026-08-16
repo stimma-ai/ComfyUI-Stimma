@@ -72,6 +72,11 @@ class ProviderConfig:
     server: Optional[str] = None  # Software identifier, e.g. "ComfyUI-Stimma/1.2.3"
     max_concurrent: int = 1
     supports_cancel: bool = True  # exposed as the `cancel` capability
+    # Optional presentation hints sent at registration:
+    # {"icon": <data URI, <=32KiB>, "management_url": <relative or absolute URL>}
+    presentation: Optional[dict] = None
+    # Provider emits provider.state / provider.notify (capability `provider_state`).
+    provider_state: bool = False
     asset_endpoint: str = "/stp-v1/assets"  # Provider's asset endpoint path
     # Provider streams in-flight preview frames on tools.progress — exposed as
     # the `preview_frames` capability so hosts can shape their generating UI.
@@ -299,6 +304,15 @@ class Provider:
         except Exception as e:
             logger.exception(f"Message loop error: {e}")
 
+    def _build_capabilities(self) -> dict:
+        caps = {
+            "cancel": self._config.supports_cancel,
+            "preview_frames": self._config.preview_frames,
+        }
+        if self._config.provider_state:
+            caps["provider_state"] = True
+        return caps
+
     async def _register(self) -> None:
         """Register with Stimma."""
         if not self._handler:
@@ -314,11 +328,9 @@ class Provider:
             provider_name=self._config.provider_name,
             server=self._config.server,
             max_concurrent=self._config.max_concurrent,
-            capabilities={
-                "cancel": self._config.supports_cancel,
-                "preview_frames": self._config.preview_frames,
-            },
+            capabilities=self._build_capabilities(),
             asset_endpoint=asset_endpoint,
+            presentation=self._config.presentation or None,
         )
 
         response = await self._handler.send_request(
@@ -336,6 +348,7 @@ class Provider:
         self.host_capabilities = result.capabilities
 
         logger.info(f"Registered with session ID: {self._session_id}")
+        await self.on_registered()
 
     async def _handle_request(self, request: JsonRpcRequest) -> JsonRpcResponse:
         """Handle an incoming JSON-RPC request."""
@@ -614,6 +627,52 @@ class Provider:
                 f"Failed to send result for {request_id}: {e} "
                 f"(success={success}, error={error})"
             )
+
+    @property
+    def host_wants_tool_status(self) -> bool:
+        """True when the host advertised `tool_status` — it accepts needs_setup tools."""
+        return bool(self.host_capabilities.get("tool_status"))
+
+    async def on_registered(self) -> None:
+        """Called after each successful registration (initial and reconnects).
+
+        Override to (re)send provider.state or refresh registrations that
+        depend on host capabilities.
+        """
+        pass
+
+    async def send_state(self, state: str, summary: Optional[str] = None) -> None:
+        """Send provider.state (capability `provider_state`).
+
+        state: "ready" | "warning" | "error". summary: optional one-liner.
+        """
+        if not self._handler or not self._config.provider_state:
+            return
+        params: dict = {"state": state}
+        if summary:
+            params["summary"] = summary
+        await self._handler.send_notification("provider.state", params)
+
+    async def notify(
+        self,
+        id: str,
+        title: str,
+        level: str = "info",
+        body: Optional[str] = None,
+        action: Optional[str] = None,
+        anchor: Optional[str] = None,
+    ) -> None:
+        """Send provider.notify — a milestone the host may show as a toast."""
+        if not self._handler or not self._config.provider_state:
+            return
+        params: dict = {"id": id, "level": level, "title": title}
+        if body:
+            params["body"] = body
+        if action:
+            params["action"] = action
+        if anchor:
+            params["anchor"] = anchor
+        await self._handler.send_notification("provider.notify", params)
 
     async def on_refresh(self) -> None:
         """

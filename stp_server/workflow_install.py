@@ -46,8 +46,11 @@ def _save_manifest(manifest_path: str, manifest: dict):
     os.replace(tmp, manifest_path)
 
 
-def sync_bundled_workflows():
+def sync_bundled_workflows(restore_deleted: bool = False):
     """Copy bundled workflows to ComfyUI's user workflow directory.
+
+    restore_deleted=True re-copies workflows the user previously deleted
+    (the manager's "Restore bundled workflows" action).
 
     Rules:
     - New source file, no dest → copy it
@@ -97,8 +100,12 @@ def sync_bundled_workflows():
                 logger.info(f"Installed workflow: {name}")
 
         elif entry.get("deleted"):
-            # User deleted it — respect that
-            pass
+            # User deleted it — respect that (unless explicitly restoring)
+            if restore_deleted and not os.path.exists(dst_path):
+                shutil.copy2(src_path, dst_path)
+                files[name] = {"hash": src_hash}
+                changed = True
+                logger.info(f"Restored workflow: {name}")
 
         elif not os.path.exists(dst_path):
             # We wrote it before but user deleted it

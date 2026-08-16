@@ -1,0 +1,15 @@
+[project]
+name = "comfyui-stimma"
+description = "Serve your ComfyUI workflows as tools to Stimma over the Stimma Tools Protocol, with an in-app manager for setup, downloads, and status."
+version = "1.2.0"
+license = { file = "LICENSE" }
+dependencies = ["aiohttp>=3.9.0", "pyyaml>=6.0"]
+
+[project.urls]
+Repository = "https://github.com/stimma-ai/ComfyUI-Stimma"
+Documentation = "https://docs.stimma.ai"
+
+[tool.comfy]
+PublisherId = "stimma"
+DisplayName = "ComfyUI-Stimma"
+Icon = "https://stimma.ai/icon.png"

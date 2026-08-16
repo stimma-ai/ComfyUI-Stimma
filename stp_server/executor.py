@@ -300,6 +300,15 @@ async def execute_workflow(
                         )
                     prompt_id = queue_response["prompt_id"]
                     logger.info(f"Queued prompt {prompt_id} on {instance.addr}")
+                    try:
+                        from .manage import jobs as _mjobs
+                        _mjobs.register(
+                            prompt_id,
+                            (workflow.tool_info or {}).get("display_name") or context.tool.display_name,
+                            context.request_id, instance.addr,
+                        )
+                    except Exception:
+                        pass
 
                     # Step 8: Monitor via websocket
                     gen_start = time.time()
@@ -313,6 +322,11 @@ async def execute_workflow(
                     # that latency onto every generation. We already have the
                     # completion signal and the output file, so let it close async.
                     _schedule_ws_close(ws)
+                    try:
+                        from .manage import jobs as _mjobs
+                        _mjobs.unregister(prompt_id)
+                    except Exception:
+                        pass
 
                 await context.report_progress(0.9)
 
@@ -1507,6 +1521,11 @@ async def _monitor_execution(ws, prompt_id: str, context: "ExecutionContext"):
                         )
                         _last_progress_value = progress
                         await context.report_progress(progress)
+                        try:
+                            from .manage import jobs as _mjobs
+                            _mjobs.progress(prompt_id, progress)
+                        except Exception:
+                            pass
 
             elif msg_type == "execution_success":
                 if data.get("data", {}).get("prompt_id") == prompt_id:

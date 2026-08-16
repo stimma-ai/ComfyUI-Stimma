@@ -13,6 +13,9 @@ from stimma_tools_protocol.transport import Transport
 from .config import Config
 from .comfy_client import Comfy
 from .version import PRODUCT_NAME, PRODUCT_VERSION
+from .manage.icon import COMFYUI_ICON_DATA_URI
+
+MANAGEMENT_URL = "/stp-v1/manage/"
 
 logger = logging.getLogger(__name__)
 
@@ -37,6 +40,11 @@ class StimmaPluginProvider(Provider):
             max_concurrent=max_concurrent,
             supports_cancel=True,
             preview_frames=True,
+            presentation={
+                "icon": COMFYUI_ICON_DATA_URI,
+                "management_url": MANAGEMENT_URL,
+            },
+            provider_state=True,
         )
         self._tool_registry = ToolRegistry()
         super().__init__(provider_config, transport, tool_registry=self._tool_registry)
@@ -60,6 +68,14 @@ class StimmaPluginProvider(Provider):
         self._deps_snapshot: Optional[str] = None  # hash of models + custom_nodes dirs
         self._initial_discovery_done = False
         self._pending_uploads: Dict[str, dict] = {}  # upload_id → {asset_id, filename, subdir}
+        # Whether the registry currently includes needs_setup tools (only when
+        # the connected host advertised `tool_status`).
+        self._registered_with_status = False
+        # Management surface (downloads, instances, restarts, ...) — attached
+        # by startup once the aiohttp app is available.
+        self.manager = None
+        # Provider-level state last sent to the host.
+        self._last_state: Optional[tuple] = None
 
     @property
     def plugin_config(self) -> Config:
@@ -150,9 +166,13 @@ class StimmaPluginProvider(Provider):
         workflows = discover_workflows(self._plugin_config, object_info=self._object_info)
         self._discovered_workflows = {w.tool_info["slug"]: w for w in workflows if w.tool_info.get("slug")}
 
-        # Only register workflows that validated cleanly — skip any with missing
-        # nodes or models so the user knows to install them.
-        registerable = [w for w in workflows if not w.warnings]
+        # Register workflows that validated cleanly. When the host advertised
+        # `tool_status` it also gets the ones with missing nodes/models,
+        # flagged needs_setup (it must not run or pick them); otherwise those
+        # stay invisible on the wire and only the manager UI shows them.
+        include_needs_setup = self.host_wants_tool_status
+        registerable = [w for w in workflows if include_needs_setup or not w.warnings]
+        self._registered_with_status = include_needs_setup
 
         # Build Tool objects
         tools = build_tools_from_workflows(
@@ -169,12 +189,16 @@ class StimmaPluginProvider(Provider):
 
         self._last_build_wf_snapshot = wf_snapshot
 
-        # Check if tool list changed
-        current_slugs = {t.slug for t in tools}
-        if current_slugs != self._previous_slugs:
-            self._previous_slugs = current_slugs
-            return True  # Tools changed
-        return False
+        # Check if tool list changed (identity or readiness)
+        current_slugs = {(t.slug, t.status) for t in tools}
+        changed = current_slugs != self._previous_slugs
+        self._previous_slugs = current_slugs
+        if self.manager is not None:
+            try:
+                self.manager.on_tools_rebuilt(workflows, tools, changed)
+            except Exception:
+                logger.debug("manager.on_tools_rebuilt failed", exc_info=True)
+        return changed
 
     async def _handle_tools_list(self, request):
         """Re-enumerate tools, LoRAs, and property values on every tools.list.
@@ -212,6 +236,32 @@ class StimmaPluginProvider(Provider):
                 f"\033[1m{n}\033[0m tool(s) registered"
             )
         return await super()._handle_tools_list(request)
+
+    async def on_registered(self):
+        """After (re)registration: align registry with host capabilities, send state."""
+        if self._initial_discovery_done and self._registered_with_status != self.host_wants_tool_status:
+            try:
+                await self.discover_and_register_tools(force=True)
+            except Exception:
+                logger.debug("rebuild after registration failed", exc_info=True)
+        self._last_state = None  # force a resend for the new session
+        await self.push_state()
+
+    async def push_state(self, force: bool = False):
+        """Compute and send provider.state if it changed (or force)."""
+        state, summary = ("ready", None)
+        if self.manager is not None:
+            try:
+                state, summary = self.manager.provider_state()
+            except Exception:
+                logger.debug("manager.provider_state failed", exc_info=True)
+        cur = (state, summary)
+        if force or cur != self._last_state:
+            self._last_state = cur
+            try:
+                await self.send_state(state, summary)
+            except Exception:
+                logger.debug("send_state failed", exc_info=True)
 
     async def on_refresh(self):
         """Handle tools.refresh — rescan workflows and update tools."""

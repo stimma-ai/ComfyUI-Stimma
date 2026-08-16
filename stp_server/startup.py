@@ -232,20 +232,43 @@ def setup_stp_server():
     asset_server = LocalAssetServer()
     transport.add_routes(asset_server.get_aiohttp_routes("/stp-v1/assets"))
 
+    # Management UI + API (/stp-v1/manage). Routes must exist before the app
+    # starts; the Manager they talk to is attached once the provider exists.
+    from .manage.routes import make_routes as _make_manage_routes
+    manage_proxy = _ManagerProxy()
+    transport.add_routes(_make_manage_routes(manage_proxy))
+
     logger.info("STP routes added to ComfyUI server")
 
     # Schedule provider startup after the HTTP server is running
     async def _on_startup(app):
-        asyncio.create_task(_run_provider(config, transport, asset_server))
+        asyncio.create_task(_run_provider(config, transport, asset_server, manage_proxy))
 
     app.on_startup.append(_on_startup)
 
 
-async def _run_provider(config: Config, transport, asset_server):
+class _ManagerProxy:
+    """Late-bound handle so routes can be registered before the Manager exists."""
+
+    def __init__(self):
+        self._target = None
+
+    def bind(self, manager):
+        self._target = manager
+
+    def __getattr__(self, name):
+        target = self.__dict__.get("_target")
+        if target is None:
+            raise RuntimeError("manager not ready yet")
+        return getattr(target, name)
+
+
+async def _run_provider(config: Config, transport, asset_server, manage_proxy=None):
     """Background task: start and run the STP provider on ComfyUI's event loop."""
     global _provider
 
     from .provider import StimmaPluginProvider
+    from .manage.manager import Manager
 
     # Set up ComfyUI client
     addresses = _get_comfyui_addresses(config)
@@ -258,7 +281,13 @@ async def _run_provider(config: Config, transport, asset_server):
     )
     _provider = provider
 
+    manager = Manager(provider, config)
+    provider.manager = manager
+    if manage_proxy is not None:
+        manage_proxy.bind(manager)
+
     try:
+        manager.start()
         await provider.start(asset_manager=asset_server)
         logger.info("STP provider running on ComfyUI's server")
         await provider.run()
@@ -267,6 +296,10 @@ async def _run_provider(config: Config, transport, asset_server):
     except Exception as e:
         logger.exception(f"STP provider error: {e}")
     finally:
+        try:
+            await manager.stop()
+        except Exception:
+            pass
         try:
             await provider.stop()
         except Exception:

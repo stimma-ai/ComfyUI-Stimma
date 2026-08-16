@@ -46,6 +46,9 @@ class SingleComfy:
         self.addr = addr
         self.client_id = str(uuid.uuid4())
         self._session: Optional[aiohttp.ClientSession] = None
+        # Liveness, maintained by the manager's instance monitor. Unhealthy
+        # instances are skipped by Comfy.acquire() while a healthy one exists.
+        self.healthy: bool = True
 
     async def _get_session(self) -> aiohttp.ClientSession:
         """Get (or lazily create) a keep-alive HTTP session for this instance.
@@ -315,6 +318,14 @@ class Comfy:
         if not self.instances:
             raise RuntimeError("No ComfyUI instances configured")
         instance = await self._available.get()
+        # Prefer a healthy instance: if this one is marked down and some
+        # other instance is healthy, rotate. Bounded so an all-down pool still
+        # hands out an instance (the job then fails loudly instead of hanging).
+        tried = 0
+        while not instance.healthy and any(i.healthy for i in self.instances) and tried < len(self.instances):
+            self._available.put_nowait(instance)
+            tried += 1
+            instance = await self._available.get()
         try:
             yield instance
         finally:

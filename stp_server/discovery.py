@@ -73,6 +73,34 @@ class DiscoveredWorkflow:
     lora_nodes: List[Dict[str, Any]] = field(default_factory=list)
     checkpoint_nodes: List[Dict[str, Any]] = field(default_factory=list)
     warnings: List[str] = field(default_factory=list)  # validation warnings
+    # Structured form of `warnings` for the manager UI / tool status:
+    # {kind: "missing_model"|"missing_node"|"missing_checkpoint", name, class_type,
+    #  input, folder (models subdir when known)}
+    issues: List[Dict[str, Any]] = field(default_factory=list)
+    # ComfyUI's own embedded download hints (nodes[].properties.models):
+    # basename -> {"url": ..., "directory": ..., "hash": ...?}
+    model_hints: Dict[str, Dict[str, Any]] = field(default_factory=dict)
+
+
+@dataclass
+class OtherWorkflow:
+    """A workflow file that is not (yet) a Stimma tool."""
+    file_path: str
+    has_stimma_nodes: bool  # Stimma nodes present but no StimmaToolInfo → "incomplete"
+    error: Optional[str] = None
+
+
+@dataclass
+class WorkflowScan:
+    """Full result of the last discovery pass (tools + everything else seen)."""
+    tools: List[DiscoveredWorkflow] = field(default_factory=list)
+    others: List[OtherWorkflow] = field(default_factory=list)
+    duplicates: List[tuple] = field(default_factory=list)  # (slug, kept_path, skipped_path)
+    directories: List[str] = field(default_factory=list)
+
+
+# Last completed scan, for the management UI. Written by discover_workflows().
+LAST_SCAN: Optional[WorkflowScan] = None
 
 
 # --- Model file extensions used to identify model-file COMBOs ---
@@ -191,9 +219,86 @@ def _match_path_filter(name: str, pattern: str) -> bool:
     return False
 
 
+def _folder_for_combo(combo_values: list) -> Optional[str]:
+    """Best-effort: which ComfyUI models folder produced this COMBO list.
+
+    ComfyUI builds model COMBOs from folder_paths.get_filename_list(<folder>),
+    so an exact list match identifies the folder. Falls back to None.
+    """
+    try:
+        import folder_paths
+    except ImportError:
+        return None
+    try:
+        names = list(getattr(folder_paths, "folder_names_and_paths", {}).keys())
+    except Exception:
+        return None
+    wanted = list(combo_values)
+    for name in names:
+        try:
+            if list(folder_paths.get_filename_list(name)) == wanted:
+                return name
+        except Exception:
+            continue
+    return None
+
+
+# Fallback folder inference by loader class/input when the COMBO match fails
+# (e.g. the list is empty because nothing is installed yet).
+_LOADER_FOLDER_HINTS = {
+    ("UNETLoader", "unet_name"): "diffusion_models",
+    ("UnetLoaderGGUF", "unet_name"): "diffusion_models",
+    ("CheckpointLoaderSimple", "ckpt_name"): "checkpoints",
+    ("CheckpointLoader", "ckpt_name"): "checkpoints",
+    ("ImageOnlyCheckpointLoader", "ckpt_name"): "checkpoints",
+    ("VAELoader", "vae_name"): "vae",
+    ("CLIPLoader", "clip_name"): "text_encoders",
+    ("CLIPLoaderGGUF", "clip_name"): "text_encoders",
+    ("DualCLIPLoader", "clip_name1"): "text_encoders",
+    ("DualCLIPLoader", "clip_name2"): "text_encoders",
+    ("TripleCLIPLoader", "clip_name1"): "text_encoders",
+    ("TripleCLIPLoader", "clip_name2"): "text_encoders",
+    ("TripleCLIPLoader", "clip_name3"): "text_encoders",
+    ("QuadrupleCLIPLoader", "clip_name1"): "text_encoders",
+    ("QuadrupleCLIPLoader", "clip_name2"): "text_encoders",
+    ("QuadrupleCLIPLoader", "clip_name3"): "text_encoders",
+    ("QuadrupleCLIPLoader", "clip_name4"): "text_encoders",
+    ("CLIPVisionLoader", "clip_name"): "clip_vision",
+    ("LoraLoader", "lora_name"): "loras",
+    ("LoraLoaderModelOnly", "lora_name"): "loras",
+    ("ControlNetLoader", "control_net_name"): "controlnet",
+    ("UpscaleModelLoader", "model_name"): "upscale_models",
+    ("LatentUpscaleModelLoader", "model_name"): "latent_upscale_models",
+    ("AudioEncoderLoader", "audio_encoder_name"): "audio_encoders",
+    ("ModelPatchLoader", "name"): "model_patches",
+    ("StyleModelLoader", "style_model_name"): "style_models",
+}
+
+
+def _guess_folder(class_type: str, input_name: str, combo_values: Optional[list]) -> Optional[str]:
+    folder = _folder_for_combo(combo_values) if combo_values else None
+    if folder:
+        return folder
+    if (class_type, input_name) in _LOADER_FOLDER_HINTS:
+        return _LOADER_FOLDER_HINTS[(class_type, input_name)]
+    low = input_name.lower()
+    if "lora" in low:
+        return "loras"
+    if "vae" in low:
+        return "vae"
+    if "clip" in low or "text_encoder" in low:
+        return "text_encoders"
+    if "ckpt" in low or "checkpoint" in low:
+        return "checkpoints"
+    if "unet" in low or "diffusion" in low:
+        return "diffusion_models"
+    return None
+
+
 def _validate_workflow(
     api_prompt: Dict[str, Any],
     object_info: Optional[Dict[str, Any]],
+    issues_out: Optional[list] = None,
 ) -> List[str]:
     """Validate a workflow's api_prompt against object_info.
 
@@ -206,6 +311,7 @@ def _validate_workflow(
         return []
 
     warnings = []
+    issues = issues_out if issues_out is not None else []
     seen_missing_nodes = set()
     seen_missing_models = set()
 
@@ -242,6 +348,13 @@ def _validate_workflow(
                     warnings.append(
                         f"missing model: {desc} (StimmaCheckpointLoader.ckpt_name)"
                     )
+                    issues.append({
+                        "kind": "missing_checkpoint",
+                        "name": path_filter or "*",
+                        "class_type": "StimmaCheckpointLoader",
+                        "input": "ckpt_name",
+                        "folder": "checkpoints",
+                    })
             continue
 
         # Skip our own Stimma nodes — always present, values injected at runtime
@@ -257,6 +370,13 @@ def _validate_workflow(
             if class_type not in seen_missing_nodes:
                 seen_missing_nodes.add(class_type)
                 warnings.append(f"missing node: {class_type}")
+                issues.append({
+                    "kind": "missing_node",
+                    "name": class_type,
+                    "class_type": class_type,
+                    "input": None,
+                    "folder": None,
+                })
             continue
 
         # Missing model check — inspect string inputs against COMBO specs
@@ -300,6 +420,16 @@ def _validate_workflow(
                                     f"missing model: {input_value} "
                                     f"({class_type}.{input_name}{detail})"
                                 )
+                                issues.append({
+                                    "kind": "missing_model",
+                                    "name": input_value,
+                                    "class_type": class_type,
+                                    "input": input_name,
+                                    "folder": _guess_folder(
+                                        class_type, input_name, combo_values
+                                    ),
+                                    "ambiguous": list(ambiguous) if ambiguous else [],
+                                })
                     break
 
     return warnings
@@ -1737,14 +1867,57 @@ def _is_scannable_json(filename: str) -> bool:
     return True
 
 
+def _collect_model_hints(data: Any) -> Dict[str, Dict[str, Any]]:
+    """Gather ComfyUI's embedded download hints (nodes[].properties.models)."""
+    hints: Dict[str, Dict[str, Any]] = {}
+    nodes = data.get("nodes") if isinstance(data, dict) else None
+    if not isinstance(nodes, list):
+        return hints
+    stack = list(nodes)
+    while stack:
+        node = stack.pop()
+        if not isinstance(node, dict):
+            continue
+        props = node.get("properties") or {}
+        for m in props.get("models") or []:
+            if not isinstance(m, dict):
+                continue
+            name = m.get("name")
+            url = m.get("url")
+            if not name or not url:
+                continue
+            base = os.path.basename(str(name).replace("\\", "/"))
+            hints.setdefault(base, {
+                "url": url,
+                "directory": m.get("directory"),
+                "hash": m.get("hash"),
+                "hash_type": m.get("hash_type"),
+            })
+    # Subgraph definitions (frontend >= 1.20) carry their own nodes
+    if isinstance(data, dict):
+        for sg in (data.get("definitions") or {}).get("subgraphs", []) or []:
+            if isinstance(sg, dict):
+                for k, v in _collect_model_hints({"nodes": sg.get("nodes") or []}).items():
+                    hints.setdefault(k, v)
+    return hints
+
+
+def _has_any_stimma_node(api_prompt: Dict[str, Any]) -> bool:
+    for node_data in api_prompt.values():
+        if isinstance(node_data, dict) and node_data.get("class_type", "") in ALL_STIMMA_TYPES:
+            return True
+    return False
+
+
 def _scan_single_file(
     filepath: str,
     filename: str,
     object_info: Optional[Dict[str, Any]],
     workflows: list,
     errors: list,
+    others: Optional[list] = None,
 ) -> None:
-    """Process one JSON file. Appends to workflows or errors."""
+    """Process one JSON file. Appends to workflows, others, or errors."""
     with open(filepath, "r") as f:
         data = json.load(f)
 
@@ -1757,14 +1930,23 @@ def _scan_single_file(
         return
 
     if api_prompt is None:
+        if others is not None:
+            others.append(OtherWorkflow(file_path=filepath, has_stimma_nodes=False,
+                                        error="could not convert to API format"))
         return
 
     result = _extract_stimma_nodes(api_prompt)
     if result is None:
+        if others is not None:
+            others.append(OtherWorkflow(
+                file_path=filepath,
+                has_stimma_nodes=_has_any_stimma_node(api_prompt),
+            ))
         return
 
     # Validate workflow against object_info
-    wf_warnings = _validate_workflow(api_prompt, object_info)
+    wf_issues: List[Dict[str, Any]] = []
+    wf_warnings = _validate_workflow(api_prompt, object_info, issues_out=wf_issues)
 
     workflows.append(DiscoveredWorkflow(
         file_path=filepath,
@@ -1777,6 +1959,8 @@ def _scan_single_file(
         lora_nodes=result["lora_nodes"],
         checkpoint_nodes=result["checkpoint_nodes"],
         warnings=wf_warnings,
+        issues=wf_issues,
+        model_hints=_collect_model_hints(data),
     ))
 
 
@@ -1787,6 +1971,7 @@ class _ScanResult:
     workflows: List[DiscoveredWorkflow]
     json_count: int
     errors: List[str]
+    others: List[OtherWorkflow] = field(default_factory=list)
 
 
 def _scan_directory(
@@ -1797,6 +1982,7 @@ def _scan_directory(
     workflows = []
     json_count = 0
     errors = []
+    others: List[OtherWorkflow] = []
 
     for root, _dirs, files in os.walk(directory):
         for filename in files:
@@ -1808,12 +1994,16 @@ def _scan_directory(
             try:
                 _scan_single_file(
                     filepath, filename, object_info,
-                    workflows, errors,
+                    workflows, errors, others,
                 )
             except Exception as e:
                 errors.append(
                     f"\033[31m\u2718 {filename}\033[0m  {type(e).__name__}: {e}"
                 )
+                others.append(OtherWorkflow(
+                    file_path=filepath, has_stimma_nodes=False,
+                    error=f"{type(e).__name__}: {e}",
+                ))
                 if not isinstance(e, (json.JSONDecodeError, OSError, ValueError)):
                     logger.debug(f"Full traceback for {filename}:", exc_info=True)
 
@@ -1822,6 +2012,7 @@ def _scan_directory(
         workflows=workflows,
         json_count=json_count,
         errors=errors,
+        others=others,
     )
 
 
@@ -1970,5 +2161,13 @@ def discover_workflows(
     body = "\n".join(lines)
 
     logger.info(f"\n{top}\n{body}\n{bot}")
+
+    global LAST_SCAN
+    LAST_SCAN = WorkflowScan(
+        tools=list(all_workflows),
+        others=[o for sr in scan_results for o in sr.others],
+        duplicates=list(duplicates),
+        directories=[sr.directory for sr in scan_results],
+    )
 
     return all_workflows

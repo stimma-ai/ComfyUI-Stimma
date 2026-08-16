@@ -151,6 +151,8 @@ class ProviderRegistration:
     capabilities: dict = field(default_factory=dict)
     asset_endpoint: Optional[str] = None  # Provider's asset endpoint (relative or absolute URL)
     stp_version: str = STP_VERSION
+    # Optional presentation hints: {"icon": <data URI>, "management_url": <relative or absolute URL>}
+    presentation: Optional[dict] = None
 
     def to_dict(self) -> dict:
         result = {
@@ -164,6 +166,8 @@ class ProviderRegistration:
             result["server"] = self.server
         if self.asset_endpoint:
             result["asset_endpoint"] = self.asset_endpoint
+        if self.presentation:
+            result["presentation"] = self.presentation
         return result
 
 
@@ -197,6 +201,10 @@ class ToolDescriptor:
     task_types: List[str] = field(default_factory=list)
     model_vendor: Optional[str] = None
     model: Optional[str] = None
+    # Tool readiness (capability `tool_status`): "ready" or "needs_setup".
+    # None = ready and omitted on the wire.
+    status: Optional[str] = None
+    status_items: Optional[list] = None  # [{kind, name, detail?}] when needs_setup
 
     def __post_init__(self):
         if not self.task_types and self.task_type:
@@ -215,6 +223,9 @@ class ToolDescriptor:
             result["model_vendor"] = self.model_vendor
         if self.model:
             result["model"] = self.model
+        if self.status and self.status != "ready":
+            result["status"] = self.status
+            result["status_items"] = list(self.status_items or [])
         return result
 
 

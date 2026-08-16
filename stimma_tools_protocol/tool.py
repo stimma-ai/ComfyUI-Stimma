@@ -133,6 +133,10 @@ class Tool:
     # {"required": [...]} branch under parameter_schema.anyOf.
     # Cross-field alternatives; array fields are also constrained non-empty.
     required_any: Optional[List[List[str]]] = None
+    # Readiness (capability `tool_status`). "ready" (default) or "needs_setup";
+    # status_items lists what is missing: [{kind, name, detail?}].
+    status: str = "ready"
+    status_items: Optional[List[dict]] = None
 
     def __post_init__(self):
         if not self.task_types and self.task_type:
@@ -208,6 +212,8 @@ class Tool:
             task_types=self.task_types,
             model_vendor=self.model_vendor or None,
             model=self.model or None,
+            status=self.status,
+            status_items=self.status_items,
         )
 
 

@@ -1,0 +1,32 @@
+name: Release
+
+# Pushing a tag like v1.2.0 publishes a GitHub release for it. ComfyUI-Stimma's
+# in-app updater ("Settings › Update") follows release tags: a checkout that
+# sits on a tag updates to the newest tag; a branch checkout (dev) just reports
+# how far behind origin it is. Version bumps are intentional: keep
+# stp_server/version.py and pyproject.toml in sync with the tag.
+on:
+  push:
+    tags: ["v*.*.*"]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check version files match the tag
+        run: |
+          TAG="${GITHUB_REF_NAME#v}"
+          PY=$(sed -n 's/^PRODUCT_VERSION = "\(.*\)"/\1/p' stp_server/version.py)
+          TOML=$(sed -n 's/^version = "\(.*\)"/\1/p' pyproject.toml | head -1)
+          echo "tag=$TAG version.py=$PY pyproject=$TOML"
+          [ "$TAG" = "$PY" ] && [ "$TAG" = "$TOML" ] || { echo "version mismatch"; exit 1; }
+      - name: Check manager UI build is committed and current
+        run: |
+          test -f stp_server/manage/ui/index.html
+      - uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true

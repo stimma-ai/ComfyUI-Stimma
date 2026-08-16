@@ -22,3 +22,9 @@ discovery:
 
   # File watch interval in seconds (0 to disable)
   watch_interval: 2.0
+
+# Download credentials — normally written by the manager (Settings tab).
+# HF_TOKEN / huggingface-cli login are used as fallbacks when unset.
+# credentials:
+#   huggingface_token: hf_...
+#   civitai_api_key: ...

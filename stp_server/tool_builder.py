@@ -908,4 +908,19 @@ def _build_single_tool(
         ),
     )
 
+    if workflow.warnings:
+        tool.status = "needs_setup"
+        tool.status_items = [
+            {
+                "kind": (
+                    "missing_node" if i.get("kind") == "missing_node"
+                    else "missing_model" if i.get("kind") in ("missing_model", "missing_checkpoint")
+                    else "other"
+                ),
+                "name": i.get("name", ""),
+                "detail": i.get("folder") or i.get("class_type") or "",
+            }
+            for i in (workflow.issues or [])
+        ] or [{"kind": "other", "name": w, "detail": ""} for w in workflow.warnings]
+
     return tool

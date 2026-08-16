@@ -11,6 +11,7 @@ A ComfyUI plugin that exposes saved workflows as [Stimma](https://stimma.ai) too
 2. Save the workflow. The plugin scans workflow directories, discovers files containing Stimma nodes, and registers them as tools.
 3. Stimma connects over WebSocket (`/stp-v1`) and can list, execute, and cancel tools.
 4. On execution, the plugin injects user-provided values into the workflow, queues it to ComfyUI, monitors progress, and returns the output as an asset.
+5. A small **manager** (served by the plugin at `/stp-v1/manage/`, and embedded in Stimma behind the ComfyUI icon in the top bar) shows status, the queue, GPU load, and every discovered workflow — and downloads the models a workflow is missing, installs missing node packs through ComfyUI-Manager, and restarts ComfyUI, so you never have to open ComfyUI again once the plugin is installed.
 
 ## Installation
 
@@ -101,6 +102,10 @@ comfyui:
 discovery:
   extra_workflow_dirs: []      # Additional directories to scan for workflows
   watch_interval: 2.0          # Seconds between filesystem polls (0 to disable)
+
+credentials:                   # Written by the manager's Settings tab; optional
+  huggingface_token: hf_...    # For gated model downloads
+  civitai_api_key: ...
 ```
 
 ### Multi-GPU
@@ -114,6 +119,8 @@ comfyui:
 ```
 
 All instances must have the same models and custom nodes installed — the plugin treats them as interchangeable. If you want different models on different GPUs, run a separate plugin instance on each ComfyUI with a distinct `provider.id`.
+
+The instance Stimma connects to (the first address) hosts the manager and drives the others: it monitors their liveness (jobs stop being routed to an unreachable instance), fans downloads out to instances on *other* machines (instances on the same machine share the model directory and download once), and restarts all of them together.
 
 ## Exposing ComfyUI workflows
 

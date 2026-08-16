@@ -7,4 +7,4 @@ user-facing naming belongs in the provider's configured display name. The
 """
 
 PRODUCT_NAME = "ComfyUI-Stimma"
-PRODUCT_VERSION = "1.1.0"
+PRODUCT_VERSION = "1.2.0"

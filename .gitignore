@@ -28,3 +28,6 @@ config.yaml
 .env
 .env.*
 *.local
+
+# Manager runtime state (operations, cached node map, remembered download URLs)
+.stimma-manage/

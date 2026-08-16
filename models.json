@@ -1,0 +1,1246 @@
+{
+  "version": 1,
+  "models": {
+    "Chroma1-HD.safetensors": {
+      "directory": "diffusion_models",
+      "source": {
+        "type": "huggingface",
+        "repo": "lodestones/Chroma1-HD",
+        "path": "Chroma1-HD.safetensors"
+      },
+      "used_by": [
+        "Stimma-Chroma-HD.json"
+      ],
+      "size": 17800038288,
+      "sha256": "d446d9695d08276f61e53653e025289dd96f7a489c27982a1fa54ecabc06642a",
+      "gated": false
+    },
+    "Flux_2-Turbo-LoRA_comfyui.safetensors": {
+      "directory": "loras",
+      "source": {
+        "type": "huggingface",
+        "repo": "ByteZSzn/Flux.2-Turbo-ComfyUI",
+        "path": "Flux_2-Turbo-LoRA_comfyui.safetensors"
+      },
+      "used_by": [
+        "Stimma-Flux2-Dev.json"
+      ],
+      "size": 2760814880,
+      "sha256": "011487390b8020baf22a9d543930c90d74a4809b7241bee6b0622777b17b413b",
+      "gated": false
+    },
+    "Qwen-Image-Edit-2509_fp8_e4m3fn.safetensors": {
+      "directory": "diffusion_models",
+      "source": {
+        "type": "huggingface",
+        "repo": "Comfy-Org/Qwen-Image-Edit_ComfyUI",
+        "path": "split_files/diffusion_models/qwen_image_edit_fp8_e4m3fn.safetensors"
+      },
+      "used_by": [
+        "Stimma-Qwen-Image-Edit-2509.json"
+      ],
+      "size": 20430635136,
+      "sha256": "393c6743d1de2e9031b5197027b36116f2096958ccc0223526d34e1860266021",
+      "gated": false,
+      "note": "Workflow-local filename differs from the repo's filename (qwen_image_edit_fp8_e4m3fn.safetensors); the workflow's own embedded properties.models entry confirms this is the intended source."
+    },
+    "Qwen-Image-Lightning-4steps-V1.0.safetensors": {
+      "directory": "loras",
+      "source": {
+        "type": "huggingface",
+        "repo": "lightx2v/Qwen-Image-Lightning",
+        "path": "Qwen-Image-Lightning-4steps-V1.0.safetensors"
+      },
+      "used_by": [
+        "Stimma-Qwen-Image-2512.json",
+        "Stimma-Qwen-Image.json"
+      ],
+      "size": 1698951104,
+      "sha256": "9526e90d71c4290392feeccf3c2172cb77ab3a489f1faeb956637f97acb4c8b1",
+      "gated": false
+    },
+    "RMBG-2.0.safetensors": {
+      "directory": "background_removal",
+      "source": {
+        "type": "huggingface",
+        "repo": "1038lab/RMBG-2.0",
+        "path": "model.safetensors"
+      },
+      "used_by": [
+        "Stimma-RMBG-2.0.json"
+      ],
+      "size": 884878856,
+      "sha256": "566ed80c3d95f87ada6864d4cbe2290a1c5eb1c7bb0b123e984f60f76b02c3a7",
+      "gated": false,
+      "note": "Non-gated mirror of briaai/RMBG-2.0 (byte-identical, same sha256); briaai/RMBG-2.0 is gated. Native ComfyUI core node (comfy_extras/nodes_bg_removal.py) uses models/background_removal/ via folder_paths."
+    },
+    "Wan2.2-Lightning_I2V-A14B-4steps-lora_HIGH_fp16.safetensors": {
+      "directory": "loras",
+      "source": {
+        "type": "huggingface",
+        "repo": "Kijai/WanVideo_comfy",
+        "path": "LoRAs/Wan22-Lightning/old/Wan2.2-Lightning_I2V-A14B-4steps-lora_HIGH_fp16.safetensors"
+      },
+      "used_by": [
+        "Stimma-Wan22-I2V-Lightning.json"
+      ],
+      "size": 613561776,
+      "sha256": "216cce62ecb5687d55fdc035b1cdbea01d1a9a8100ee924d2155cf1d64f1050b",
+      "gated": false,
+      "note": "Not found under lightx2v/Wan2.2-Lightning (renamed there); resolved via Kijai/WanVideo_comfy's archived 'old/' fp16 copies, which is a widely-trusted community mirror repo for Wan/LTX ComfyUI weights."
+    },
+    "Wan2.2-Lightning_I2V-A14B-4steps-lora_LOW_fp16.safetensors": {
+      "directory": "loras",
+      "source": {
+        "type": "huggingface",
+        "repo": "Kijai/WanVideo_comfy",
+        "path": "LoRAs/Wan22-Lightning/old/Wan2.2-Lightning_I2V-A14B-4steps-lora_LOW_fp16.safetensors"
+      },
+      "used_by": [
+        "Stimma-Wan22-I2V-Lightning.json"
+      ],
+      "size": 613561776,
+      "sha256": "a3d474925042ec908c212c6c4c1e338637e27585c3970253f65b9638a9f5874b",
+      "gated": false,
+      "note": "Not found under lightx2v/Wan2.2-Lightning (renamed there); resolved via Kijai/WanVideo_comfy's archived 'old/' fp16 copies, which is a widely-trusted community mirror repo for Wan/LTX ComfyUI weights."
+    },
+    "Wan2.2-Lightning_T2V-v1.1-A14B-4steps-lora_HIGH_fp16.safetensors": {
+      "directory": "loras",
+      "source": {
+        "type": "huggingface",
+        "repo": "Kijai/WanVideo_comfy",
+        "path": "LoRAs/Wan22-Lightning/old/Wan2.2-Lightning_T2V-v1.1-A14B-4steps-lora_HIGH_fp16.safetensors"
+      },
+      "used_by": [
+        "Stimma-Wan22-FLF2V-Lightning.json",
+        "Stimma-Wan22-T2V-Lightning.json",
+        "Stimma-Wan22-T2V.json"
+      ],
+      "size": 613561776,
+      "sha256": "b64ddbc09685b44048d20e4eebdb53bce8aa9198595fdd822a87c256953a2723",
+      "gated": false,
+      "note": "Not found under lightx2v/Wan2.2-Lightning (renamed there); resolved via Kijai/WanVideo_comfy's archived 'old/' fp16 copies, which is a widely-trusted community mirror repo for Wan/LTX ComfyUI weights."
+    },
+    "Wan2.2-Lightning_T2V-v1.1-A14B-4steps-lora_LOW_fp16.safetensors": {
+      "directory": "loras",
+      "source": {
+        "type": "huggingface",
+        "repo": "Kijai/WanVideo_comfy",
+        "path": "LoRAs/Wan22-Lightning/old/Wan2.2-Lightning_T2V-v1.1-A14B-4steps-lora_LOW_fp16.safetensors"
+      },
+      "used_by": [
+        "Stimma-Wan22-FLF2V-Lightning.json",
+        "Stimma-Wan22-T2V-Lightning.json",
+        "Stimma-Wan22-T2V.json"
+      ],
+      "size": 613561776,
+      "sha256": "2d184b3eb5ca7992a76aa39026acc6720e2278eedd5c7d1363ccaf530789ec6e",
+      "gated": false,
+      "note": "Not found under lightx2v/Wan2.2-Lightning (renamed there); resolved via Kijai/WanVideo_comfy's archived 'old/' fp16 copies, which is a widely-trusted community mirror repo for Wan/LTX ComfyUI weights."
+    },
+    "ae.safetensors": {
+      "directory": "vae",
+      "source": {
+        "type": "huggingface",
+        "repo": "Comfy-Org/z_image_turbo",
+        "path": "split_files/vae/ae.safetensors"
+      },
+      "used_by": [
+        "Stimma-Chroma-HD.json",
+        "Stimma-Flux-Dev.json",
+        "Stimma-ZImage-Turbo.json"
+      ],
+      "size": 335304388,
+      "sha256": "afc8e28272cd15db3919bacdb6918ce9c1ed22e96cb12c4d5ed0fba823529e38",
+      "gated": false,
+      "note": "Byte-identical to black-forest-labs/FLUX.1-dev's ae.safetensors (same sha256); using the non-gated Comfy-Org mirror instead."
+    },
+    "anima-preview3-base.safetensors": {
+      "directory": "diffusion_models",
+      "source": {
+        "type": "huggingface",
+        "repo": "circlestone-labs/Anima",
+        "path": "split_files/diffusion_models/anima-preview3-base.safetensors"
+      },
+      "used_by": [
+        "Stimma-Anima.json"
+      ],
+      "size": 4182218360,
+      "sha256": "14fffe8ad5116cd73b9a4696f6a89d7e5f6efdd24b2e4785603aa891a9b2295b",
+      "gated": false
+    },
+    "clip_l.safetensors": {
+      "directory": "text_encoders",
+      "source": {
+        "type": "huggingface",
+        "repo": "comfyanonymous/flux_text_encoders",
+        "path": "clip_l.safetensors"
+      },
+      "used_by": [
+        "Stimma-Flux-Dev.json"
+      ],
+      "size": 246144152,
+      "sha256": "660c6f5b1abae9dc498ac2d21e1347d2abdb0cf6c0c0c8576cd796491d9a6cdd",
+      "gated": false
+    },
+    "ema_vae_fp16.safetensors": {
+      "directory": "vae",
+      "source": {
+        "type": "huggingface",
+        "repo": "numz/SeedVR2_comfyUI",
+        "path": "ema_vae_fp16.safetensors"
+      },
+      "used_by": [
+        "Stimma-SeedVR2-Image-3B.json",
+        "Stimma-SeedVR2-Image-7B.json",
+        "Stimma-SeedVR2-Video-3B.json",
+        "Stimma-SeedVR2-Video-7B.json"
+      ],
+      "size": 501324814,
+      "sha256": "20678548f420d98d26f11442d3528f8b8c94e57ee046ef93dbb7633da8612ca1",
+      "gated": false
+    },
+    "flux-2-klein-9b-fp8.safetensors": {
+      "directory": "diffusion_models",
+      "source": {
+        "type": "huggingface",
+        "repo": "black-forest-labs/FLUX.2-klein-9b-fp8",
+        "path": "flux-2-klein-9b-fp8.safetensors"
+      },
+      "used_by": [
+        "Stimma-Flux2-Klein-9B-Inpaint.json",
+        "Stimma-Flux2-Klein-9B-Outpaint.json",
+        "Stimma-Flux2-Klein-9B.json"
+      ],
+      "size": 9433061528,
+      "sha256": "865ba09f5b4c3cbd3468a4bd3acb9fcb2f8740c54317482f0bcd4ed1d3655cee",
+      "gated": true,
+      "license_url": "https://huggingface.co/black-forest-labs/FLUX.2-klein-9b-fp8",
+      "note": "No non-gated mirror with matching content found; unofficial reuploads exist but were not verified as authoritative."
+    },
+    "flux1-dev.sft": {
+      "directory": "diffusion_models",
+      "source": {
+        "type": "huggingface",
+        "repo": "Comfy-Org/flux1-dev",
+        "path": "flux1-dev.safetensors"
+      },
+      "used_by": [
+        "Stimma-Flux-Dev.json"
+      ],
+      "size": 23802932552,
+      "sha256": "4610115bb0c89560703c892c59ac2742fa821e60ef5871b33493ba544683abd7",
+      "gated": false,
+      "note": "Workflow filename is flux1-dev.sft; byte-identical (same sha256) to black-forest-labs/FLUX.1-dev's flux1-dev.safetensors. Using the non-gated Comfy-Org/flux1-dev mirror instead of the gated official repo."
+    },
+    "flux2-vae.safetensors": {
+      "directory": "vae",
+      "source": {
+        "type": "huggingface",
+        "repo": "Comfy-Org/flux2-dev",
+        "path": "split_files/vae/flux2-vae.safetensors"
+      },
+      "used_by": [
+        "Stimma-Flux2-Dev.json",
+        "Stimma-Flux2-Klein-9B-Inpaint.json",
+        "Stimma-Flux2-Klein-9B-Outpaint.json",
+        "Stimma-Flux2-Klein-9B.json",
+        "Stimma-Ideogram4-T2I.json"
+      ],
+      "size": 336213556,
+      "sha256": "d64f3a68e1cc4f9f4e29b6e0da38a0204fe9a49f2d4053f0ec1fa1ca02f9c4b5",
+      "gated": false
+    },
+    "flux2_dev_fp8mixed.safetensors": {
+      "directory": "diffusion_models",
+      "source": {
+        "type": "huggingface",
+        "repo": "Comfy-Org/flux2-dev",
+        "path": "split_files/diffusion_models/flux2_dev_fp8mixed.safetensors"
+      },
+      "used_by": [
+        "Stimma-Flux2-Dev.json"
+      ],
+      "size": 35455599592,
+      "sha256": "863a82e4ff950a42a6b0e80bea824828f129eb1a8fbbdbd9e8cb29859127b486",
+      "gated": false
+    },
+    "gemma-3-12b-it-abliterated_lora_rank64_bf16.safetensors": {
+      "directory": "loras",
+      "source": {
+        "type": "huggingface",
+        "repo": "Comfy-Org/ltx-2",
+        "path": "split_files/loras/gemma-3-12b-it-abliterated_lora_rank64_bf16.safetensors"
+      },
+      "used_by": [
+        "Stimma-LTX2.3-Extend-Video.json",
+        "Stimma-LTX2.3-I2V.json",
+        "Stimma-LTX2.3-Loop.json",
+        "Stimma-LTX2.3-Stitch.json",
+        "Stimma-LTX2.3-T2V.json",
+        "Stimma-Sulphur2-I2V.json",
+        "Stimma-Sulphur2-T2V.json"
+      ],
+      "size": 628203616,
+      "sha256": "87bcabeac9bec9f374232b5122d6511c2b2112d479e50176149e944b3712eb4a",
+      "gated": false
+    },
+    "gemma4-12b-with-proj-ltx-2.5-comfy-int8-convrot.safetensors": {
+      "directory": "text_encoders",
+      "source": {
+        "type": "huggingface",
+        "repo": "Lightricks/LTX-2.5",
+        "path": "text_encoders/gemma4-12b-with-proj-ltx-2.5-comfy-int8-convrot.safetensors"
+      },
+      "used_by": [
+        "Stimma-LTX2.5-Extend-Video.json",
+        "Stimma-LTX2.5-I2V.json",
+        "Stimma-LTX2.5-Loop.json",
+        "Stimma-LTX2.5-Stitch.json",
+        "Stimma-LTX2.5-T2V.json"
+      ],
+      "size": 15372971786,
+      "sha256": "09a89e084de1a149c3de60cfe9dfd3e5161967eb09eea39e806fcdeffdd568de",
+      "gated": true,
+      "license_url": "https://huggingface.co/Lightricks/LTX-2.5",
+      "note": "No non-gated mirror found for LTX-2.5 assets."
+    },
+    "gemma4_e2b_it_bf16.safetensors": {
+      "directory": "text_encoders",
+      "source": {
+        "type": "huggingface",
+        "repo": "Comfy-Org/gemma-4",
+        "path": "text_encoders/gemma4_e2b_it_bf16.safetensors"
+      },
+      "used_by": [
+        "Stimma-LTX2.5-Extend-Video.json",
+        "Stimma-LTX2.5-I2V.json",
+        "Stimma-LTX2.5-Loop.json",
+        "Stimma-LTX2.5-Stitch.json",
+        "Stimma-LTX2.5-T2V.json"
+      ],
+      "size": 10278774160,
+      "sha256": "dcc3c8d27be2db2ef38b78d564ebfa1e92eb24665ed2751f2983275f03a067c8",
+      "gated": false
+    },
+    "gemma_3_12B_it_fp4_mixed.safetensors": {
+      "directory": "text_encoders",
+      "source": {
+        "type": "huggingface",
+        "repo": "Comfy-Org/ltx-2",
+        "path": "split_files/text_encoders/gemma_3_12B_it_fp4_mixed.safetensors"
+      },
+      "used_by": [
+        "Stimma-LTX2.3-Extend-Video.json",
+        "Stimma-LTX2.3-I2V.json",
+        "Stimma-LTX2.3-Loop.json",
+        "Stimma-LTX2.3-Stitch.json",
+        "Stimma-LTX2.3-T2V.json",
+        "Stimma-Sulphur2-I2V.json",
+        "Stimma-Sulphur2-T2V.json"
+      ],
+      "size": 9447702218,
+      "sha256": "aaca463d11e6d8d2a4bdb0d6299214c15ef78a3f73e0ef8113d5a9d0219b3f6d",
+      "gated": false
+    },
+    "ideogram4_fp8_scaled.safetensors": {
+      "directory": "diffusion_models",
+      "source": {
+        "type": "huggingface",
+        "repo": "Comfy-Org/Ideogram-4",
+        "path": "diffusion_models/ideogram4_fp8_scaled.safetensors"
+      },
+      "used_by": [
+        "Stimma-Ideogram4-T2I.json"
+      ],
+      "size": 9280741285,
+      "sha256": "49a946f1b0f8bcf5eab7d3b1ecc7b453c104e034cb1b592032745692724bd306",
+      "gated": false
+    },
+    "ideogram4_unconditional_fp8_scaled.safetensors": {
+      "directory": "diffusion_models",
+      "source": {
+        "type": "huggingface",
+        "repo": "Comfy-Org/Ideogram-4",
+        "path": "diffusion_models/ideogram4_unconditional_fp8_scaled.safetensors"
+      },
+      "used_by": [
+        "Stimma-Ideogram4-T2I.json"
+      ],
+      "size": 9280741293,
+      "sha256": "9b359007dae162cca7591d00868feea733eb7c56e56e3a214a4d5a9a2a07cd60",
+      "gated": false
+    },
+    "krea2/krea2_darkbrush.safetensors": {
+      "directory": "loras",
+      "source": {
+        "type": "huggingface",
+        "repo": "Comfy-Org/Krea-2",
+        "path": "loras/krea2_darkbrush.safetensors"
+      },
+      "used_by": [
+        "Stimma-Krea2-Turbo-T2I.json"
+      ],
+      "size": 469291992,
+      "sha256": "f47c4316dd93af66e0518c93b582f459571d4925b519133770c73a52cd5db7c6",
+      "gated": false,
+      "note": "LoRA-picker default path (directory-prefixed); same file as krea2_darkbrush.safetensors below."
+    },
+    "krea2_darkbrush.safetensors": {
+      "directory": "loras",
+      "source": {
+        "type": "huggingface",
+        "repo": "Comfy-Org/Krea-2",
+        "path": "loras/krea2_darkbrush.safetensors"
+      },
+      "used_by": [
+        "Stimma-Krea2-Turbo-T2I.json"
+      ],
+      "size": 469291992,
+      "sha256": "f47c4316dd93af66e0518c93b582f459571d4925b519133770c73a52cd5db7c6",
+      "gated": false
+    },
+    "krea2_turbo_fp8_scaled.safetensors": {
+      "directory": "diffusion_models",
+      "source": {
+        "type": "huggingface",
+        "repo": "Comfy-Org/Krea-2",
+        "path": "diffusion_models/krea2_turbo_fp8_scaled.safetensors"
+      },
+      "used_by": [
+        "Stimma-Krea2-Turbo-T2I.json"
+      ],
+      "size": 13141730784,
+      "sha256": "eb4dd8c612cfd10f64f25b057e6e6bbcb5737c94a7372177e456dbf7579502f1",
+      "gated": false
+    },
+    "ltx-2.3-22b-dev-fp8.safetensors": {
+      "directory": "checkpoints",
+      "source": {
+        "type": "huggingface",
+        "repo": "Lightricks/LTX-2.3-fp8",
+        "path": "ltx-2.3-22b-dev-fp8.safetensors"
+      },
+      "used_by": [
+        "Stimma-LTX2.3-Extend-Video.json",
+        "Stimma-LTX2.3-I2V.json",
+        "Stimma-LTX2.3-Loop.json",
+        "Stimma-LTX2.3-Stitch.json",
+        "Stimma-LTX2.3-T2V.json"
+      ],
+      "size": 29145431166,
+      "sha256": "28606c5b5a06ce56f896d4dfcb20f212739e07a68fbe48e53638188449d26450",
+      "gated": false
+    },
+    "ltx-2.3-22b-distilled-lora-1.1_fro90_ceil72_condsafe.safetensors": {
+      "directory": "loras",
+      "source": {
+        "type": "huggingface",
+        "repo": "SulphurAI/Sulphur-2-base",
+        "path": "distill_loras/ltx-2.3-22b-distilled-lora-1.1_fro90_ceil72_condsafe.safetensors"
+      },
+      "used_by": [
+        "Stimma-Sulphur2-I2V.json",
+        "Stimma-Sulphur2-T2V.json"
+      ],
+      "size": 662072824,
+      "sha256": "e970f64a2ce5469491fb1714a3fa72c8b606fa82affff0531e836dbc91d31f34",
+      "gated": false,
+      "note": "Workflow's embedded/documented URL (Comfy-Org/ltx-2.3/split_files/loras/...) 404s. Verified working source is SulphurAI/Sulphur-2-base/distill_loras/."
+    },
+    "ltx-2.3-id-lora-talkvid-3k.safetensors": {
+      "directory": "loras",
+      "source": {
+        "type": "huggingface",
+        "repo": "Comfy-Org/ltx-2.3",
+        "path": "split_files/loras/ltx-2.3-id-lora-talkvid-3k.safetensors"
+      },
+      "used_by": [
+        "Stimma-LTX2.3-I2V.json",
+        "Stimma-LTX2.3-T2V.json"
+      ],
+      "size": 1157884304,
+      "sha256": "e5af73441743b4852f228b03e444888dff3da80d2666033af2367ab7bda6d8b9",
+      "gated": false
+    },
+    "ltx-2.3-spatial-upscaler-x2-1.1.safetensors": {
+      "directory": "latent_upscale_models",
+      "source": {
+        "type": "huggingface",
+        "repo": "Lightricks/LTX-2.3",
+        "path": "ltx-2.3-spatial-upscaler-x2-1.1.safetensors"
+      },
+      "used_by": [
+        "Stimma-LTX2.3-Extend-Video.json",
+        "Stimma-LTX2.3-I2V.json",
+        "Stimma-LTX2.3-Loop.json",
+        "Stimma-LTX2.3-Stitch.json",
+        "Stimma-LTX2.3-T2V.json",
+        "Stimma-LTX2.5-Extend-Video.json",
+        "Stimma-Sulphur2-I2V.json",
+        "Stimma-Sulphur2-T2V.json"
+      ],
+      "size": 995743560,
+      "sha256": "5f416311fa8172b65af67530758964708d29a317b830d689a51143b7f91913ed",
+      "gated": false
+    },
+    "ltx-2.5-22b-distilled-transformer-comfy-int8-convrot.safetensors": {
+      "directory": "diffusion_models",
+      "source": {
+        "type": "huggingface",
+        "repo": "Lightricks/LTX-2.5",
+        "path": "diffusion_models/ltx-2.5-22b-distilled-transformer-comfy-int8-convrot.safetensors"
+      },
+      "used_by": [
+        "Stimma-LTX2.5-Extend-Video.json",
+        "Stimma-LTX2.5-I2V.json",
+        "Stimma-LTX2.5-Loop.json",
+        "Stimma-LTX2.5-Stitch.json",
+        "Stimma-LTX2.5-T2V.json"
+      ],
+      "size": 21504034224,
+      "sha256": "c4279eeff115cbeaca494bd2183e7d768c38fe85a184dc6afbb7159157c44334",
+      "gated": true,
+      "license_url": "https://huggingface.co/Lightricks/LTX-2.5"
+    },
+    "ltx-2.5-audio-vae-bf16.safetensors": {
+      "directory": "vae",
+      "source": {
+        "type": "huggingface",
+        "repo": "Lightricks/LTX-2.5",
+        "path": "vae/ltx-2.5-audio-vae-bf16.safetensors"
+      },
+      "used_by": [
+        "Stimma-LTX2.5-Extend-Video.json",
+        "Stimma-LTX2.5-I2V.json",
+        "Stimma-LTX2.5-Loop.json",
+        "Stimma-LTX2.5-Stitch.json",
+        "Stimma-LTX2.5-T2V.json"
+      ],
+      "size": 364866540,
+      "sha256": "c52733d37f6a7fb7949c3dc0fb468c6cb2169e4d836983a73babb9f0d54837a5",
+      "gated": true,
+      "license_url": "https://huggingface.co/Lightricks/LTX-2.5"
+    },
+    "ltx-2.5-latent-spatial-upscaler-x2-bf16-1.0.safetensors": {
+      "directory": "latent_upscale_models",
+      "source": {
+        "type": "huggingface",
+        "repo": "Lightricks/LTX-2.5",
+        "path": "latent_upscale_models/ltx-2.5-latent-spatial-upscaler-x2-bf16-1.0.safetensors"
+      },
+      "used_by": [
+        "Stimma-LTX2.5-Extend-Video.json",
+        "Stimma-LTX2.5-I2V.json",
+        "Stimma-LTX2.5-Loop.json",
+        "Stimma-LTX2.5-Stitch.json",
+        "Stimma-LTX2.5-T2V.json"
+      ],
+      "size": 995778752,
+      "sha256": "eb5a71fe4068ee87ccdb1c3aa635e547ca76bd2d30ae20ae889f2c325c0677e8",
+      "gated": true,
+      "license_url": "https://huggingface.co/Lightricks/LTX-2.5"
+    },
+    "ltx-2.5-video-vae-bf16.safetensors": {
+      "directory": "vae",
+      "source": {
+        "type": "huggingface",
+        "repo": "Lightricks/LTX-2.5",
+        "path": "vae/ltx-2.5-video-vae-bf16.safetensors"
+      },
+      "used_by": [
+        "Stimma-LTX2.5-Extend-Video.json",
+        "Stimma-LTX2.5-I2V.json",
+        "Stimma-LTX2.5-Loop.json",
+        "Stimma-LTX2.5-Stitch.json",
+        "Stimma-LTX2.5-T2V.json"
+      ],
+      "size": 1472223346,
+      "sha256": "847e14ca7f3355debca0cea4eaa24ac0fbcdf0061da054ac89ca638a869ddba3",
+      "gated": true,
+      "license_url": "https://huggingface.co/Lightricks/LTX-2.5"
+    },
+    "ltx_2.3_22b_distilled_1.1_lora_dynamic_fro09_avg_rank_111_bf16.safetensors": {
+      "directory": "loras",
+      "source": {
+        "type": "huggingface",
+        "repo": "Comfy-Org/ltx-2.3",
+        "path": "split_files/loras/ltx_2.3_22b_distilled_1.1_lora_dynamic_fro09_avg_rank_111_bf16.safetensors"
+      },
+      "used_by": [
+        "Stimma-LTX2.3-Extend-Video.json",
+        "Stimma-LTX2.3-I2V.json",
+        "Stimma-LTX2.3-Loop.json",
+        "Stimma-LTX2.3-Stitch.json",
+        "Stimma-LTX2.3-T2V.json"
+      ],
+      "size": 2741024390,
+      "sha256": "31e0c0195fb841bf31af78e8b60858f489e87ddcea4a5239abc80943da65e3ac",
+      "gated": false
+    },
+    "ltxv/ltx2/SYSTMS_FLW_V1_LTX23.safetensors": {
+      "directory": "loras",
+      "source": {
+        "type": "huggingface",
+        "repo": "systms/SYSTMS-FLW-IC-LORA-LTX-2.3",
+        "path": "SYSTMS_FLW_V1_LTX23.safetensors"
+      },
+      "used_by": [
+        "Stimma-LTX2.3-Loop.json",
+        "Stimma-LTX2.3-Stitch.json"
+      ],
+      "size": 805412808,
+      "sha256": "be7c31fdc69e20e6a8b89f105ccbef0e77397425c154a8b83d547cc2b1771dd4",
+      "gated": false,
+      "note": "Optional user-selectable LoRA-picker default (directory-prefixed path). Resolved to the creator's own HF repo, exact filename match."
+    },
+    "minimax_h3_audio_vae_fp32.safetensors": {
+      "directory": "vae",
+      "source": {
+        "type": "huggingface",
+        "repo": "Comfy-Org/MiniMax-H3",
+        "path": "vae/minimax_h3_audio_vae_fp32.safetensors"
+      },
+      "used_by": [
+        "Stimma-MiniMax-H3-I2V-Turbo.json",
+        "Stimma-MiniMax-H3-I2V.json",
+        "Stimma-MiniMax-H3-R2V-Turbo.json",
+        "Stimma-MiniMax-H3-R2V.json",
+        "Stimma-MiniMax-H3-T2V-Turbo.json",
+        "Stimma-MiniMax-H3-T2V.json"
+      ],
+      "size": 605254808,
+      "sha256": "8e505d95dd1561d47abd43d4238fd40d9bb1ae9e147ed0a4cba778d76ae4db48",
+      "gated": false
+    },
+    "minimax_h3_fl2va_pruned_fp8_scaled.safetensors": {
+      "directory": "diffusion_models",
+      "source": {
+        "type": "huggingface",
+        "repo": "Comfy-Org/MiniMax-H3",
+        "path": "diffusion_models/minimax_h3_fl2va_pruned_fp8_scaled.safetensors"
+      },
+      "used_by": [
+        "Stimma-MiniMax-H3-I2V-Turbo.json",
+        "Stimma-MiniMax-H3-I2V.json",
+        "Stimma-MiniMax-H3-T2V-Turbo.json",
+        "Stimma-MiniMax-H3-T2V.json"
+      ],
+      "size": 20958205608,
+      "sha256": "12944c1f7791637e7de12208aef04da82bd26b95271b1b47d817364315ade993",
+      "gated": false
+    },
+    "minimax_h3_fl2va_pruned_int8_convrot.safetensors": {
+      "directory": "diffusion_models",
+      "source": {
+        "type": "huggingface",
+        "repo": "Comfy-Org/MiniMax-H3",
+        "path": "diffusion_models/minimax_h3_fl2va_pruned_int8_convrot.safetensors"
+      },
+      "used_by": [
+        "Stimma-MiniMax-H3-I2V-Turbo.json",
+        "Stimma-MiniMax-H3-I2V.json",
+        "Stimma-MiniMax-H3-T2V-Turbo.json",
+        "Stimma-MiniMax-H3-T2V.json"
+      ],
+      "size": 20970379616,
+      "sha256": "e889202c41dafb67b10d67b97f0d8541508036a6090af23425a5c2615d03c47a",
+      "gated": false
+    },
+    "minimax_h3_ref2va_pruned_fp8_scaled.safetensors": {
+      "directory": "diffusion_models",
+      "source": {
+        "type": "huggingface",
+        "repo": "Comfy-Org/MiniMax-H3",
+        "path": "diffusion_models/minimax_h3_ref2va_pruned_fp8_scaled.safetensors"
+      },
+      "used_by": [
+        "Stimma-MiniMax-H3-R2V-Turbo.json",
+        "Stimma-MiniMax-H3-R2V.json"
+      ],
+      "size": 20958205608,
+      "sha256": "f86f2f79ebd2d76eb8eeb46091e83982e6ff51d255747e7b16e92834b392b8e9",
+      "gated": false
+    },
+    "minimax_h3_ref2va_pruned_int8_convrot.safetensors": {
+      "directory": "diffusion_models",
+      "source": {
+        "type": "huggingface",
+        "repo": "Comfy-Org/MiniMax-H3",
+        "path": "diffusion_models/minimax_h3_ref2va_pruned_int8_convrot.safetensors"
+      },
+      "used_by": [
+        "Stimma-MiniMax-H3-R2V-Turbo.json",
+        "Stimma-MiniMax-H3-R2V.json"
+      ],
+      "size": 20970379616,
+      "sha256": "9255f52b6677845ad238f20dfaafa94727053694127ab7f255c048f0f9365779",
+      "gated": false
+    },
+    "minimax_h3_turbo_4step_ema_ckpt850.safetensors": {
+      "directory": "loras",
+      "source": {
+        "type": "huggingface",
+        "repo": "larryvrh/MiniMax-H3-Turbo-Lora",
+        "path": "minimax_h3_turbo_4step_ema_ckpt850.safetensors"
+      },
+      "used_by": [
+        "Stimma-MiniMax-H3-I2V-Turbo.json",
+        "Stimma-MiniMax-H3-R2V-Turbo.json",
+        "Stimma-MiniMax-H3-T2V-Turbo.json"
+      ],
+      "size": 779849816,
+      "sha256": "5a6eeba171cf183020a4ad48774bb2968f29f8168afd6ec17a04987f3528b4ea",
+      "gated": false
+    },
+    "minimax_h3_video_vae_fp16.safetensors": {
+      "directory": "vae",
+      "source": {
+        "type": "huggingface",
+        "repo": "Comfy-Org/MiniMax-H3",
+        "path": "vae/minimax_h3_video_vae_fp16.safetensors"
+      },
+      "used_by": [
+        "Stimma-MiniMax-H3-I2V-Turbo.json",
+        "Stimma-MiniMax-H3-I2V.json",
+        "Stimma-MiniMax-H3-R2V-Turbo.json",
+        "Stimma-MiniMax-H3-R2V.json",
+        "Stimma-MiniMax-H3-T2V-Turbo.json",
+        "Stimma-MiniMax-H3-T2V.json"
+      ],
+      "size": 5207808496,
+      "sha256": "7c1f131492e7eddacaac9069a61b81bdd39de5cc96561e677c5eab1cdce5e522",
+      "gated": false
+    },
+    "mistral_3_small_flux2_fp8.safetensors": {
+      "directory": "text_encoders",
+      "source": {
+        "type": "huggingface",
+        "repo": "Comfy-Org/flux2-dev",
+        "path": "split_files/text_encoders/mistral_3_small_flux2_fp8.safetensors"
+      },
+      "used_by": [
+        "Stimma-Flux2-Dev.json"
+      ],
+      "size": 18034640095,
+      "sha256": "e3467b7d912a234fb929cdf215dc08efdb011810b44bc21081c4234cc75b370e",
+      "gated": false
+    },
+    "qwen3vl_32b_minimax_h3_nvfp4_awq.safetensors": {
+      "directory": "text_encoders",
+      "source": {
+        "type": "huggingface",
+        "repo": "Comfy-Org/MiniMax-H3",
+        "path": "text_encoders/qwen3vl_32b_minimax_h3_nvfp4_awq.safetensors"
+      },
+      "used_by": [
+        "Stimma-MiniMax-H3-I2V-Turbo.json",
+        "Stimma-MiniMax-H3-I2V.json",
+        "Stimma-MiniMax-H3-R2V-Turbo.json",
+        "Stimma-MiniMax-H3-R2V.json",
+        "Stimma-MiniMax-H3-T2V-Turbo.json",
+        "Stimma-MiniMax-H3-T2V.json"
+      ],
+      "size": 15687142551,
+      "sha256": "35a88d51044231fe332301d7a62aa81e3f2cba62febeb446e2c1e3e0ef76f2c6",
+      "gated": false
+    },
+    "qwen3vl_4b_fp8_scaled.safetensors": {
+      "directory": "text_encoders",
+      "source": {
+        "type": "huggingface",
+        "repo": "Comfy-Org/Krea-2",
+        "path": "text_encoders/qwen3vl_4b_fp8_scaled.safetensors"
+      },
+      "used_by": [
+        "Stimma-Krea2-Turbo-T2I.json"
+      ],
+      "size": 5242467968,
+      "sha256": "54bd5144df0bbc25dd6ccadfcb826b521445a1b06ae5a42570bdd2974ca87094",
+      "gated": false
+    },
+    "qwen3vl_8b_fp8_scaled.safetensors": {
+      "directory": "text_encoders",
+      "source": {
+        "type": "huggingface",
+        "repo": "Comfy-Org/Qwen3-VL",
+        "path": "text_encoders/qwen3vl_8b_fp8_scaled.safetensors"
+      },
+      "used_by": [
+        "Stimma-Ideogram4-T2I.json"
+      ],
+      "size": 10588637512,
+      "sha256": "4ba424cf62e51392e4d1a39933e803706f4e823c1065f36aaf149c6453f66bcd",
+      "gated": false
+    },
+    "qwen_2.5_vl_7b_fp8_scaled.safetensors": {
+      "directory": "text_encoders",
+      "source": {
+        "type": "huggingface",
+        "repo": "Comfy-Org/Qwen-Image_ComfyUI",
+        "path": "split_files/text_encoders/qwen_2.5_vl_7b_fp8_scaled.safetensors"
+      },
+      "used_by": [
+        "Stimma-Qwen-Image-2512.json",
+        "Stimma-Qwen-Image-Edit-2509.json",
+        "Stimma-Qwen-Image-Edit-2511.json",
+        "Stimma-Qwen-Image.json"
+      ],
+      "size": 9384670680,
+      "sha256": "cb5636d852a0ea6a9075ab1bef496c0db7aef13c02350571e388aea959c5c0b4",
+      "gated": false
+    },
+    "qwen_3_06b_base.safetensors": {
+      "directory": "text_encoders",
+      "source": {
+        "type": "huggingface",
+        "repo": "circlestone-labs/Anima",
+        "path": "split_files/text_encoders/qwen_3_06b_base.safetensors"
+      },
+      "used_by": [
+        "Stimma-Anima.json"
+      ],
+      "size": 1192135096,
+      "sha256": "cd2a512003e2f9f3cd3c32a9c3573f820bb28c940f73c57b1ddaa983d9223eba",
+      "gated": false
+    },
+    "qwen_3_4b.safetensors": {
+      "directory": "text_encoders",
+      "source": {
+        "type": "huggingface",
+        "repo": "Comfy-Org/z_image_turbo",
+        "path": "split_files/text_encoders/qwen_3_4b.safetensors"
+      },
+      "used_by": [
+        "Stimma-ZImage-Turbo.json"
+      ],
+      "size": 8044982048,
+      "sha256": "6c671498573ac2f7a5501502ccce8d2b08ea6ca2f661c458e708f36b36edfc5a",
+      "gated": false
+    },
+    "qwen_3_8b_fp8mixed.safetensors": {
+      "directory": "text_encoders",
+      "source": {
+        "type": "huggingface",
+        "repo": "Comfy-Org/vae-text-encorder-for-flux-klein-9b",
+        "path": "split_files/text_encoders/qwen_3_8b_fp8mixed.safetensors"
+      },
+      "used_by": [
+        "Stimma-Flux2-Klein-9B-Inpaint.json",
+        "Stimma-Flux2-Klein-9B-Outpaint.json",
+        "Stimma-Flux2-Klein-9B.json"
+      ],
+      "size": 8664848742,
+      "sha256": "abad16806e0cbabc54e0325d6565847443fe396d5f0be38bb3cd3fe75a1201d6",
+      "gated": false
+    },
+    "qwen_image_2512_fp8_e4m3fn.safetensors": {
+      "directory": "diffusion_models",
+      "source": {
+        "type": "huggingface",
+        "repo": "Comfy-Org/Qwen-Image_ComfyUI",
+        "path": "split_files/diffusion_models/qwen_image_2512_fp8_e4m3fn.safetensors"
+      },
+      "used_by": [
+        "Stimma-Qwen-Image-2512.json"
+      ],
+      "size": 20430679144,
+      "sha256": "5dc80554d5d83390046a2f4a94ece06afb7700bf7b0aaf8bde9769793875876b",
+      "gated": false
+    },
+    "qwen_image_edit_2511_bf16.safetensors": {
+      "directory": "diffusion_models",
+      "source": {
+        "type": "huggingface",
+        "repo": "Comfy-Org/Qwen-Image-Edit_ComfyUI",
+        "path": "split_files/diffusion_models/qwen_image_edit_2511_bf16.safetensors"
+      },
+      "used_by": [
+        "Stimma-Qwen-Image-Edit-2511.json"
+      ],
+      "size": 40861031560,
+      "sha256": "ae42d927b5fac4f278b9a894554c727e619727a63622976f2d95625be4bce08c",
+      "gated": false
+    },
+    "qwen_image_edit_fp8_e4m3fn.safetensors": {
+      "directory": "diffusion_models",
+      "source": {
+        "type": "huggingface",
+        "repo": "Comfy-Org/Qwen-Image-Edit_ComfyUI",
+        "path": "split_files/diffusion_models/qwen_image_edit_fp8_e4m3fn.safetensors"
+      },
+      "used_by": [
+        "Stimma-Qwen-Image-Edit-2509.json",
+        "Stimma-Qwen-Image-Edit-2511.json"
+      ],
+      "size": 20430635136,
+      "sha256": "393c6743d1de2e9031b5197027b36116f2096958ccc0223526d34e1860266021",
+      "gated": false
+    },
+    "qwen_image_fp8_e4m3fn.safetensors": {
+      "directory": "diffusion_models",
+      "source": {
+        "type": "huggingface",
+        "repo": "Comfy-Org/Qwen-Image_ComfyUI",
+        "path": "split_files/diffusion_models/qwen_image_fp8_e4m3fn.safetensors"
+      },
+      "used_by": [
+        "Stimma-Qwen-Image.json"
+      ],
+      "size": 20430635136,
+      "sha256": "98763a127701eb6fb59096f7742cb3aa7d64ed510b9f4e882d8351f8176e3ce3",
+      "gated": false
+    },
+    "qwen_image_vae.safetensors": {
+      "directory": "vae",
+      "source": {
+        "type": "huggingface",
+        "repo": "Comfy-Org/Qwen-Image_ComfyUI",
+        "path": "split_files/vae/qwen_image_vae.safetensors"
+      },
+      "used_by": [
+        "Stimma-Anima.json",
+        "Stimma-Krea2-Turbo-T2I.json",
+        "Stimma-Qwen-Image-2512.json",
+        "Stimma-Qwen-Image-Edit-2509.json",
+        "Stimma-Qwen-Image-Edit-2511.json",
+        "Stimma-Qwen-Image.json"
+      ],
+      "size": 253806246,
+      "sha256": "a70580f0213e67967ee9c95f05bb400e8fb08307e017a924bf3441223e023d1f",
+      "gated": false
+    },
+    "sdxl/sd_xl_base_1.0.safetensors": {
+      "directory": "checkpoints",
+      "source": {
+        "type": "huggingface",
+        "repo": "stabilityai/stable-diffusion-xl-base-1.0",
+        "path": "sd_xl_base_1.0.safetensors"
+      },
+      "used_by": [
+        "Stimma-SDXL-T2I.json"
+      ],
+      "size": 6938078334,
+      "sha256": "31e35c80fc4829d14f90153f4c74cd59c90b779f6afe05a74cd6120b893f7e5b",
+      "gated": false
+    },
+    "seedvr2_ema_3b_fp16.safetensors": {
+      "directory": "diffusion_models",
+      "source": {
+        "type": "huggingface",
+        "repo": "numz/SeedVR2_comfyUI",
+        "path": "seedvr2_ema_3b_fp16.safetensors"
+      },
+      "used_by": [
+        "Stimma-SeedVR2-Video-3B.json"
+      ],
+      "size": 6783018808,
+      "sha256": "2fd0e03a3dad24e07086750360727ca437de4ecd456f769856e960ae93e2b304",
+      "gated": false
+    },
+    "seedvr2_ema_3b_fp8_e4m3fn.safetensors": {
+      "directory": "diffusion_models",
+      "source": {
+        "type": "huggingface",
+        "repo": "numz/SeedVR2_comfyUI",
+        "path": "seedvr2_ema_3b_fp8_e4m3fn.safetensors"
+      },
+      "used_by": [
+        "Stimma-SeedVR2-Image-3B.json"
+      ],
+      "size": 3391544696,
+      "sha256": "3bf1e43ebedd570e7e7a0b1b60d6a02e105978f505c8128a241cde99a8240cff",
+      "gated": false
+    },
+    "seedvr2_ema_7b_fp16.safetensors": {
+      "directory": "diffusion_models",
+      "source": {
+        "type": "huggingface",
+        "repo": "numz/SeedVR2_comfyUI",
+        "path": "seedvr2_ema_7b_fp16.safetensors"
+      },
+      "used_by": [
+        "Stimma-SeedVR2-Video-7B.json"
+      ],
+      "size": 16479334424,
+      "sha256": "7b8241aa957606ab6cfb66edabc96d43234f9819c5392b44d2492d9f0b0bbe4a",
+      "gated": false
+    },
+    "seedvr2_ema_7b_sharp_fp16.safetensors": {
+      "directory": "diffusion_models",
+      "source": {
+        "type": "huggingface",
+        "repo": "numz/SeedVR2_comfyUI",
+        "path": "seedvr2_ema_7b_sharp_fp16.safetensors"
+      },
+      "used_by": [
+        "Stimma-SeedVR2-Image-7B.json"
+      ],
+      "size": 16479334424,
+      "sha256": "20a93e01ff24beaeebc5de4e4e5be924359606c356c9c51509fba245bd2d77dd",
+      "gated": false
+    },
+    "sulphur_dev_fp8mixed.safetensors": {
+      "directory": "checkpoints",
+      "source": {
+        "type": "huggingface",
+        "repo": "SulphurAI/Sulphur-2-base",
+        "path": "sulphur_dev_fp8mixed.safetensors"
+      },
+      "used_by": [
+        "Stimma-Sulphur2-I2V.json",
+        "Stimma-Sulphur2-T2V.json"
+      ],
+      "size": 29161842846,
+      "sha256": "41c999575859c528ff108022246a5524960a778c18742696971c9b0aadb4f70f",
+      "gated": false,
+      "note": "Workflow's embedded/documented URL (Lightricks/LTX-2.3-fp8/sulphur_dev_fp8mixed.safetensors) 404s. Verified working source is SulphurAI/Sulphur-2-base (the model author's own repo)."
+    },
+    "t5xxl_fp16.safetensors": {
+      "directory": "text_encoders",
+      "source": {
+        "type": "huggingface",
+        "repo": "comfyanonymous/flux_text_encoders",
+        "path": "t5xxl_fp16.safetensors"
+      },
+      "used_by": [
+        "Stimma-Chroma-HD.json",
+        "Stimma-Flux-Dev.json"
+      ],
+      "size": 9787841024,
+      "sha256": "6e480b09fae049a72d2a8c5fbccb8d3e92febeb233bbe9dfe7256958a9167635",
+      "gated": false
+    },
+    "umt5_xxl_fp8_e4m3fn_scaled.safetensors": {
+      "directory": "text_encoders",
+      "source": {
+        "type": "huggingface",
+        "repo": "Comfy-Org/Wan_2.1_ComfyUI_repackaged",
+        "path": "split_files/text_encoders/umt5_xxl_fp8_e4m3fn_scaled.safetensors"
+      },
+      "used_by": [
+        "Stimma-Wan22-FLF2V-Lightning.json",
+        "Stimma-Wan22-FLF2V.json",
+        "Stimma-Wan22-I2V-Lightning.json",
+        "Stimma-Wan22-I2V.json",
+        "Stimma-Wan22-T2V-Lightning.json",
+        "Stimma-Wan22-T2V.json"
+      ],
+      "size": 6735906897,
+      "sha256": "c3355d30191f1f066b26d93fba017ae9809dce6c627dda5f6a66eaa651204f68",
+      "gated": false
+    },
+    "wan2.2_i2v_high_noise_14B_fp16.safetensors": {
+      "directory": "diffusion_models",
+      "source": {
+        "type": "huggingface",
+        "repo": "Comfy-Org/Wan_2.2_ComfyUI_Repackaged",
+        "path": "split_files/diffusion_models/wan2.2_i2v_high_noise_14B_fp16.safetensors"
+      },
+      "used_by": [
+        "Stimma-Wan22-FLF2V-Lightning.json",
+        "Stimma-Wan22-FLF2V.json",
+        "Stimma-Wan22-I2V-Lightning.json",
+        "Stimma-Wan22-I2V.json"
+      ],
+      "size": 28577914792,
+      "sha256": "c21c21efa368d529a982a7d89dd11d86608b5937cae9a125d0ffe5491918a100",
+      "gated": false
+    },
+    "wan2.2_i2v_high_noise_14B_fp8_scaled.safetensors": {
+      "directory": "diffusion_models",
+      "source": {
+        "type": "huggingface",
+        "repo": "Comfy-Org/Wan_2.2_ComfyUI_Repackaged",
+        "path": "split_files/diffusion_models/wan2.2_i2v_high_noise_14B_fp8_scaled.safetensors"
+      },
+      "used_by": [
+        "Stimma-Wan22-FLF2V-Lightning.json",
+        "Stimma-Wan22-FLF2V.json"
+      ],
+      "size": 14294742832,
+      "sha256": "6122e79d55e0f235698d11d657f3b196c5273c830da00b2b013c5a048d5e6a42",
+      "gated": false
+    },
+    "wan2.2_i2v_lightx2v_4steps_lora_v1_high_noise.safetensors": {
+      "directory": "loras",
+      "source": {
+        "type": "huggingface",
+        "repo": "Comfy-Org/Wan_2.2_ComfyUI_Repackaged",
+        "path": "split_files/loras/wan2.2_i2v_lightx2v_4steps_lora_v1_high_noise.safetensors"
+      },
+      "used_by": [
+        "Stimma-Wan22-FLF2V-Lightning.json"
+      ],
+      "size": 1226977424,
+      "sha256": "d176c808d6fc461999b68e321efcb7501b20b8c3797523ed0df14f7d1deff11e",
+      "gated": false
+    },
+    "wan2.2_i2v_lightx2v_4steps_lora_v1_low_noise.safetensors": {
+      "directory": "loras",
+      "source": {
+        "type": "huggingface",
+        "repo": "Comfy-Org/Wan_2.2_ComfyUI_Repackaged",
+        "path": "split_files/loras/wan2.2_i2v_lightx2v_4steps_lora_v1_low_noise.safetensors"
+      },
+      "used_by": [
+        "Stimma-Wan22-FLF2V-Lightning.json"
+      ],
+      "size": 1226977424,
+      "sha256": "024f21de095bc8fad9809ded3e9e49a2e170dcf27075da8145ba7d60d8aab7f9",
+      "gated": false
+    },
+    "wan2.2_i2v_low_noise_14B_fp16.safetensors": {
+      "directory": "diffusion_models",
+      "source": {
+        "type": "huggingface",
+        "repo": "Comfy-Org/Wan_2.2_ComfyUI_Repackaged",
+        "path": "split_files/diffusion_models/wan2.2_i2v_low_noise_14B_fp16.safetensors"
+      },
+      "used_by": [
+        "Stimma-Wan22-FLF2V-Lightning.json",
+        "Stimma-Wan22-FLF2V.json",
+        "Stimma-Wan22-I2V-Lightning.json",
+        "Stimma-Wan22-I2V.json"
+      ],
+      "size": 28577914792,
+      "sha256": "edb89340c8a6fbf1a70e76a839ae01eaf7d289f05ea1ebd6b1a3fc6f533826e9",
+      "gated": false
+    },
+    "wan2.2_i2v_low_noise_14B_fp8_scaled.safetensors": {
+      "directory": "diffusion_models",
+      "source": {
+        "type": "huggingface",
+        "repo": "Comfy-Org/Wan_2.2_ComfyUI_Repackaged",
+        "path": "split_files/diffusion_models/wan2.2_i2v_low_noise_14B_fp8_scaled.safetensors"
+      },
+      "used_by": [
+        "Stimma-Wan22-FLF2V-Lightning.json",
+        "Stimma-Wan22-FLF2V.json"
+      ],
+      "size": 14294742832,
+      "sha256": "5471a457b6ac404202a5fbe6c11595a3d5641fc766b00f38763f72303fffc21e",
+      "gated": false
+    },
+    "wan2.2_t2v_high_noise_14B_fp8_scaled.safetensors": {
+      "directory": "diffusion_models",
+      "source": {
+        "type": "huggingface",
+        "repo": "Comfy-Org/Wan_2.2_ComfyUI_Repackaged",
+        "path": "split_files/diffusion_models/wan2.2_t2v_high_noise_14B_fp8_scaled.safetensors"
+      },
+      "used_by": [
+        "Stimma-Wan22-I2V-Lightning.json",
+        "Stimma-Wan22-I2V.json",
+        "Stimma-Wan22-T2V-Lightning.json",
+        "Stimma-Wan22-T2V.json"
+      ],
+      "size": 14293923632,
+      "sha256": "cad711ae211c8b23455ec68cd6a190a33a3d874234a77eb57266d73f8f0e6c9f",
+      "gated": false
+    },
+    "wan2.2_t2v_lightx2v_4steps_lora_v1.1_high_noise.safetensors": {
+      "directory": "loras",
+      "source": {
+        "type": "huggingface",
+        "repo": "Comfy-Org/Wan_2.2_ComfyUI_Repackaged",
+        "path": "split_files/loras/wan2.2_t2v_lightx2v_4steps_lora_v1.1_high_noise.safetensors"
+      },
+      "used_by": [
+        "Stimma-Wan22-T2V-Lightning.json",
+        "Stimma-Wan22-T2V.json"
+      ],
+      "size": 1226977424,
+      "sha256": "698321cb86bd30c4af06c9b84e656a1048c8cb54e06d50694536fb5de37fde41",
+      "gated": false
+    },
+    "wan2.2_t2v_lightx2v_4steps_lora_v1.1_low_noise.safetensors": {
+      "directory": "loras",
+      "source": {
+        "type": "huggingface",
+        "repo": "Comfy-Org/Wan_2.2_ComfyUI_Repackaged",
+        "path": "split_files/loras/wan2.2_t2v_lightx2v_4steps_lora_v1.1_low_noise.safetensors"
+      },
+      "used_by": [
+        "Stimma-Wan22-T2V-Lightning.json",
+        "Stimma-Wan22-T2V.json"
+      ],
+      "size": 1226977424,
+      "sha256": "ec95216e614b3c132c11bfb387b11feedf62163150ccc9068bca8a189771e75a",
+      "gated": false
+    },
+    "wan2.2_t2v_low_noise_14B_fp8_scaled.safetensors": {
+      "directory": "diffusion_models",
+      "source": {
+        "type": "huggingface",
+        "repo": "Comfy-Org/Wan_2.2_ComfyUI_Repackaged",
+        "path": "split_files/diffusion_models/wan2.2_t2v_low_noise_14B_fp8_scaled.safetensors"
+      },
+      "used_by": [
+        "Stimma-Wan22-I2V-Lightning.json",
+        "Stimma-Wan22-I2V.json",
+        "Stimma-Wan22-T2V-Lightning.json",
+        "Stimma-Wan22-T2V.json"
+      ],
+      "size": 14293923632,
+      "sha256": "e71b96d7c82e638694c5e7fb98fac4bfb0e4ddc5fbbb4b1df40da8f0f1278a97",
+      "gated": false
+    },
+    "wan_2.1_vae.safetensors": {
+      "directory": "vae",
+      "source": {
+        "type": "huggingface",
+        "repo": "Comfy-Org/Wan_2.2_ComfyUI_Repackaged",
+        "path": "split_files/vae/wan_2.1_vae.safetensors"
+      },
+      "used_by": [
+        "Stimma-Wan22-FLF2V-Lightning.json",
+        "Stimma-Wan22-FLF2V.json",
+        "Stimma-Wan22-I2V-Lightning.json",
+        "Stimma-Wan22-I2V.json",
+        "Stimma-Wan22-T2V-Lightning.json",
+        "Stimma-Wan22-T2V.json"
+      ],
+      "size": 253815318,
+      "sha256": "2fc39d31359a4b0a64f55876d8ff7fa8d780956ae2cb13463b0223e15148976b",
+      "gated": false
+    },
+    "z_image_turbo_bf16.safetensors": {
+      "directory": "diffusion_models",
+      "source": {
+        "type": "huggingface",
+        "repo": "Comfy-Org/z_image_turbo",
+        "path": "split_files/diffusion_models/z_image_turbo_bf16.safetensors"
+      },
+      "used_by": [
+        "Stimma-ZImage-Turbo.json"
+      ],
+      "size": 12309866400,
+      "sha256": "2407613050b809ffdff18a4ac99af83ea6b95443ecebdf80e064a79c825574a6",
+      "gated": false
+    }
+  },
+  "unresolved": [
+    {
+      "filename": "anima/Studio_Ghibli_Dark_FairytaleV2-step00006000.safetensors",
+      "used_by": [
+        "Stimma-Anima.json"
+      ],
+      "reason": "Optional user-selectable LoRA (path_filter picker default in a LoRA-picker node); no exact-filename match found in a clearly authoritative public HF repo after search."
+    },
+    {
+      "filename": "wan/Kissing_high_noise.safetensors",
+      "used_by": [
+        "Stimma-Wan22-T2V.json"
+      ],
+      "reason": "Optional user-selectable LoRA (path_filter picker default in a LoRA-picker node); no exact-filename match found in a clearly authoritative public HF repo after search."
+    },
+    {
+      "filename": "wan/Kissing_low_noise.safetensors",
+      "used_by": [
+        "Stimma-Wan22-T2V.json"
+      ],
+      "reason": "Optional user-selectable LoRA (path_filter picker default in a LoRA-picker node); no exact-filename match found in a clearly authoritative public HF repo after search."
+    }
+  ]
+}
