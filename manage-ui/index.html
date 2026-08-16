@@ -5,6 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="color-scheme" content="dark light" />
     <title>ComfyUI · Stimma</title>
+    <script>
+      // Theme before first paint (no white flash inside an embedding iframe).
+      (function () {
+        var t = new URLSearchParams(location.search).get('theme') === 'light' ? 'light' : 'dark'
+        document.documentElement.setAttribute('data-theme', t)
+      })()
+    </script>
+    <style>
+      html { background: rgb(19 23 32); }
+      html[data-theme="light"] { background: rgb(244 244 245); }
+      html, body { margin: 0; }
+    </style>
   </head>
   <body>
     <div id="app"></div>
