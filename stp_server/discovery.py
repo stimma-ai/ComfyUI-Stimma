@@ -1364,9 +1364,27 @@ def _convert_ui_to_api(ui_data: Dict[str, Any], object_info: Optional[Dict[str, 
     # skips nodes with mode NEVER or BYPASS (mode 4).  We do the same.
     _MUTED_MODE = 4
 
-    # Build bypass map for muted nodes: (muted_node_id, output_slot) → (src_node, src_slot)
-    # Muted nodes pass-through: Nth input connects to Nth output.
-    muted_bypass = {}  # (str(node_id), output_slot) → (str(src_node), src_slot)
+    # Build a bypass map for virtual pass-through nodes. Top-level Reroute
+    # nodes are frontend-only and must never appear in the API prompt; their
+    # consumers need to point at the first real upstream node instead. Muted
+    # nodes use the same post-processing path, with their Nth input connected
+    # to their Nth output.
+    passthrough_bypass = {}  # (str(node_id), output_slot) → (str(src_node), src_slot)
+    for node in nodes:
+        if node.get("type") != "Reroute":
+            continue
+        node_id = str(node.get("id"))
+        node_inputs = node.get("inputs", [])
+        if not node_inputs:
+            continue
+        link_id = node_inputs[0].get("link")
+        if link_id is None or link_id not in link_map:
+            continue
+        src = link_map[link_id]
+        passthrough_bypass[(node_id, 0)] = (
+            str(src["src_node"]), src["src_slot"]
+        )
+
     for node in nodes:
         if node.get("mode") != _MUTED_MODE:
             continue
@@ -1383,7 +1401,9 @@ def _convert_ui_to_api(ui_data: Dict[str, Any], object_info: Optional[Dict[str, 
         # Map each output slot to the corresponding input's source
         for slot_idx, src in enumerate(conn_inputs):
             if src is not None:
-                muted_bypass[(node_id, slot_idx)] = (str(src["src_node"]), src["src_slot"])
+                passthrough_bypass[(node_id, slot_idx)] = (
+                    str(src["src_node"]), src["src_slot"]
+                )
 
     for node in nodes:
         node_id = str(node.get("id"))
@@ -1393,6 +1413,11 @@ def _convert_ui_to_api(ui_data: Dict[str, Any], object_info: Optional[Dict[str, 
 
         # Skip muted/disabled nodes (mode 4 = NEVER in LiteGraph)
         if node.get("mode") == _MUTED_MODE:
+            continue
+
+        # Reroutes are virtual frontend nodes. Their links are rewired through
+        # passthrough_bypass below, so they must not be emitted as API nodes.
+        if class_type == "Reroute":
             continue
 
         # Expand group nodes
@@ -1476,17 +1501,18 @@ def _convert_ui_to_api(ui_data: Dict[str, Any], object_info: Optional[Dict[str, 
             api_prompt.update(expanded)
             rewire_map.update(nested_rewires)
 
-    # Post-process: reroute links through muted/bypassed nodes
-    if muted_bypass:
+    # Post-process: reroute links through virtual/muted pass-through nodes.
+    # Follow whole chains and stop safely on malformed cycles.
+    if passthrough_bypass:
         for node_data in api_prompt.values():
             for inp_name, inp_val in list(node_data.get("inputs", {}).items()):
                 if isinstance(inp_val, list) and len(inp_val) == 2 and isinstance(inp_val[0], str):
                     key = (inp_val[0], inp_val[1])
-                    # Follow bypass chains (muted → muted → ...)
+                    # Follow bypass chains (reroute/muted → reroute/muted → ...)
                     seen = set()
-                    while key in muted_bypass and key not in seen:
+                    while key in passthrough_bypass and key not in seen:
                         seen.add(key)
-                        key = muted_bypass[key]
+                        key = passthrough_bypass[key]
                     if key != (inp_val[0], inp_val[1]):
                         node_data["inputs"][inp_name] = [key[0], key[1]]
 

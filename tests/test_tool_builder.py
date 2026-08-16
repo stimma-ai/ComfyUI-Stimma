@@ -26,6 +26,7 @@ from stp_server.discovery import (
     DiscoveredWorkflow,
     _convert_ui_to_api,
     _extract_stimma_nodes,
+    _validate_workflow,
 )
 from stp_server.tool_builder import _build_single_tool
 
@@ -162,6 +163,170 @@ class TestSavedStimmaWidgetCompatibility(unittest.TestCase):
             [(node["inputs"]["required"], node["inputs"]["ui_order"]) for node in image_fields],
             [(True, 5), (False, 6)],
         )
+
+
+class TestTopLevelRerouteConversion(unittest.TestCase):
+    @staticmethod
+    def _base_nodes():
+        return [
+            {
+                "id": 1,
+                "type": "StimmaToolInfo",
+                "widgets_values": {
+                    "slug": "reroute-test",
+                    "display_name": "Reroute Test",
+                    "task_types": "text-to-image",
+                },
+            },
+            {
+                "id": 2,
+                "type": "StimmaPromptParam",
+                "widgets_values": {
+                    "name": "prompt",
+                    "default_text": "hello",
+                    "required": True,
+                    "ui_order": 0,
+                },
+                "outputs": [{"name": "STRING", "type": "STRING", "links": []}],
+            },
+        ]
+
+    @staticmethod
+    def _object_info():
+        return {
+            "StimmaToolInfo": {},
+            "StimmaPromptParam": {},
+            "SomeConsumer": {
+                "input": {"required": {"text": ("STRING", {})}}
+            },
+        }
+
+    def test_array_link_reroute_is_removed_and_rewired(self):
+        nodes = self._base_nodes() + [
+            {
+                "id": 3,
+                "type": "Reroute",
+                "inputs": [{"name": "", "type": "*", "link": 10}],
+                "outputs": [{"name": "", "type": "*", "links": [11]}],
+            },
+            {
+                "id": 4,
+                "type": "SomeConsumer",
+                "inputs": [{"name": "text", "type": "STRING", "link": 11}],
+            },
+        ]
+        workflow = {
+            "nodes": nodes,
+            "links": [
+                [10, 2, 0, 3, 0, "*"],
+                [11, 3, 0, 4, 0, "STRING"],
+            ],
+        }
+
+        prompt = _convert_ui_to_api(workflow, self._object_info())
+
+        self.assertNotIn("3", prompt)
+        self.assertEqual(prompt["4"]["inputs"]["text"], ["2", 0])
+        self.assertEqual(_validate_workflow(prompt, self._object_info()), [])
+
+    def test_object_link_reroute_chain_rewires_every_consumer(self):
+        nodes = self._base_nodes() + [
+            {
+                "id": "r1",
+                "type": "Reroute",
+                "inputs": [{"name": "", "type": "*", "link": "a"}],
+                "outputs": [{"name": "", "type": "*", "links": ["b"]}],
+            },
+            {
+                "id": "r2",
+                "type": "Reroute",
+                "inputs": [{"name": "", "type": "*", "link": "b"}],
+                "outputs": [{"name": "", "type": "*", "links": ["c", "d"]}],
+            },
+            {
+                "id": 5,
+                "type": "SomeConsumer",
+                "inputs": [{"name": "text", "type": "STRING", "link": "c"}],
+            },
+            {
+                "id": 6,
+                "type": "SomeConsumer",
+                "inputs": [{"name": "text", "type": "STRING", "link": "d"}],
+            },
+        ]
+
+        def link(link_id, source, target):
+            return {
+                "id": link_id,
+                "origin_id": source,
+                "origin_slot": 0,
+                "target_id": target,
+                "target_slot": 0,
+                "type": "STRING",
+            }
+
+        workflow = {
+            "nodes": nodes,
+            "links": [
+                link("a", 2, "r1"),
+                link("b", "r1", "r2"),
+                link("c", "r2", 5),
+                link("d", "r2", 6),
+            ],
+        }
+
+        prompt = _convert_ui_to_api(workflow, self._object_info())
+
+        self.assertNotIn("r1", prompt)
+        self.assertNotIn("r2", prompt)
+        self.assertEqual(prompt["5"]["inputs"]["text"], ["2", 0])
+        self.assertEqual(prompt["6"]["inputs"]["text"], ["2", 0])
+
+    def test_dangling_and_cyclic_reroutes_do_not_leave_invalid_inputs(self):
+        nodes = self._base_nodes() + [
+            {
+                "id": 3,
+                "type": "Reroute",
+                "inputs": [{"name": "", "type": "*", "link": 10}],
+                "outputs": [{"name": "", "type": "*", "links": [11, 12]}],
+            },
+            {
+                "id": 4,
+                "type": "Reroute",
+                "inputs": [{"name": "", "type": "*", "link": 11}],
+                "outputs": [{"name": "", "type": "*", "links": [10]}],
+            },
+            {
+                "id": 5,
+                "type": "SomeConsumer",
+                "inputs": [{"name": "text", "type": "STRING", "link": 12}],
+            },
+            {
+                "id": 6,
+                "type": "SomeConsumer",
+                "inputs": [{"name": "text", "type": "STRING", "link": 13}],
+            },
+            {
+                "id": 7,
+                "type": "Reroute",
+                "inputs": [{"name": "", "type": "*", "link": None}],
+                "outputs": [{"name": "", "type": "*", "links": [13]}],
+            },
+        ]
+        workflow = {
+            "nodes": nodes,
+            "links": [
+                [10, 4, 0, 3, 0, "*"],
+                [11, 3, 0, 4, 0, "*"],
+                [12, 3, 0, 5, 0, "STRING"],
+                [13, 7, 0, 6, 0, "STRING"],
+            ],
+        }
+
+        prompt = _convert_ui_to_api(workflow, self._object_info())
+
+        self.assertNotIn("text", prompt["5"]["inputs"])
+        self.assertNotIn("text", prompt["6"]["inputs"])
 
 
 class TestReferenceToVideoWorkflow(unittest.TestCase):
