@@ -1525,12 +1525,14 @@ async def _monitor_execution(ws, prompt_id: str, context: "ExecutionContext"):
                             0.1 + (value / max_val) * 0.8, _last_progress_value
                         )
                         _last_progress_value = progress
-                        await context.report_progress(progress)
                         try:
                             from .manage import jobs as _mjobs
                             _mjobs.progress(prompt_id, progress)
                         except Exception:
                             pass
+                        # Update the manager snapshot before forwarding the STP
+                        # event that tells the host iframe to refresh it.
+                        await context.report_progress(progress)
 
             elif msg_type == "execution_success":
                 if data.get("data", {}).get("prompt_id") == prompt_id:

@@ -18,8 +18,8 @@
         <div class="li">
           <div class="t"><div class="a">ComfyUI-Manager</div><div class="b mono">{{ managerLabel }}</div></div>
           <div class="r">
-            <button v-if="s.comfyui_manager.state === 'missing' || s.comfyui_manager.state === 'failed'" class="btn sm" :disabled="busy === 'manager'" @click="installManager">{{ busy === 'manager' ? 'Starting…' : s.comfyui_manager.state === 'failed' ? 'Retry' : 'Install' }}</button>
-            <span v-else-if="s.comfyui_manager.state === 'installing'">Installing</span>
+            <button v-if="manager.state === 'missing' || manager.state === 'failed'" class="btn sm" :disabled="busy === 'manager'" @click="installManager">{{ busy === 'manager' ? 'Starting…' : manager.state === 'failed' ? 'Retry' : 'Install' }}</button>
+            <span v-else-if="manager.state === 'installing'">Installing</span>
             <span v-else>Enabled</span>
           </div>
         </div>
@@ -83,12 +83,19 @@ const updateLabel = computed(() => {
   return `${p.head} · current`
 })
 const managerLabel = computed(() => {
-  const m = s.value?.comfyui_manager
-  if (!m) return '…'
+  const m = manager.value
   if (m.state === 'failed') return m.operation?.error || 'Install failed'
   if (m.state === 'installing') return m.operation?.detail || 'Installing'
   if (m.state === 'restart_needed') return 'Restart required'
   return m.version || (m.installed ? 'Installed' : 'Not installed')
+})
+// The management UI can update before every running ComfyUI process has
+// restarted into the matching Python backend. Keep Settings usable against
+// the older `manager_present` response during that rolling-upgrade window.
+const manager = computed(() => {
+  if (s.value?.comfyui_manager) return s.value.comfyui_manager
+  const installed = !!s.value?.manager_present
+  return { state: installed ? 'ready' : 'missing', installed }
 })
 function edit(which) { editing.value = which; secret.value = '' }
 async function saveSecret() { try { await api.setCredentials({ [editing.value]: secret.value }); editing.value = null; await load() } catch (e) { alert(e.message) } }

@@ -12,7 +12,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from stp_server.manage.instances import InstanceMonitor, InstanceStatus, gpu_stats, merge_comfy_gpu_memory
-from stp_server.manage.manager import Manager
+from stp_server.manage.manager import Manager, _running_jobs_view
 from stp_server.manage.ops import Operation, STATE_FAILED, STATE_PAUSED, STATE_RUNNING
 
 
@@ -100,6 +100,32 @@ class TestInstanceStartupState(unittest.TestCase):
         failed = Operation(id="failed", kind="install_node", title="Install nodes", state=STATE_FAILED)
         manager = self._manager_with_ops([running, failed])
         self.assertEqual(manager.provider_state(), ("warning", "Operation failed"))
+
+
+class TestRunningJobsView(unittest.TestCase):
+    def test_live_progress_overrides_sample_and_settled_job_disappears(self):
+        status = types.SimpleNamespace(
+            addr="127.0.0.1:8188",
+            pending=2,
+            running=[
+                {"prompt_id": "live", "ours": True, "title": "Old", "progress": 0.2},
+                {"prompt_id": "done", "ours": True, "title": "Done", "progress": 0.9},
+                {"prompt_id": "external", "ours": False, "title": "External", "progress": None},
+            ],
+        )
+        live = {
+            "live": {"title": "Current", "request_id": "r1", "started_at": 1, "progress": 0.6},
+            "new": {"title": "New", "request_id": "r2", "started_at": 2,
+                    "progress": 0.1, "addr": "127.0.0.1:8188"},
+        }
+
+        running, pending = _running_jobs_view([status], live)
+
+        self.assertEqual(pending, 2)
+        by_id = {job["prompt_id"]: job for job in running}
+        self.assertEqual(set(by_id), {"live", "new", "external"})
+        self.assertEqual(by_id["live"]["title"], "Current")
+        self.assertEqual(by_id["live"]["progress"], 0.6)
 
 
 if __name__ == "__main__":

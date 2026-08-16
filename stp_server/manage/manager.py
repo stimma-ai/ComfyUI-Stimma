@@ -40,6 +40,30 @@ def _required_issues(workflow) -> list:
     return [issue for issue in (workflow.issues or []) if not issue.get("optional")]
 
 
+def _running_jobs_view(statuses, live_jobs: dict) -> tuple:
+    """Overlay websocket-driven Stimma job state on the slower queue sample."""
+    running, pending = [], 0
+    seen_prompt_ids = set()
+    for status in statuses:
+        for sampled in status.running:
+            prompt_id = sampled.get("prompt_id")
+            live = live_jobs.get(prompt_id)
+            if sampled.get("ours") and live is None:
+                continue
+            merged = {**sampled, "addr": status.addr}
+            if live:
+                merged.update({k: live.get(k) for k in
+                               ("title", "request_id", "started_at", "progress")})
+            running.append(merged)
+            seen_prompt_ids.add(prompt_id)
+        pending += status.pending
+    for prompt_id, live in live_jobs.items():
+        if prompt_id in seen_prompt_ids or not live.get("progress"):
+            continue
+        running.append({"prompt_id": prompt_id, "ours": True, **live})
+    return running, pending
+
+
 class Manager:
     def __init__(self, provider, config):
         self.provider = provider
@@ -203,11 +227,8 @@ class Manager:
                             h["gpus"].append({"index": d.get("index"), "name": d.get("name"), "util": None,
                                               "mem_used": (d.get("vram_total") or 0) - (d.get("vram_free") or 0),
                                               "mem_total": d.get("vram_total"), "temp": None})
-        running, pending = [], 0
-        for s in st:
-            for r in s.running:
-                running.append({**r, "addr": s.addr})
-            pending += s.pending
+        live_jobs = jobs.snapshot()
+        running, pending = _running_jobs_view(st, live_jobs)
         # Provider-side queue (jobs accepted but not yet on a Comfy instance)
         try:
             qs = {"queued": len(self.provider._queued_jobs), "running": len(self.provider._running_jobs)}

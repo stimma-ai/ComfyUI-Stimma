@@ -71,6 +71,7 @@ const managerBusy = ref(false)
 const restartBusy = ref(false)
 const restartError = ref('')
 let timer = null
+let hostRefreshTimer = null
 
 async function load() {
   try { overview.value = await api.overview() } catch (e) { overview.value = overview.value || { state: 'error', summary: 'Manager unavailable' } }
@@ -107,10 +108,28 @@ onMounted(() => {
   if (rootEl.value) sizeObs.observe(rootEl.value, { childList: true, subtree: true, characterData: true, attributes: true })
   nextTick(reportSize)
   window.addEventListener('resize', reportSize)
+  window.addEventListener('message', onHostMessage)
 })
-onUnmounted(() => { clearInterval(timer); sizeObs?.disconnect(); window.removeEventListener('resize', reportSize) })
+onUnmounted(() => {
+  clearInterval(timer)
+  if (hostRefreshTimer) clearTimeout(hostRefreshTimer)
+  sizeObs?.disconnect()
+  window.removeEventListener('resize', reportSize)
+  window.removeEventListener('message', onHostMessage)
+})
 watch(tab, () => nextTick(reportSize))
 window.addEventListener('hashchange', () => { const h = location.hash.replace('#', ''); if (tabs.some(t => t.id === h)) tab.value = h })
+
+function onHostMessage(e) {
+  if (e.data?.type !== 'stimma-manage-refresh') return
+  // Progress can arrive around 10 times a second. Coalesce it into a prompt
+  // manager refresh without reintroducing a multi-second polling delay.
+  if (hostRefreshTimer) return
+  hostRefreshTimer = setTimeout(() => {
+    hostRefreshTimer = null
+    load()
+  }, 100)
+}
 
 const stateDot = computed(() => overview.value?.checking ? 'z' : ({ ready: 'g', warning: 'a', error: 'r' }[overview.value?.state] || 'z'))
 const stateLabel = computed(() => {
