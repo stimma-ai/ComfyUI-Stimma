@@ -1,25 +1,22 @@
-"""Plugin version / update via git + GitHub releases.
+"""Plugin update: main-or-newer.
 
-Two modes:
-  release — HEAD is exactly at a tag `vX.Y.Z`: compare against the newest
-            remote tag; update = fetch + checkout newest tag.
-  dev     — HEAD is on a branch: report commits behind origin/<branch>;
-            update = fast-forward pull. Never switches a dev checkout to a tag.
+main is the release channel (like most ComfyUI plugins). A checkout strictly
+behind origin/main can update (fast-forward); a checkout with local commits is
+"ahead" and never nagged. Identity is the git hash. Tagged releases can layer
+on later without changing this surface.
 """
 
 import asyncio
 import logging
-import re
 import time
 from pathlib import Path
-from typing import Optional
 
 from ..version import PRODUCT_VERSION
 
 logger = logging.getLogger(__name__)
 
 _PLUGIN_DIR = Path(__file__).resolve().parent.parent.parent
-_TAG_RE = re.compile(r"^v?(\d+)\.(\d+)\.(\d+)$")
+_BRANCH = "main"
 
 _state = {"checked_at": 0.0, "result": None, "checking": False}
 
@@ -35,11 +32,6 @@ async def _git(*args, timeout: float = 30) -> tuple:
         proc.kill()
         return 124, "", "timeout"
     return proc.returncode, out.decode(errors="replace").strip(), err.decode(errors="replace").strip()
-
-
-def _ver_key(tag: str):
-    m = _TAG_RE.match(tag)
-    return tuple(int(x) for x in m.groups()) if m else None
 
 
 def is_git_checkout() -> bool:
@@ -64,55 +56,46 @@ async def status(force: bool = False) -> dict:
 
 
 async def _compute() -> dict:
-    base = {"version": PRODUCT_VERSION, "git": is_git_checkout(), "mode": None,
-            "update_available": False, "latest": None, "behind": 0, "branch": None,
-            "head": None, "error": None, "checked_at": time.time()}
-    if not is_git_checkout():
-        base["mode"] = "static"
+    base = {"version": PRODUCT_VERSION, "git": is_git_checkout(), "head": None,
+            "behind": 0, "ahead": 0, "update_available": False, "error": None,
+            "checked_at": time.time()}
+    if not base["git"]:
         return base
     rc, head, _ = await _git("rev-parse", "--short", "HEAD")
     base["head"] = head if rc == 0 else None
-    rc, _, err = await _git("fetch", "--tags", "--quiet", timeout=60)
+    rc, _, err = await _git("fetch", "--quiet", "origin", _BRANCH, timeout=60)
     if rc != 0:
         base["error"] = f"git fetch failed: {err.splitlines()[-1] if err else rc}"
-    rc, tag_here, _ = await _git("describe", "--tags", "--exact-match", "HEAD")
-    if rc == 0 and _ver_key(tag_here):
-        base["mode"] = "release"
-        base["version"] = tag_here.lstrip("v")
-        rc, tags, _ = await _git("tag", "--list")
-        vers = [t for t in tags.splitlines() if _ver_key(t)]
-        if vers:
-            latest = max(vers, key=_ver_key)
-            base["latest"] = latest.lstrip("v")
-            base["update_available"] = _ver_key(latest) > _ver_key(tag_here)
         return base
-    base["mode"] = "dev"
-    rc, branch, _ = await _git("rev-parse", "--abbrev-ref", "HEAD")
-    base["branch"] = branch if rc == 0 else None
-    if branch and branch != "HEAD":
-        rc, cnt, _ = await _git("rev-list", "--count", f"HEAD..origin/{branch}")
-        if rc == 0 and cnt.isdigit():
-            base["behind"] = int(cnt)
-            base["update_available"] = int(cnt) > 0
+    rc, behind, _ = await _git("rev-list", "--count", f"HEAD..origin/{_BRANCH}")
+    if rc == 0 and behind.isdigit():
+        base["behind"] = int(behind)
+    rc, ahead, _ = await _git("rev-list", "--count", f"origin/{_BRANCH}..HEAD")
+    if rc == 0 and ahead.isdigit():
+        base["ahead"] = int(ahead)
+    # Local commits mean a dev checkout: identify it, never nag it.
+    base["update_available"] = base["behind"] > 0 and base["ahead"] == 0
     return base
 
 
 async def apply_update(log) -> None:
-    """Perform the update for the current mode. Raises on failure."""
+    """Fast-forward to origin/main. Raises on failure."""
     st = await status(force=True)
-    if st["mode"] == "release":
-        if not st.get("latest") or not st["update_available"]:
-            log("Already current")
-            return
-        rc, out, err = await _git("checkout", f"v{st['latest']}", timeout=60)
-        log(out or err)
-        if rc != 0:
-            raise RuntimeError(f"git checkout failed: {err}")
-    elif st["mode"] == "dev":
-        rc, out, err = await _git("pull", "--ff-only", timeout=120)
-        log(out or err)
-        if rc != 0:
-            raise RuntimeError(f"git pull failed: {err}")
-    else:
+    if not st["git"]:
         raise RuntimeError("Not a git checkout")
+    if st.get("error"):
+        raise RuntimeError(st["error"])
+    if not st["update_available"]:
+        log("Already current")
+        return
+    rc, branch, _ = await _git("rev-parse", "--abbrev-ref", "HEAD")
+    if rc == 0 and branch != _BRANCH:
+        rc, out, err = await _git("checkout", _BRANCH, timeout=60)
+        log(out or err)
+        if rc != 0:
+            raise RuntimeError(f"git checkout {_BRANCH} failed: {err}")
+    rc, out, err = await _git("merge", "--ff-only", f"origin/{_BRANCH}", timeout=120)
+    log(out or err)
+    if rc != 0:
+        raise RuntimeError(f"git merge failed: {err}")
     _state["checked_at"] = 0

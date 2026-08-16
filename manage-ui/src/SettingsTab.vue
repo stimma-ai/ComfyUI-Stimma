@@ -65,10 +65,11 @@ function srcNote(c) { return c.set && c.source && c.source !== 'config' ? ` · f
 const updateLabel = computed(() => {
   const p = upd.value
   if (!p) return '…'
-  if (p.error) return `${p.version} · ${p.error}`
-  if (p.mode === 'dev') return `${p.branch || 'dev'} @ ${p.head || '?'}${p.behind ? ` · ${p.behind} commit${p.behind === 1 ? '' : 's'} behind` : ' · up to date'}`
-  if (p.mode === 'static') return `${p.version} · not a git checkout`
-  return p.update_available ? `${p.version} · ${p.latest} available` : `${p.version} · up to date`
+  if (!p.git) return p.version
+  if (p.error) return `${p.head || '?'} · ${p.error}`
+  if (p.update_available) return `${p.head} · ${p.behind} behind`
+  if (p.ahead) return `${p.head} · ahead of main`
+  return `${p.head} · current`
 })
 function edit(which) { editing.value = which; secret.value = '' }
 async function saveSecret() { try { await api.setCredentials({ [editing.value]: secret.value }); editing.value = null; await load() } catch (e) { alert(e.message) } }

@@ -49,9 +49,9 @@ const pendingTotal = computed(() => (props.overview?.pending || 0) + (props.over
 const pluginLabel = computed(() => {
   const p = props.overview?.plugin
   if (!p) return ''
-  if (p.mode === 'dev') return `${p.branch || 'dev'}${p.behind ? ` · ${p.behind} behind` : ' · up to date'}`
-  if (p.update_available) return `${p.version} · ${p.latest} available`
-  return `${p.version} · up to date`
+  if (!p.git) return p.version
+  if (p.update_available) return `${p.head} · ${p.behind} behind`
+  return p.head || ''
 })
 function hostLabel(h) { return h.local ? (h.hostname || 'This machine') : h.host }
 function hostSub(h) {
