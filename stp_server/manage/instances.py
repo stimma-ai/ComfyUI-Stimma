@@ -15,6 +15,8 @@ import aiohttp
 
 logger = logging.getLogger(__name__)
 
+_STARTUP_CHECK_ATTEMPTS = 15
+
 
 def _local_host_names() -> set:
     names = {"127.0.0.1", "localhost", "::1", "0.0.0.0"}
@@ -54,6 +56,7 @@ class InstanceStatus:
     pending: int = 0
     comfy_version: Optional[str] = None
     stimma_manage: bool = False  # peer plugin's manage API reachable
+    poll_attempts: int = 0
 
     def to_dict(self) -> dict:
         return {
@@ -214,7 +217,22 @@ class InstanceMonitor:
     def summary(self) -> dict:
         st = self.statuses
         up = [s for s in st if s.healthy]
-        return {"total": len(st), "healthy": len(up), "down": [s.addr for s in st if not s.healthy]}
+        checking = [s for s in st if self.is_checking(s)]
+        return {
+            "total": len(st),
+            "healthy": len(up),
+            "checking": [s.addr for s in checking],
+            "down": [s.addr for s in st if not s.healthy and s not in checking],
+        }
+
+    @staticmethod
+    def is_checking(status: InstanceStatus) -> bool:
+        """An instance is unconfirmed, not down, during bounded startup retries."""
+        return (
+            not status.healthy
+            and status.last_seen is None
+            and status.poll_attempts < _STARTUP_CHECK_ATTEMPTS
+        )
 
     def gpus(self) -> List[Dict[str, Any]]:
         if time.time() - self._gpus_at > 2.0:
@@ -253,7 +271,7 @@ class InstanceMonitor:
 
     async def _poll(self, addr: str) -> bool:
         st = self._statuses[addr]
-        was = st.healthy
+        was = (st.healthy, self.is_checking(st))
         session = await self._get_session()
         try:
             async with session.get(f"http://{addr}/system_stats") as r:
@@ -291,7 +309,9 @@ class InstanceMonitor:
             st.error = _short_err(e)
             st.running = []
             st.pending = 0
-        return was != st.healthy
+        finally:
+            st.poll_attempts += 1
+        return was != (st.healthy, self.is_checking(st))
 
     async def _loop(self):
         # First poll immediately so state is right at startup
@@ -301,7 +321,8 @@ class InstanceMonitor:
             logger.debug("initial instance poll failed", exc_info=True)
         while True:
             active = (time.time() - self._last_interest) < 30
-            await asyncio.sleep(self._interval_active if active else self._interval_idle)
+            checking = any(self.is_checking(s) for s in self.statuses)
+            await asyncio.sleep(1.0 if checking else (self._interval_active if active else self._interval_idle))
             try:
                 await self.poll_once()
             except asyncio.CancelledError:

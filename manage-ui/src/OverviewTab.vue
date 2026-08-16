@@ -12,7 +12,7 @@
             <div class="k mono" style="margin-top:3px">{{ h.reachable ? mem(g) : '—' }}</div>
           </div>
         </div>
-        <div v-else class="li"><div class="t"><div class="b">{{ h.reachable ? '' : 'Unreachable' }}</div></div></div>
+        <div v-else class="li"><div class="t"><div class="b">{{ h.checking ? 'Checking…' : h.reachable ? '' : 'Unreachable' }}</div></div></div>
       </div>
 
       <div class="grp">
@@ -57,6 +57,7 @@ function hostLabel(h) { return h.local ? (h.hostname || 'This machine') : h.host
 function hostSub(h) {
   const n = h.instances.length
   const up = h.instances.filter(i => i.healthy).length
+  if (h.checking && !h.reachable) return 'checking'
   if (!h.reachable) { const ls = h.instances[0]?.last_seen; return 'unreachable' + (ls ? ` · last seen ${ago(ls)}` : '') }
   return `${n} instance${n === 1 ? '' : 's'}${up < n ? ` · ${n - up} down` : ''}`
 }

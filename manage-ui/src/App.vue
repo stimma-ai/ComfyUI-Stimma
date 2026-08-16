@@ -98,8 +98,9 @@ onUnmounted(() => { clearInterval(timer); sizeObs?.disconnect(); window.removeEv
 watch(tab, () => nextTick(reportSize))
 window.addEventListener('hashchange', () => { const h = location.hash.replace('#', ''); if (tabs.some(t => t.id === h)) tab.value = h })
 
-const stateDot = computed(() => ({ ready: 'g', warning: 'a', error: 'r' }[overview.value?.state] || 'z'))
+const stateDot = computed(() => overview.value?.checking ? 'z' : ({ ready: 'g', warning: 'a', error: 'r' }[overview.value?.state] || 'z'))
 const stateLabel = computed(() => {
+  if (overview.value?.checking) return 'Checking'
   const s = overview.value?.state
   if (!s) return '…'
   if (s === 'ready') return 'Ready'

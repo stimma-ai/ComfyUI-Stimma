@@ -130,10 +130,10 @@ class Manager:
     # ------------------------------------------------------------------ provider state
     def provider_state(self):
         s = self.instances.summary()
-        if s["total"] and s["healthy"] == 0:
+        if s["down"] and s["healthy"] == 0 and not s["checking"]:
             return "error", "No ComfyUI instance is reachable"
-        if s["total"] > 1 and s["healthy"] < s["total"]:
-            n = s["total"] - s["healthy"]
+        if s["down"]:
+            n = len(s["down"])
             return "warning", f"{n} of {s['total']} instances unreachable"
         if self._restart_needed:
             if "comfyui-manager" in self._restart_needed:
@@ -153,8 +153,12 @@ class Manager:
         hosts: Dict[str, dict] = {}
         for s in st:
             key = "local" if s.local else s.addr.rsplit(":", 1)[0]
-            h = hosts.setdefault(key, {"host": key, "local": s.local, "instances": [], "gpus": [], "reachable": False})
-            h["instances"].append(s.to_dict())
+            h = hosts.setdefault(key, {"host": key, "local": s.local, "instances": [], "gpus": [], "reachable": False, "checking": False})
+            instance = s.to_dict()
+            instance["checking"] = self.instances.is_checking(s)
+            h["instances"].append(instance)
+            if instance["checking"]:
+                h["checking"] = True
             if s.healthy:
                 h["reachable"] = True
         if "local" in hosts:
@@ -191,8 +195,10 @@ class Manager:
             qs = {"queued": 0, "running": 0}
         upd = await updater.status()
         state, summary = self.provider_state()
+        instance_summary = self.instances.summary()
         return {
             "state": state, "summary": summary,
+            "checking": bool(instance_summary["checking"]),
             "comfyui_manager": self.comfyui_manager_status(),
             "hosts": list(hosts.values()),
             "running": running, "pending": pending, "stp_queue": qs,
