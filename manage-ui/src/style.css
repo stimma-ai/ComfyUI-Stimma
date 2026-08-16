@@ -76,6 +76,12 @@ a:hover { text-decoration: underline; }
 .banner.red { background: rgba(239,68,68,.10); color: var(--red-t); }
 .banner .lnk { margin-left: auto; color: inherit; opacity: .9; white-space: nowrap; }
 .banner .lnk:hover { opacity: 1; }
+.capability { display: flex; align-items: center; gap: 10px; padding: 9px 14px; border-bottom: 1px solid rgba(18,166,150,.22); background: rgba(18,166,150,.08); color: var(--text); font-size: 12px; }
+.capability.red { border-bottom-color: rgba(239,68,68,.22); background: rgba(239,68,68,.08); }
+.capability .cap-text { flex: 1; min-width: 0; }
+.capability .cap-detail { margin-top: 1px; overflow: hidden; color: var(--text3); font-size: 11px; text-overflow: ellipsis; white-space: nowrap; }
+.capability .lnk { color: var(--accent-hi); white-space: nowrap; }
+.capability.red .lnk { color: var(--red-t); }
 
 /* rows */
 .grp { padding: 10px 14px 4px; }

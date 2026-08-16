@@ -18,6 +18,15 @@
       <span>Restart ComfyUI to finish setup</span>
       <button class="lnk" @click="restart">Restart</button>
     </div>
+    <div v-if="managerNotice" class="capability" :class="{ red: managerNotice.state === 'failed' }">
+      <div class="cap-text">
+        <div>{{ managerNotice.title }}</div>
+        <div v-if="managerNotice.detail" class="cap-detail">{{ managerNotice.detail }}</div>
+      </div>
+      <button v-if="managerNotice.state === 'missing'" class="btn sm primary" :disabled="managerBusy" @click="installManager">{{ managerBusy ? 'Starting…' : 'Install' }}</button>
+      <button v-else-if="managerNotice.state === 'failed'" class="btn sm" :disabled="managerBusy" @click="installManager">{{ managerBusy ? 'Retrying…' : 'Retry' }}</button>
+      <button v-else class="lnk" @click="tab = 'activity'">Activity</button>
+    </div>
 
     <OverviewTab v-if="tab === 'overview'" :overview="overview" @refresh="load" @open="tab = $event" />
     <WorkflowsTab v-else-if="tab === 'workflows'" @activity="tab = 'activity'" />
@@ -43,6 +52,7 @@ const tabs = [
 const initial = (location.hash || '').replace('#', '')
 const tab = ref(tabs.some(t => t.id === initial) ? initial : 'overview')
 const overview = ref(null)
+const managerBusy = ref(false)
 let timer = null
 
 async function load() {
@@ -94,6 +104,19 @@ const stateLabel = computed(() => {
   return 'Error'
 })
 const bannerText = computed(() => overview.value?.summary || '')
+const managerNotice = computed(() => {
+  const m = overview.value?.comfyui_manager
+  if (!m || m.state === 'ready' || m.state === 'restart_needed') return null
+  if (m.state === 'installing') return { state: m.state, title: 'Installing ComfyUI-Manager', detail: m.operation?.detail || '' }
+  if (m.state === 'failed') return { state: m.state, title: 'ComfyUI-Manager install failed', detail: m.operation?.error || '' }
+  return { state: 'missing', title: 'Install ComfyUI-Manager to enable automatic custom-node setup.', detail: '' }
+})
+async function installManager() {
+  managerBusy.value = true
+  try { await api.installManager(); await load() }
+  catch (e) { overview.value = { ...(overview.value || {}), comfyui_manager: { state: 'failed', operation: { error: e.message } } } }
+  finally { managerBusy.value = false }
+}
 async function restart() {
   if (!confirm('Restart ComfyUI?')) return
   try { await api.restart('all') } catch (e) { alert(e.message) }

@@ -138,6 +138,11 @@ def make_routes(manager) -> list:
                 from .ops import STATE_QUEUED
                 manager.ops.update(op, state=STATE_QUEUED, error=None, error_kind=None, fix=None)
                 asyncio.create_task(manager._run_install(op))
+            elif op.kind == "install_manager":
+                import asyncio
+                from .ops import STATE_QUEUED
+                manager.ops.update(op, state=STATE_QUEUED, error=None, error_kind=None, fix=None)
+                asyncio.create_task(manager._run_manager_install(op))
             else:
                 return _err("not retryable")
         elif action == "pause":
@@ -188,6 +193,11 @@ def make_routes(manager) -> list:
 
     async def settings(request):
         return _json(manager.settings_view())
+
+    async def install_manager(request):
+        if not _mutation_allowed(request):
+            return _err("forbidden", 403)
+        return _json(await manager.start_manager_install())
 
     async def set_credentials(request):
         if not _mutation_allowed(request):
@@ -249,6 +259,7 @@ def make_routes(manager) -> list:
         web.post(api + "/downloads", add_download),
         web.post(api + "/jobs/cancel", cancel_job),
         web.get(api + "/settings", settings),
+        web.post(api + "/manager/install", install_manager),
         web.post(api + "/settings/credentials", set_credentials),
         web.post(api + "/restart", restart),
         web.get(api + "/update", update_status),

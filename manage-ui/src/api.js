@@ -33,6 +33,7 @@ export const api = {
   addDownload: (body) => req('POST', '/downloads', body),
   cancelJob: (prompt_id, addr) => req('POST', '/jobs/cancel', { prompt_id, addr }),
   settings: () => req('GET', '/settings'),
+  installManager: () => req('POST', '/manager/install'),
   setCredentials: (body) => req('POST', '/settings/credentials', body),
   restart: (scope) => req('POST', '/restart', { scope: scope || 'all' }),
   updateStatus: (force) => req('GET', `/update${force ? '?force=1' : ''}`),

@@ -16,6 +16,14 @@
       <div class="grp">
         <h4>ComfyUI</h4>
         <div class="li">
+          <div class="t"><div class="a">ComfyUI-Manager</div><div class="b mono">{{ managerLabel }}</div></div>
+          <div class="r">
+            <button v-if="s.comfyui_manager.state === 'missing' || s.comfyui_manager.state === 'failed'" class="btn sm" :disabled="busy === 'manager'" @click="installManager">{{ busy === 'manager' ? 'Starting…' : s.comfyui_manager.state === 'failed' ? 'Retry' : 'Install' }}</button>
+            <span v-else-if="s.comfyui_manager.state === 'installing'">Installing</span>
+            <span v-else>Enabled</span>
+          </div>
+        </div>
+        <div class="li">
           <div class="t"><div class="a">{{ s.instances.length > 1 ? 'Restart all instances' : 'Restart ComfyUI' }}</div></div>
           <div class="r"><button class="btn sm" @click="restart">Restart</button></div>
         </div>
@@ -49,7 +57,7 @@
 </template>
 
 <script setup>
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { api } from './api'
 const props = defineProps({ overview: Object })
 const emit = defineEmits(['refresh'])
@@ -58,9 +66,11 @@ const upd = ref(null)
 const busy = ref('')
 const editing = ref(null)
 const secret = ref('')
+let timer = null
 
 async function load() { try { s.value = await api.settings(); upd.value = await api.updateStatus() } catch (e) { /* */ } }
-onMounted(load)
+onMounted(() => { load(); timer = setInterval(load, 3000) })
+onUnmounted(() => clearInterval(timer))
 function srcNote(c) { return c.set && c.source && c.source !== 'config' ? ` · from ${c.source}` : '' }
 const updateLabel = computed(() => {
   const p = upd.value
@@ -71,10 +81,19 @@ const updateLabel = computed(() => {
   if (p.ahead) return `${p.head} · ahead of main`
   return `${p.head} · current`
 })
+const managerLabel = computed(() => {
+  const m = s.value?.comfyui_manager
+  if (!m) return '…'
+  if (m.state === 'failed') return m.operation?.error || 'Install failed'
+  if (m.state === 'installing') return m.operation?.detail || 'Installing'
+  if (m.state === 'restart_needed') return 'Restart required'
+  return m.version || (m.installed ? 'Installed' : 'Not installed')
+})
 function edit(which) { editing.value = which; secret.value = '' }
 async function saveSecret() { try { await api.setCredentials({ [editing.value]: secret.value }); editing.value = null; await load() } catch (e) { alert(e.message) } }
 async function restart() { if (!confirm('Restart ComfyUI?')) return; try { await api.restart('all') } catch (e) { alert(e.message) } }
 async function restore() { busy.value = 'restore'; try { await api.restoreBundled() } catch (e) { alert(e.message) } finally { busy.value = '' } }
 async function check() { busy.value = 'check'; try { upd.value = await api.updateStatus(true) } catch (e) { alert(e.message) } finally { busy.value = '' } }
 async function applyUpdate() { busy.value = 'update'; try { const r = await api.updateApply(); if (!r.ok) alert(r.error); await load(); emit('refresh') } catch (e) { alert(e.message) } finally { busy.value = '' } }
+async function installManager() { busy.value = 'manager'; try { await api.installManager(); await load(); emit('refresh') } catch (e) { alert(e.message) } finally { busy.value = '' } }
 </script>

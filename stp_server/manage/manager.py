@@ -136,8 +136,11 @@ class Manager:
             n = s["total"] - s["healthy"]
             return "warning", f"{n} of {s['total']} instances unreachable"
         if self._restart_needed:
+            if "comfyui-manager" in self._restart_needed:
+                return "warning", "Restart ComfyUI to enable automatic custom-node setup"
             return "warning", "Restart ComfyUI to finish setup"
-        failed = [o for o in self.ops.all() if o.state == STATE_FAILED and o.id not in self._dismissed_failures]
+        failed = [o for o in self.ops.all()
+                  if o.state == STATE_FAILED and o.kind != "install_manager" and o.id not in self._dismissed_failures]
         if failed:
             return "warning", "Download failed" if failed[0].kind == "download" else "Operation failed"
         return "ready", None
@@ -184,6 +187,7 @@ class Manager:
         state, summary = self.provider_state()
         return {
             "state": state, "summary": summary,
+            "comfyui_manager": self.comfyui_manager_status(),
             "hosts": list(hosts.values()),
             "running": running, "pending": pending, "stp_queue": qs,
             "disk": disk_stats(resolve.model_dirs()),
@@ -376,8 +380,6 @@ class Manager:
         for lic in hf_license:
             if not any(b.get("kind") == "hf_license" and b.get("repo") == lic["repo"] for b in blockers):
                 blockers.append({"kind": "hf_license", **lic})
-        if any(p for p in packs if not p["installed"] and not p["installable"]):
-            blockers.append({"kind": "no_manager", "packs": [p for p in packs if not p["installed"] and not p["installable"]]})
         total = sum((d.get("size") or 0) for d in downloads if not d.get("already_present"))
         free = None
         for d in downloads:
@@ -482,6 +484,65 @@ class Manager:
             self.ops.save()
             self.log(f"install failed: {e}")
 
+    # ------------------------------------------------------------------ ComfyUI-Manager capability
+    def comfyui_manager_status(self) -> dict:
+        op = next((o for o in self.ops.all() if o.kind == "install_manager"), None)
+        restart_needed = "comfyui-manager" in self._restart_needed
+        if restart_needed:
+            state = "restart_needed"
+        elif nodepacks.has_manager():
+            state = "ready"
+        elif op and op.state in (STATE_QUEUED, STATE_RUNNING):
+            state = "installing"
+        elif op and op.state == STATE_FAILED:
+            state = "failed"
+        else:
+            state = "missing"
+        return {
+            "installed": nodepacks.has_manager(),
+            "version": nodepacks.manager_version(),
+            "state": state,
+            "operation": op.to_dict() if op else None,
+        }
+
+    async def start_manager_install(self) -> dict:
+        if nodepacks.has_manager():
+            return {"ok": True, "manager": self.comfyui_manager_status()}
+        existing = self.ops.find("install_manager")
+        if existing:
+            return {"ok": True, "operation": existing.to_dict(), "manager": self.comfyui_manager_status()}
+        op = self.ops.create("install_manager", "Install ComfyUI-Manager")
+        asyncio.create_task(self._run_manager_install(op))
+        return {"ok": True, "operation": op.to_dict(), "manager": self.comfyui_manager_status()}
+
+    async def _run_manager_install(self, op: Operation):
+        self.ops.update(op, state=STATE_RUNNING, detail="Downloading")
+
+        def _log(line: str):
+            self.log(f"[install manager] {line}")
+            self.ops.update(op, detail=str(line)[:120])
+
+        try:
+            await nodepacks.install_manager(_log)
+            if "comfyui-manager" not in self._restart_needed:
+                self._restart_needed.append("comfyui-manager")
+            self.ops.update(op, state=STATE_DONE, detail="Installed · restart to enable")
+            self.ops.save()
+            await self.provider.notify(
+                id="comfyui-manager-restart", level="warning",
+                title="Restart ComfyUI to enable automatic custom-node setup",
+                action="manage", anchor="overview",
+            )
+            await self.provider.push_state(force=True)
+        except Exception as e:
+            self.ops.update(op, state=STATE_FAILED, error=str(e), error_kind="other", fix={"action": "retry"})
+            self.ops.save()
+            await self.provider.notify(
+                id="comfyui-manager-install-failed", level="error",
+                title="ComfyUI-Manager install failed", body=str(e),
+                action="manage", anchor="overview",
+            )
+
     # ------------------------------------------------------------------ activity
     def activity(self) -> dict:
         return {"operations": [o.to_dict() for o in self.ops.all()],
@@ -558,7 +619,7 @@ class Manager:
         return {
             "credentials": credentials.summary(),
             "instances": [s.to_dict() for s in self.instances.statuses],
-            "manager_present": nodepacks.has_manager(),
+            "comfyui_manager": self.comfyui_manager_status(),
             "config_path": str(credentials.CONFIG_PATH),
         }
 
@@ -633,4 +694,3 @@ class Manager:
             "packs": packs,
             "in_progress": any(o.group == f"setup:{slug}" for o in self.ops.active()),
         }
-

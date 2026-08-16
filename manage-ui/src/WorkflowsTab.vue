@@ -89,7 +89,7 @@
           <div v-for="d in downloadsToDo" :key="d.filename"><span class="mono f" :title="d.filename">{{ d.filename }}</span><span class="mono">{{ d.size ? fmtBytes(d.size) : (d.resolved ? '' : 'no source') }}</span></div>
         </div>
         <div class="lst" v-if="packsToDo.length">
-          <div v-for="p in packsToDo" :key="p.url"><span class="f">Install {{ p.title }}</span><span class="mono">{{ p.installable ? 'node pack' : 'manual' }}</span></div>
+          <div v-for="p in packsToDo" :key="p.url"><span class="f">Install {{ p.title }}</span><span class="mono">{{ p.installable ? 'node pack' : 'Manager required' }}</span></div>
         </div>
 
         <!-- blockers -->
@@ -108,15 +108,11 @@
           <template v-else-if="b.kind === 'unknown_node'">
             <span class="mono">{{ b.class_type }}</span> — no known node pack.
           </template>
-          <template v-else-if="b.kind === 'no_manager'">
-            ComfyUI-Manager not installed — run on the ComfyUI machine, then restart:
-            <div v-for="p in b.packs" :key="p.url" class="cmd mono">{{ p.manual }}</div>
-          </template>
         </div>
 
         <div class="acts">
-          <button class="btn" @click="closeSheet">Cancel</button>
-          <button class="btn primary" :disabled="!canStart || starting" @click="start">{{ starting ? 'Starting…' : startLabel }}</button>
+          <button class="btn" @click="closeSheet">{{ canStart ? 'Cancel' : 'Close' }}</button>
+          <button v-if="canStart" class="btn primary" :disabled="starting" @click="start">{{ starting ? 'Starting…' : startLabel }}</button>
         </div>
       </template>
     </div>

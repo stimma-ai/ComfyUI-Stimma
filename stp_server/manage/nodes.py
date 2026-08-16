@@ -4,6 +4,7 @@ import asyncio
 import json
 import logging
 import os
+import shutil
 import sys
 import time
 from pathlib import Path
@@ -18,6 +19,7 @@ _CACHE_DIR = _PLUGIN_DIR / ".stimma-manage"
 _NODE_MAP_CACHE = _CACHE_DIR / "extension-node-map.json"
 _NODE_MAP_URL = "https://raw.githubusercontent.com/ltdrdata/ComfyUI-Manager/main/extension-node-map.json"
 _NODE_MAP_TTL = 24 * 3600
+_MANAGER_REPO = "https://github.com/ltdrdata/ComfyUI-Manager"
 
 _node_map: Dict[str, Any] = {"loaded_at": 0, "by_class": {}}
 
@@ -42,13 +44,67 @@ def manager_dir() -> Optional[Path]:
 
 
 def has_manager() -> bool:
-    if manager_dir() is not None:
-        return True
+    """Whether the cm-cli integration used by this manager is available."""
+    return manager_dir() is not None
+
+
+def manager_version() -> Optional[str]:
+    md = manager_dir()
+    if md is None:
+        return None
     try:
-        import comfyui_manager  # noqa: F401  (pip-installed manager, newer ComfyUI)
-        return True
+        import tomllib
+        data = tomllib.loads((md / "pyproject.toml").read_text())
+        value = data.get("project", {}).get("version")
+        return str(value) if value else None
     except Exception:
-        return False
+        return None
+
+
+async def install_manager(log) -> Path:
+    """Install ComfyUI-Manager using its documented git-clone layout."""
+    existing = manager_dir()
+    if existing is not None:
+        return existing
+    base = comfy_base_path()
+    if not base:
+        raise RuntimeError("Could not find the ComfyUI directory")
+    custom_nodes = Path(base) / "custom_nodes"
+    custom_nodes.mkdir(parents=True, exist_ok=True)
+    target = custom_nodes / "comfyui-manager"
+    if target.exists():
+        raise RuntimeError(f"{target} exists but is not a valid ComfyUI-Manager installation")
+
+    # Clone to a private sibling and rename only after git succeeds, so an
+    # interrupted install never leaves a directory that looks installed.
+    temp = custom_nodes / f".stimma-manager-install-{os.getpid()}"
+    if temp.exists():
+        raise RuntimeError(f"Temporary install path already exists: {temp}")
+    cmd = ["git", "clone", "--depth", "1", _MANAGER_REPO, str(temp)]
+    log("Downloading ComfyUI-Manager")
+    try:
+        proc = await asyncio.create_subprocess_exec(
+            *cmd, cwd=str(custom_nodes),
+            stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.STDOUT,
+        )
+        assert proc.stdout
+        while True:
+            line = await proc.stdout.readline()
+            if not line:
+                break
+            text = line.decode(errors="replace").rstrip()
+            if text:
+                log(text)
+        rc = await proc.wait()
+        if rc != 0:
+            raise RuntimeError(f"git clone exited with code {rc}")
+        os.replace(temp, target)
+        log("Installed ComfyUI-Manager")
+        return target
+    except Exception:
+        if temp.exists():
+            shutil.rmtree(temp, ignore_errors=True)
+        raise
 
 
 def _index_map(raw: dict) -> Dict[str, dict]:
