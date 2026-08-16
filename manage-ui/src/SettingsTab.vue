@@ -8,10 +8,6 @@
           <div class="t"><div class="a">Hugging Face token</div><div class="b">Gated models{{ srcNote(s.credentials.huggingface) }}</div></div>
           <div class="r"><span class="mono" v-if="s.credentials.huggingface.set">{{ s.credentials.huggingface.masked }}</span><button class="btn sm" @click="edit('huggingface_token')">{{ s.credentials.huggingface.set ? 'Change' : 'Add' }}</button></div>
         </div>
-        <div class="li">
-          <div class="t"><div class="a">Civitai API key</div><div class="b">Optional</div></div>
-          <div class="r"><span class="mono" v-if="s.credentials.civitai.set">{{ s.credentials.civitai.masked }}</span><button class="btn sm" @click="edit('civitai_api_key')">{{ s.credentials.civitai.set ? 'Change' : 'Add' }}</button></div>
-        </div>
       </div>
       <div class="grp">
         <h4>ComfyUI</h4>
@@ -47,10 +43,9 @@
 
   <div v-if="editing" class="sheet-wrap" @click.self="editing = null">
     <div class="sheet">
-      <h5>{{ editing === 'huggingface_token' ? 'Hugging Face token' : 'Civitai API key' }}</h5>
-      <p v-if="editing === 'huggingface_token'"><a href="https://huggingface.co/settings/tokens" target="_blank" rel="noopener">huggingface.co/settings/tokens ↗</a></p>
-      <p v-else><a href="https://civitai.com/user/account" target="_blank" rel="noopener">civitai.com/user/account ↗</a></p>
-      <div class="field"><input v-model="secret" type="password" :placeholder="editing === 'huggingface_token' ? 'hf_…' : 'key'" spellcheck="false" /></div>
+      <h5>Hugging Face token</h5>
+      <p><a href="https://huggingface.co/settings/tokens" target="_blank" rel="noopener">huggingface.co/settings/tokens ↗</a></p>
+      <div class="field"><input v-model="secret" type="password" placeholder="hf_…" spellcheck="false" /></div>
       <div class="acts"><button class="btn" @click="editing = null">Cancel</button><button class="btn primary" @click="saveSecret">Save</button></div>
     </div>
   </div>
