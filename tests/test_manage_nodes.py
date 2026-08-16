@@ -33,6 +33,19 @@ class _Process:
 
 
 class TestComfyUIManager(unittest.TestCase):
+    def test_bundled_pack_override_resolves_before_manager_index(self):
+        async def run():
+            with patch.object(nodes, "_ensure_node_map", side_effect=AssertionError("index should not be needed")):
+                return await nodes.lookup_pack("SpectrumApplyMiniMaxH3")
+
+        result = asyncio.run(run())
+
+        self.assertEqual(result["title"], "Spectrum for MiniMax H3")
+        self.assertEqual(
+            result["url"],
+            "https://github.com/xmarre/ComfyUI-Spectrum-MiniMax-H3",
+        )
+
     def test_detection_requires_cm_cli_and_reads_version(self):
         with tempfile.TemporaryDirectory() as td:
             base = Path(td)

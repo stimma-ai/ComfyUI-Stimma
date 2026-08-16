@@ -21,6 +21,16 @@ _NODE_MAP_URL = "https://raw.githubusercontent.com/ltdrdata/ComfyUI-Manager/main
 _NODE_MAP_TTL = 24 * 3600
 _MANAGER_REPO = "https://github.com/ltdrdata/ComfyUI-Manager"
 
+# Newly released or unregistered packs can lag ComfyUI-Manager's extension
+# map. Bundled workflows are tested against these exact repositories, so keep
+# narrow class-to-pack overrides here instead of leaving setup blocked.
+_PACK_OVERRIDES: Dict[str, dict] = {
+    "SpectrumApplyMiniMaxH3": {
+        "url": "https://github.com/xmarre/ComfyUI-Spectrum-MiniMax-H3",
+        "title": "Spectrum for MiniMax H3",
+    },
+}
+
 _node_map: Dict[str, Any] = {"loaded_at": 0, "by_class": {}}
 
 
@@ -159,6 +169,8 @@ async def _ensure_node_map() -> Dict[str, dict]:
 
 
 async def lookup_pack(class_type: str) -> Optional[dict]:
+    if class_type in _PACK_OVERRIDES:
+        return dict(_PACK_OVERRIDES[class_type])
     m = await _ensure_node_map()
     return m.get(class_type)
 
