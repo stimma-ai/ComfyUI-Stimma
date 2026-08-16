@@ -102,7 +102,7 @@ async def apply_update(log) -> None:
     st = await status(force=True)
     if st["mode"] == "release":
         if not st.get("latest") or not st["update_available"]:
-            log("Already on the newest release.")
+            log("Already current")
             return
         rc, out, err = await _git("checkout", f"v{st['latest']}", timeout=60)
         log(out or err)
@@ -114,5 +114,5 @@ async def apply_update(log) -> None:
         if rc != 0:
             raise RuntimeError(f"git pull failed: {err}")
     else:
-        raise RuntimeError("Not a git checkout — update ComfyUI-Stimma the way you installed it.")
+        raise RuntimeError("Not a git checkout")
     _state["checked_at"] = 0

@@ -12,7 +12,7 @@
             <div class="k mono" style="margin-top:3px">{{ h.reachable ? mem(g) : '—' }}</div>
           </div>
         </div>
-        <div v-else class="li"><div class="t"><div class="b">{{ h.reachable ? 'No GPU information' : 'Unreachable' }}</div></div></div>
+        <div v-else class="li"><div class="t"><div class="b">{{ h.reachable ? '' : 'Unreachable' }}</div></div></div>
       </div>
 
       <div class="grp">
@@ -66,7 +66,7 @@ function mem(g) { return g.mem_total ? `${Math.round((g.mem_used || 0) / 2 ** 30
 function jobSub(j) {
   const parts = []
   if (j.started_at) parts.push(fmtElapsed(j.started_at) + ' elapsed')
-  if (!j.ours) parts.push('started in ComfyUI')
+  if (!j.ours) parts.push('ComfyUI')
   if (props.overview.hosts.length > 1 || (props.overview.hosts[0]?.instances.length > 1)) parts.push(j.addr)
   return parts.join(' · ')
 }

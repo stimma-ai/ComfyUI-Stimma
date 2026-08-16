@@ -69,14 +69,14 @@ class OperationRegistry:
                     if op.state in (STATE_RUNNING, STATE_QUEUED, STATE_PAUSED):
                         if op.kind == "download":
                             op.state = STATE_QUEUED  # resumable — re-queue
-                            op.detail = "Waiting to resume"
+                            op.detail = None
                         elif op.kind == "restart":
                             op.state = STATE_DONE
                             op.finished_at = time.time()
                             op.detail = "Restarted"
                         else:
                             op.state = STATE_FAILED
-                            op.error = "Interrupted by a restart"
+                            op.error = "Interrupted by restart"
                             op.error_kind = "other"
                             op.fix = {"action": "retry"}
                     self._ops[op.id] = op

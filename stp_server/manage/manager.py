@@ -100,7 +100,7 @@ class Manager:
                 asyncio.ensure_future(self.provider.notify(
                     id=f"workflow-ready:{slug}", level="info",
                     title=f"{w.tool_info.get('display_name') or slug} is ready",
-                    body="Downloads finished and verified.", action="manage", anchor="workflows",
+                    action="manage", anchor="workflows",
                 ))
         asyncio.ensure_future(self.provider.push_state())
 
@@ -113,7 +113,7 @@ class Manager:
         if op.state == STATE_FAILED and op.kind == "download":
             asyncio.ensure_future(self.provider.notify(
                 id=f"download-failed:{op.id}", level="error",
-                title="A download failed", body=op.error or op.title, action="manage", anchor="activity",
+                title=f"Download failed: {op.title}", body=op.error, action="manage", anchor="activity",
             ))
         if op.state in TERMINAL:
             asyncio.ensure_future(self.provider.push_state())
@@ -141,7 +141,7 @@ class Manager:
             return "warning", "Restart ComfyUI to finish setup"
         failed = [o for o in self.ops.all() if o.state == STATE_FAILED and o.id not in self._dismissed_failures]
         if failed:
-            return "warning", "A download failed" if failed[0].kind == "download" else "An operation failed"
+            return "warning", "Download failed" if failed[0].kind == "download" else "Operation failed"
         return "ready", None
 
     # ------------------------------------------------------------------ overview
@@ -461,7 +461,7 @@ class Manager:
                 self.log(f"peer {host} unreachable for download fan-out: {e}")
 
     async def _run_install(self, op: Operation):
-        self.ops.update(op, state=STATE_RUNNING, detail="Installing…")
+        self.ops.update(op, state=STATE_RUNNING, detail=None)
         lines: List[str] = []
 
         def _log(line: str):
@@ -473,10 +473,10 @@ class Manager:
         try:
             await nodepacks.install_pack(op.meta["url"], _log)
             self._restart_needed.append(f"install:{op.meta['url']}")
-            self.ops.update(op, state=STATE_DONE, detail="Installed · restart ComfyUI to load it")
+            self.ops.update(op, state=STATE_DONE, detail="Installed · restart to load")
             self.ops.save()
-            await self.provider.notify(id="restart-needed", level="warning", title="Restart ComfyUI to finish",
-                                       body="Node packs were installed.", action="manage", anchor="overview")
+            await self.provider.notify(id="restart-needed", level="warning", title="Restart ComfyUI to finish setup",
+                                       action="manage", anchor="overview")
             await self.provider.push_state(force=True)
         except Exception as e:
             self.ops.update(op, state=STATE_FAILED, error=str(e), error_kind="other",
@@ -493,7 +493,7 @@ class Manager:
     async def restart(self, scope: str = "all") -> dict:
         """Restart ComfyUI. Peers first (via their manage API), then ourselves via execv."""
         op = self.ops.create("restart", "Restart ComfyUI", meta={"scope": scope})
-        self.ops.update(op, state=STATE_RUNNING, detail="Restarting…")
+        self.ops.update(op, state=STATE_RUNNING, detail=None)
         peers = []
         for s in self.instances.statuses:
             # Skip ourselves: the instance whose port matches this process
@@ -542,11 +542,11 @@ class Manager:
 
     async def apply_update(self) -> dict:
         op = self.ops.create("update", "Update ComfyUI-Stimma")
-        self.ops.update(op, state=STATE_RUNNING, detail="Updating…")
+        self.ops.update(op, state=STATE_RUNNING, detail=None)
         try:
             await updater.apply_update(lambda l: self.ops.update(op, detail=str(l)[:120]))
             self._restart_needed.append("update")
-            self.ops.update(op, state=STATE_DONE, detail="Updated · restart ComfyUI to load it")
+            self.ops.update(op, state=STATE_DONE, detail="Updated · restart to load")
             self.ops.save()
             await self.provider.push_state(force=True)
             return {"ok": True, "restart_needed": True}

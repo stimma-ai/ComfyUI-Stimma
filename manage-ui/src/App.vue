@@ -15,7 +15,7 @@
       <button v-else-if="overview.state !== 'ready'" class="lnk" @click="tab = overview.summary.toLowerCase().includes('download') ? 'activity' : 'overview'">Details</button>
     </div>
     <div v-else-if="overview && overview.restart_needed && overview.restart_needed.length" class="banner">
-      <span>Restart ComfyUI to finish setup.</span>
+      <span>Restart ComfyUI to finish setup</span>
       <button class="lnk" @click="restart">Restart</button>
     </div>
 
@@ -95,7 +95,7 @@ const stateLabel = computed(() => {
 })
 const bannerText = computed(() => overview.value?.summary || '')
 async function restart() {
-  if (!confirm('Restart ComfyUI now? Running jobs will be interrupted.')) return
+  if (!confirm('Restart ComfyUI?')) return
   try { await api.restart('all') } catch (e) { alert(e.message) }
 }
 </script>

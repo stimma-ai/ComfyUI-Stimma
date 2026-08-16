@@ -32,13 +32,12 @@
           </div>
         </div>
       </div>
-      <div v-if="!active.length && !done.length" class="empty">No downloads or installs yet. Use “Get ready” on a workflow to start.</div>
+      <div v-if="!active.length && !done.length" class="empty">No activity</div>
     </template>
   </div>
-  <div class="foot">
-    <span>Runs on the ComfyUI machine — safe to close this</span>
+  <div class="foot" v-if="done.length">
     <span class="sp"></span>
-    <button v-if="done.length" @click="clearDone">Clear done</button>
+    <button @click="clearDone">Clear done</button>
   </div>
 
   <div v-if="fixing" class="sheet-wrap" @click.self="fixing = null">
@@ -46,21 +45,21 @@
       <h5>{{ fixing.title }}</h5>
       <p>{{ fixing.error }}</p>
       <template v-if="fixing.fix && fixing.fix.action === 'hf_license'">
-        <p style="margin-top:6px"><a :href="fixing.fix.license_url" target="_blank" rel="noopener">Accept the license on Hugging Face ↗</a>, then retry.</p>
+        <p style="margin-top:6px"><a :href="fixing.fix.license_url" target="_blank" rel="noopener">Accept the license on Hugging Face ↗</a></p>
         <div class="acts"><button class="btn" @click="act(fixing, 'dismiss'); fixing = null">Remove</button><button class="btn primary" @click="act(fixing, 'retry'); fixing = null">Retry</button></div>
       </template>
       <template v-else-if="fixing.fix && fixing.fix.action === 'hf_token'">
-        <p style="margin-top:6px">Paste a Hugging Face read token (<a href="https://huggingface.co/settings/tokens" target="_blank" rel="noopener">create one ↗</a>). If the model is gated, <a :href="fixing.fix.license_url" target="_blank" rel="noopener">accept its license ↗</a> first.</p>
+        <p style="margin-top:6px"><a href="https://huggingface.co/settings/tokens" target="_blank" rel="noopener">Hugging Face read token ↗</a><template v-if="fixing.fix.license_url"> · <a :href="fixing.fix.license_url" target="_blank" rel="noopener">model license ↗</a></template></p>
         <div class="field"><input v-model="token" type="password" placeholder="hf_…" spellcheck="false" /></div>
         <div class="acts"><button class="btn" @click="act(fixing, 'dismiss'); fixing = null">Remove</button><button class="btn primary" :disabled="!token.trim()" @click="saveTokenAndRetry">Save & retry</button></div>
       </template>
       <template v-else-if="fixing.fix && fixing.fix.action === 'add_url'">
-        <p style="margin-top:6px">Paste a working download URL for <span class="mono">{{ fixing.meta.filename }}</span>.</p>
-        <div class="field"><input v-model="url" placeholder="https://…" spellcheck="false" /></div>
+        <p style="margin-top:6px" class="mono">{{ fixing.meta.filename }}</p>
+        <div class="field"><input v-model="url" placeholder="Download URL" spellcheck="false" /></div>
         <div class="acts"><button class="btn" @click="act(fixing, 'dismiss'); fixing = null">Remove</button><button class="btn primary" :disabled="!url.trim()" @click="redownload">Download</button></div>
       </template>
       <template v-else-if="fixing.fix && fixing.fix.action === 'manual'">
-        <p style="margin-top:6px">Run this on the ComfyUI machine, then restart ComfyUI:</p>
+        <p style="margin-top:6px">On the ComfyUI machine, then restart:</p>
         <div class="cmd mono">{{ fixing.fix.command }}</div>
         <div class="acts"><button class="btn" @click="act(fixing, 'dismiss'); fixing = null">Done</button><button class="btn primary" @click="act(fixing, 'retry'); fixing = null">Retry</button></div>
       </template>

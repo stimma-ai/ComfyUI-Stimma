@@ -18,11 +18,10 @@
           </div>
         </div>
       </div>
-      <div v-else class="empty">Nothing here.</div>
+      <div v-else class="empty">None</div>
     </template>
   </div>
   <div class="foot">
-    <span>{{ dirLabel }}</span>
     <span class="sp"></span>
     <button :disabled="scanning" @click="rescan">{{ scanning ? 'Scanning…' : 'Rescan' }}</button>
   </div>
@@ -30,18 +29,18 @@
   <div v-if="sheet" class="sheet-wrap" @click.self="closeSheet">
     <div class="sheet">
       <template v-if="sheet.loading">
-        <h5>Checking what {{ sheet.w.name }} needs…</h5>
+        <h5>{{ sheet.w.name }}</h5>
         <p><span class="spin"></span></p>
       </template>
       <template v-else-if="sheet.error">
-        <h5>Couldn't plan setup</h5>
+        <h5>Setup unavailable</h5>
         <p>{{ sheet.error }}</p>
         <div class="acts"><button class="btn" @click="closeSheet">Close</button></div>
       </template>
       <template v-else>
         <h5>Set up {{ sheet.plan.name }}</h5>
         <p v-if="downloadsToDo.length">Downloads to {{ targetsLabel }} · {{ fmtBytes(sheet.plan.total_size) }}<span v-if="sheet.plan.free_space"> · {{ fmtBytes(sheet.plan.free_space) }} free</span></p>
-        <p v-else-if="packsToDo.length">No downloads needed.</p>
+        
         <div class="lst" v-if="downloadsToDo.length">
           <div v-for="d in downloadsToDo" :key="d.filename"><span class="mono f" :title="d.filename">{{ d.filename }}</span><span class="mono">{{ d.size ? fmtBytes(d.size) : (d.resolved ? '' : 'no source') }}</span></div>
         </div>
@@ -52,23 +51,22 @@
         <!-- blockers -->
         <div v-for="(b, i) in sheet.plan.blockers" :key="i" class="warn">
           <template v-if="b.kind === 'hf_token'">
-            This needs a Hugging Face token. <a :href="b.license_url || 'https://huggingface.co/settings/tokens'" target="_blank" rel="noopener">Accept the model license ↗</a> if it has one, then paste a read token — it's saved on the ComfyUI machine for next time.
+            Needs a <a href="https://huggingface.co/settings/tokens" target="_blank" rel="noopener">Hugging Face read token ↗</a><template v-if="b.license_url"> and the <a :href="b.license_url" target="_blank" rel="noopener">model license ↗</a> accepted</template>.
             <div class="field"><input v-model="hfToken" type="password" placeholder="hf_…" spellcheck="false" /></div>
           </template>
           <template v-else-if="b.kind === 'hf_license'">
-            {{ b.repo || 'This model' }} requires accepting a license on Hugging Face. <a :href="b.license_url" target="_blank" rel="noopener">Accept it ↗</a>, then download.
+            {{ b.repo || 'This model' }} is gated — <a :href="b.license_url" target="_blank" rel="noopener">accept the license on Hugging Face ↗</a>.
           </template>
           <template v-else-if="b.kind === 'no_source'">
-            No download source is known for <span class="mono">{{ b.filename }}</span>. Paste a direct URL to download it into <span class="mono">{{ b.folder || 'models' }}</span>, or install it yourself.
-            <div class="field"><input v-model="sources[b.filename]" placeholder="https://…" spellcheck="false" /></div>
+            No known source for <span class="mono">{{ b.filename }}</span>.
+            <div class="field"><input v-model="sources[b.filename]" placeholder="Download URL" spellcheck="false" /></div>
           </template>
           <template v-else-if="b.kind === 'unknown_node'">
-            The node <span class="mono">{{ b.class_type }}</span> isn't in any known node pack. Install whichever pack provides it, then restart ComfyUI.
+            <span class="mono">{{ b.class_type }}</span> — no known node pack.
           </template>
           <template v-else-if="b.kind === 'no_manager'">
-            ComfyUI-Manager isn't installed here, so node packs need a terminal on the ComfyUI machine:
+            ComfyUI-Manager not installed — run on the ComfyUI machine, then restart:
             <div v-for="p in b.packs" :key="p.url" class="cmd mono">{{ p.manual }}</div>
-            Restart ComfyUI afterwards; Stimma picks it up automatically.
           </template>
         </div>
 
@@ -113,7 +111,6 @@ const filters = computed(() => [
 ])
 const rows = computed(() => all.value.filter(w =>
   filter.value === 'all' ? true : filter.value === 'other' ? w.kind === 'other' : w.state === filter.value))
-const dirLabel = computed(() => 'Read from ComfyUI\'s workflows folder')
 
 function dotFor(w) {
   if (w.in_progress) return 'b'
@@ -130,7 +127,7 @@ function subFor(w) {
   const parts = []
   const tl = taskLabel(w)
   if (tl) parts.push(tl)
-  if (w.in_progress) parts.push('Setting up — see Activity')
+  if (w.in_progress) parts.push('Setting up')
   else if (w.state === 'needs_setup' && w.summary) parts.push(w.summary)
   return parts.join(' · ')
 }
@@ -165,7 +162,7 @@ const canStart = computed(() => {
 const startLabel = computed(() => {
   const dl = downloadsToDo.value.some(d => d.resolved || sources[d.filename])
   const inst = packsToDo.value.some(x => x.installable)
-  return dl && inst ? 'Download & install' : dl ? 'Download' : inst ? 'Install' : 'Nothing to do'
+  return dl && inst ? 'Download & install' : dl ? 'Download' : inst ? 'Install' : 'Start'
 })
 async function start() {
   const w = sheet.value.w

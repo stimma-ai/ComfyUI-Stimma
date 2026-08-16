@@ -5,7 +5,7 @@
       <div class="grp">
         <h4>Credentials</h4>
         <div class="li">
-          <div class="t"><div class="a">Hugging Face token</div><div class="b">For gated models · stored on the ComfyUI machine{{ srcNote(s.credentials.huggingface) }}</div></div>
+          <div class="t"><div class="a">Hugging Face token</div><div class="b">Gated models{{ srcNote(s.credentials.huggingface) }}</div></div>
           <div class="r"><span class="mono" v-if="s.credentials.huggingface.set">{{ s.credentials.huggingface.masked }}</span><button class="btn sm" @click="edit('huggingface_token')">{{ s.credentials.huggingface.set ? 'Change' : 'Add' }}</button></div>
         </div>
         <div class="li">
@@ -16,11 +16,11 @@
       <div class="grp">
         <h4>ComfyUI</h4>
         <div class="li">
-          <div class="t"><div class="a">{{ s.instances.length > 1 ? 'Restart all instances' : 'Restart ComfyUI' }}</div><div class="b">Applies node installs and plugin updates</div></div>
+          <div class="t"><div class="a">{{ s.instances.length > 1 ? 'Restart all instances' : 'Restart ComfyUI' }}</div></div>
           <div class="r"><button class="btn sm" @click="restart">Restart</button></div>
         </div>
         <div class="li">
-          <div class="t"><div class="a">Restore bundled workflows</div><div class="b">Re-copy Stimma reference workflows you've removed</div></div>
+          <div class="t"><div class="a">Restore bundled workflows</div></div>
           <div class="r"><button class="btn sm" :disabled="busy === 'restore'" @click="restore">Restore</button></div>
         </div>
       </div>
@@ -47,8 +47,8 @@
   <div v-if="editing" class="sheet-wrap" @click.self="editing = null">
     <div class="sheet">
       <h5>{{ editing === 'huggingface_token' ? 'Hugging Face token' : 'Civitai API key' }}</h5>
-      <p v-if="editing === 'huggingface_token'">A read token from <a href="https://huggingface.co/settings/tokens" target="_blank" rel="noopener">huggingface.co/settings/tokens ↗</a>. Saved to config.yaml on the ComfyUI machine. Leave empty to remove.</p>
-      <p v-else>From <a href="https://civitai.com/user/account" target="_blank" rel="noopener">civitai.com/user/account ↗</a>. Leave empty to remove.</p>
+      <p v-if="editing === 'huggingface_token'"><a href="https://huggingface.co/settings/tokens" target="_blank" rel="noopener">huggingface.co/settings/tokens ↗</a></p>
+      <p v-else><a href="https://civitai.com/user/account" target="_blank" rel="noopener">civitai.com/user/account ↗</a></p>
       <div class="field"><input v-model="secret" type="password" :placeholder="editing === 'huggingface_token' ? 'hf_…' : 'key'" spellcheck="false" /></div>
       <div class="acts"><button class="btn" @click="editing = null">Cancel</button><button class="btn primary" @click="saveSecret">Save</button></div>
     </div>
@@ -81,7 +81,7 @@ const updateLabel = computed(() => {
 })
 function edit(which) { editing.value = which; secret.value = '' }
 async function saveSecret() { try { await api.setCredentials({ [editing.value]: secret.value }); editing.value = null; await load() } catch (e) { alert(e.message) } }
-async function restart() { if (!confirm('Restart ComfyUI now? Running jobs will be interrupted.')) return; try { await api.restart('all') } catch (e) { alert(e.message) } }
+async function restart() { if (!confirm('Restart ComfyUI?')) return; try { await api.restart('all') } catch (e) { alert(e.message) } }
 async function restore() { busy.value = 'restore'; try { await api.restoreBundled() } catch (e) { alert(e.message) } finally { busy.value = '' } }
 async function check() { busy.value = 'check'; try { upd.value = await api.updateStatus(true) } catch (e) { alert(e.message) } finally { busy.value = '' } }
 async function applyUpdate() { busy.value = 'update'; try { const r = await api.updateApply(); if (!r.ok) alert(r.error); await load(); emit('refresh') } catch (e) { alert(e.message) } finally { busy.value = '' } }

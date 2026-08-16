@@ -113,7 +113,7 @@ class DownloadManager:
             return None
         if op.id in self._tasks and not self._tasks[op.id].done():
             return op
-        self._ops.update(op, state=STATE_QUEUED, error=None, error_kind=None, fix=None, detail="Waiting to resume", finished_at=None)
+        self._ops.update(op, state=STATE_QUEUED, error=None, error_kind=None, fix=None, detail=None, finished_at=None)
         self._start(op)
         return op
 
@@ -161,7 +161,7 @@ class DownloadManager:
             if self._cancel.get(op.id):
                 return
             try:
-                self._ops.update(op, state=STATE_RUNNING, detail="Starting…", error=None, error_kind=None, fix=None)
+                self._ops.update(op, state=STATE_RUNNING, detail=None, error=None, error_kind=None, fix=None)
                 await self._download(op)
                 self._ops.update(op, state=STATE_DONE, progress=1.0,
                                  detail=("Verified" if op.meta.get("sha256") else "Downloaded") + f" · {_fmt_bytes(op.meta.get('size'))}")
@@ -227,7 +227,7 @@ class DownloadManager:
         # Already there and (if we can) verified? Done.
         if dest.exists() and dest.stat().st_size > 0:
             if want_sha:
-                self._ops.update(op, detail="Verifying existing file…")
+                self._ops.update(op, detail="Verifying")
                 if await _sha256_file(dest) == want_sha:
                     meta["bytes"] = dest.stat().st_size
                     return
@@ -241,7 +241,7 @@ class DownloadManager:
         have = part.stat().st_size if part.exists() else 0
         hasher = hashlib.sha256() if want_sha else None
         if have and hasher:
-            self._ops.update(op, detail=f"Resuming · checking {_fmt_bytes(have)} already downloaded…")
+            self._ops.update(op, detail=f"Resuming · {_fmt_bytes(have)}")
             with open(part, "rb") as f:
                 while True:
                     b = f.read(8 * _CHUNK)
@@ -259,13 +259,13 @@ class DownloadManager:
             if resp.status in (401, 403):
                 raise self._auth_error(resp.status, meta)
             if resp.status == 404:
-                raise DownloadError("The file wasn't found at its download URL (404).", "not_found", {"action": "add_url"})
+                raise DownloadError("Not found at the download URL (404).", "not_found", {"action": "add_url"})
             if resp.status == 416:  # range not satisfiable → part is complete or bogus
                 part.unlink(missing_ok=True)
                 have = 0
                 return await self._download(op)
             if resp.status not in (200, 206):
-                raise DownloadError(f"Download failed (HTTP {resp.status}).", "network", {"action": "retry"})
+                raise DownloadError(f"HTTP {resp.status}.", "network", {"action": "retry"})
             if have and resp.status == 200:
                 # Server ignored Range: start over
                 have = 0
@@ -287,7 +287,7 @@ class DownloadManager:
                 need = (size or 0) - have
                 if need > 0 and free < need + 512 * 1024 * 1024:
                     raise DownloadError(
-                        f"Not enough free space: {_fmt_bytes(free)} free, {_fmt_bytes(need)} needed.", "disk", {"action": "retry"}
+                        f"Not enough disk space: {_fmt_bytes(free)} free, {_fmt_bytes(need)} needed.", "disk", {"action": "retry"}
                     )
             except OSError:
                 pass
@@ -319,7 +319,7 @@ class DownloadManager:
 
         if want_sha and hasher and hasher.hexdigest() != want_sha:
             part.unlink(missing_ok=True)
-            raise DownloadError("The downloaded file didn't match its expected checksum; it was discarded.", "verify", {"action": "retry"})
+            raise DownloadError("Checksum mismatch — file discarded.", "verify", {"action": "retry"})
 
         os.replace(part, dest)
 
@@ -331,19 +331,19 @@ class DownloadManager:
         if "huggingface.co" in url:
             if not has_token:
                 return DownloadError(
-                    "Hugging Face requires a token for this file.", "auth",
+                    "Hugging Face token required.", "auth",
                     {"action": "hf_token", "license_url": license_url, "repo": repo},
                 )
             if status == 401:
                 return DownloadError(
-                    "Hugging Face rejected the token (401). Check that it is a valid read token.", "auth",
+                    "Hugging Face rejected the token (401).", "auth",
                     {"action": "hf_token", "license_url": license_url, "repo": repo},
                 )
             return DownloadError(
-                "Hugging Face refused the download (403): the license for this model hasn't been accepted on the token's account.",
+                "Hugging Face 403 — model license not accepted for this token.",
                 "gated", {"action": "hf_license", "license_url": license_url, "repo": repo},
             )
-        return DownloadError(f"The server refused the download (HTTP {status}).", "auth", {"action": "retry"})
+        return DownloadError(f"HTTP {status}.", "auth", {"action": "retry"})
 
 
 def _repo_from_hf_url(url: str) -> Optional[str]:
