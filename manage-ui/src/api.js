@@ -38,7 +38,7 @@ export const api = {
   updateStatus: (force) => req('GET', `/update${force ? '?force=1' : ''}`),
   updateApply: () => req('POST', '/update'),
   restoreBundled: () => req('POST', '/workflows/restore-bundled'),
-  diagnostics: () => req('GET', '/diagnostics'),
+  workflowDetail: (slug) => req('GET', `/workflows/${encodeURIComponent(slug)}`),
 }
 
 export function fmtBytes(n) {

@@ -129,6 +129,11 @@ a:hover { text-decoration: underline; }
 .gpu .bar i { background: var(--accent); }
 .gpu.down { opacity: .5; } .gpu.down .bar i { background: var(--red); width: 100% !important; }
 
+/* subview */
+.subhead { display: flex; align-items: center; gap: 6px; padding: 8px 10px; border-bottom: 1px solid var(--edge-subtle); font-size: 12.5px; font-weight: 500; }
+.subhead .back { width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; border-radius: var(--r-md); color: var(--text2); font-size: 16px; }
+.subhead .back:hover { background: var(--ov-subtle); color: var(--text); }
+
 /* sheet */
 .sheet-wrap { position: absolute; inset: 0; background: rgba(0,0,0,.35); display: flex; align-items: flex-start; justify-content: center; padding: 48px 14px 14px; z-index: 5; }
 .sheet { width: 100%; max-height: 100%; overflow: auto; padding: 12px 12px; border: 1px solid var(--edge-subtle); border-radius: var(--r-lg); background: var(--raised); box-shadow: 0 8px 16px rgba(0,0,0,.35); }

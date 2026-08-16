@@ -228,8 +228,12 @@ def make_routes(manager) -> list:
         await manager.provider.notify_tools_changed()
         return _json({"ok": True})
 
-    async def diagnostics(request):
-        return _json({"scan": manager.scan_report(), "log": manager.recent_log()})
+    async def workflow_detail(request):
+        slug = request.match_info["slug"]
+        try:
+            return _json(await manager.workflow_detail(slug))
+        except KeyError:
+            return _err("unknown workflow", 404)
 
     r += [
         web.get(api + "/overview", overview),
@@ -237,6 +241,7 @@ def make_routes(manager) -> list:
         web.get(api + "/workflows", workflows),
         web.post(api + "/workflows/rescan", rescan),
         web.get(api + "/workflows/{slug}/plan", plan),
+        web.get(api + "/workflows/{slug}", workflow_detail),
         web.post(api + "/workflows/{slug}/setup", setup),
         web.get(api + "/activity", activity),
         web.post(api + "/activity/{op_id}/{action}", op_action),
@@ -249,7 +254,6 @@ def make_routes(manager) -> list:
         web.get(api + "/update", update_status),
         web.post(api + "/update", update_apply),
         web.post(api + "/workflows/restore-bundled", restore_bundled),
-        web.get(api + "/diagnostics", diagnostics),
         # static assets last (catch-all under the prefix)
         web.get(PREFIX + "/{path:.*}", ui_static),
     ]

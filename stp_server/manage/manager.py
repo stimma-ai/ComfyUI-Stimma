@@ -46,7 +46,6 @@ class Manager:
         self._dismissed_failures: set = set()
         self._started = False
         self._session: Optional[aiohttp.ClientSession] = None
-        self._log_lines: List[str] = []
         self.ops.on_change(self._on_op_change)
         self.instances.on_change(self._on_instances_change)
 
@@ -76,8 +75,7 @@ class Manager:
             await asyncio.sleep(6 * 3600)
 
     def log(self, line: str):
-        self._log_lines.append(f"{time.strftime('%H:%M:%S')} {line}")
-        del self._log_lines[:-400]
+        logger.info("[manage] %s", line)
 
     # ------------------------------------------------------------------ hooks
     def on_tools_rebuilt(self, workflows, tools, changed: bool):
@@ -567,16 +565,72 @@ class Manager:
     def dismiss_failure(self, op_id: str):
         self._dismissed_failures.add(op_id)
 
-    def scan_report(self) -> dict:
-        scan = self._scan()
-        if not scan:
-            return {"tools": [], "others": [], "directories": []}
+    async def workflow_detail(self, slug: str) -> dict:
+        """Every dependency of one workflow, present or not, with size."""
+        from .. import discovery
+        w = self._workflow(slug)
+        if w is None:
+            raise KeyError(slug)
+        oi = self.provider.object_info or {}
+        missing_names = {i.get("name") for i in (w.issues or []) if i.get("kind") in ("missing_model", "missing_checkpoint")}
+        models = []
+        seen = set()
+        for node_data in w.api_prompt.values():
+            ct = node_data.get("class_type", "")
+            if ct in discovery.ALL_STIMMA_TYPES or ct in discovery._ANNOTATION_NODE_TYPES:
+                continue
+            input_def = oi.get(ct, {}).get("input", {})
+            for name, val in (node_data.get("inputs") or {}).items():
+                if not isinstance(val, str) or not val:
+                    continue
+                if not any(val.lower().endswith(e) for e in discovery._MODEL_EXTENSIONS):
+                    continue
+                if val in seen:
+                    continue
+                seen.add(val)
+                combo = None
+                for cat in ("required", "optional"):
+                    sp = input_def.get(cat, {}).get(name)
+                    if sp is not None:
+                        combo = discovery._extract_combo_values_for_validation(sp)
+                        break
+                installed = bool(combo) and val in combo and val not in missing_names
+                folder = discovery._guess_folder(ct, name, combo)
+                entry = {"filename": val, "folder": folder, "installed": installed}
+                if installed:
+                    try:
+                        import folder_paths
+                        fp = folder_paths.get_full_path(folder, val) if folder else None
+                        if fp and os.path.exists(fp):
+                            entry["size"] = os.path.getsize(fp)
+                    except Exception:
+                        pass
+                else:
+                    src = resolve.resolve_source(val, w.model_hints)
+                    if src:
+                        entry["size"] = src.get("size")
+                        entry["gated"] = bool(src.get("gated"))
+                        entry["source"] = src.get("repo") or "url"
+                    else:
+                        entry["no_source"] = True
+                models.append(entry)
+        packs = []
+        for i in (w.issues or []):
+            if i.get("kind") != "missing_node":
+                continue
+            pack = await nodepacks.lookup_pack(i["name"])
+            entry = {"class_type": i["name"], "installed": False}
+            if pack:
+                entry.update({"title": pack["title"], "url": pack["url"]})
+            packs.append(entry)
         return {
-            "directories": scan.directories,
-            "tools": [{"slug": w.tool_info.get("slug"), "file": w.file_path, "warnings": w.warnings} for w in scan.tools],
-            "others": [{"file": o.file_path, "has_stimma_nodes": o.has_stimma_nodes, "error": o.error} for o in scan.others],
-            "duplicates": [list(d) for d in scan.duplicates],
+            "slug": slug,
+            "name": w.tool_info.get("display_name") or slug,
+            "file": os.path.basename(w.file_path),
+            "task_types": w.tool_info.get("task_types") or [],
+            "state": "ready" if not w.warnings else "needs_setup",
+            "models": sorted(models, key=lambda m: (m["installed"], m["filename"].lower())),
+            "packs": packs,
+            "in_progress": any(o.group == f"setup:{slug}" for o in self.ops.active()),
         }
 
-    def recent_log(self) -> List[str]:
-        return list(self._log_lines)

@@ -34,13 +34,6 @@
           </div>
         </div>
       </div>
-      <div class="grp">
-        <h4>Diagnostics</h4>
-        <div class="li" style="cursor:pointer" @click="toggleDiag('scan')"><div class="t"><div class="a">Workflow scan report</div></div><div class="r">{{ diag === 'scan' ? '▾' : '›' }}</div></div>
-        <div v-if="diag === 'scan' && diagData" class="pre">{{ scanText }}</div>
-        <div class="li" style="cursor:pointer" @click="toggleDiag('log')"><div class="t"><div class="a">Recent log</div></div><div class="r">{{ diag === 'log' ? '▾' : '›' }}</div></div>
-        <div v-if="diag === 'log' && diagData" class="pre">{{ (diagData.log || []).slice(-80).join('\n') || 'Nothing logged yet.' }}</div>
-      </div>
     </template>
   </div>
 
@@ -65,8 +58,6 @@ const upd = ref(null)
 const busy = ref('')
 const editing = ref(null)
 const secret = ref('')
-const diag = ref('')
-const diagData = ref(null)
 
 async function load() { try { s.value = await api.settings(); upd.value = await api.updateStatus() } catch (e) { /* */ } }
 onMounted(load)
@@ -85,15 +76,4 @@ async function restart() { if (!confirm('Restart ComfyUI?')) return; try { await
 async function restore() { busy.value = 'restore'; try { await api.restoreBundled() } catch (e) { alert(e.message) } finally { busy.value = '' } }
 async function check() { busy.value = 'check'; try { upd.value = await api.updateStatus(true) } catch (e) { alert(e.message) } finally { busy.value = '' } }
 async function applyUpdate() { busy.value = 'update'; try { const r = await api.updateApply(); if (!r.ok) alert(r.error); await load(); emit('refresh') } catch (e) { alert(e.message) } finally { busy.value = '' } }
-async function toggleDiag(which) { if (diag.value === which) { diag.value = ''; return } diag.value = which; try { diagData.value = await api.diagnostics() } catch (e) { diagData.value = { log: [String(e)] } } }
-const scanText = computed(() => {
-  const sc = diagData.value?.scan
-  if (!sc) return ''
-  const lines = []
-  for (const d of sc.directories || []) lines.push(`dir  ${d}`)
-  for (const t of sc.tools || []) { lines.push(`${t.warnings && t.warnings.length ? '⚠' : '✔'} ${t.slug}  ${t.file}`); for (const w of t.warnings || []) lines.push(`    ${w}`) }
-  for (const o of sc.others || []) lines.push(`·  ${o.file}${o.has_stimma_nodes ? '  (Stimma nodes, no ToolInfo)' : ''}${o.error ? '  ' + o.error : ''}`)
-  for (const d of sc.duplicates || []) lines.push(`dup ${d[0]}: kept ${d[1]} skipped ${d[2]}`)
-  return lines.join('\n')
-})
 </script>

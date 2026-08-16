@@ -1,4 +1,46 @@
 <template>
+  <template v-if="detail">
+    <div class="subhead">
+      <button class="back" @click="detail = null">‹</button>
+      <span>{{ detail.name || detail.slug }}</span>
+      <span class="sp" style="flex:1"></span>
+      <span class="dot" :class="detail.state === 'ready' ? 'g' : 'z'" style="margin-right:2px"></span>
+    </div>
+    <div class="body">
+      <div v-if="detail.loading" class="empty"><span class="spin"></span></div>
+      <template v-else>
+        <div class="grp" v-if="detail.models && detail.models.length">
+          <h4>Models</h4>
+          <div v-for="m in detail.models" :key="m.filename" class="li" style="min-height:32px;padding:6px 0">
+            <span class="dot" :class="m.installed ? 'g' : 'z'"></span>
+            <div class="t">
+              <div class="a mono" :title="m.filename">{{ m.filename }}</div>
+              <div class="b">{{ modelSub(m) }}</div>
+            </div>
+            <div class="r mono">{{ m.size ? fmtBytes(m.size) : '' }}</div>
+          </div>
+        </div>
+        <div class="grp" v-if="detail.packs && detail.packs.length">
+          <h4>Node packs</h4>
+          <div v-for="pk in detail.packs" :key="pk.class_type" class="li" style="min-height:32px;padding:6px 0">
+            <span class="dot z"></span>
+            <div class="t"><div class="a">{{ pk.title || pk.class_type }}</div><div class="b mono">{{ pk.class_type }}</div></div>
+            <div class="r">missing</div>
+          </div>
+        </div>
+        <div class="grp" v-if="!detail.error && !(detail.models || []).length && !(detail.packs || []).length"><div class="empty">No dependencies</div></div>
+        <div v-if="detail.error" class="empty">{{ detail.error }}</div>
+      </template>
+    </div>
+    <div class="foot" v-if="detail.state === 'needs_setup'">
+      <span class="mono">{{ detail.file }}</span>
+      <span class="sp"></span>
+      <button v-if="detail.in_progress" style="color:var(--accent-hi)" @click="detail = null; $emit('activity')">Activity</button>
+      <button v-else class="btn sm" @click="openPlanFromDetail">Get ready</button>
+    </div>
+    <div class="foot" v-else><span class="mono">{{ detail.file }}</span></div>
+  </template>
+  <template v-else>
   <div class="pills">
     <button v-for="f in filters" :key="f.id" class="pill" :class="{ on: filter === f.id }" @click="filter = f.id">{{ f.label }}<span class="n">{{ f.count }}</span></button>
   </div>
@@ -6,15 +48,16 @@
     <div v-if="!data" class="empty"><span class="spin"></span></div>
     <template v-else>
       <div class="grp" v-if="rows.length">
-        <div v-for="w in rows" :key="w.key" class="li" :class="{ dim: w.kind === 'other' }">
+        <div v-for="w in rows" :key="w.key" class="li" :class="{ dim: w.kind === 'other' }" :style="w.kind === 'tool' ? 'cursor:pointer' : ''" @click="w.kind === 'tool' && openDetail(w)">
           <span class="dot" :class="dotFor(w)"></span>
           <div class="t">
             <div class="a">{{ w.name }}</div>
             <div class="b">{{ subFor(w) }}</div>
           </div>
           <div class="r">
-            <button v-if="w.state === 'needs_setup' && !w.in_progress" class="btn sm" @click="openPlan(w)">Get ready</button>
-            <button v-else-if="w.in_progress" class="btn sm ghost" style="color:var(--accent-hi)" @click="$emit('activity')">Activity</button>
+            <button v-if="w.state === 'needs_setup' && !w.in_progress" class="btn sm" @click.stop="openPlan(w)">Get ready</button>
+            <button v-else-if="w.in_progress" class="btn sm ghost" style="color:var(--accent-hi)" @click.stop="$emit('activity')">Activity</button>
+            <span v-else-if="w.kind === 'tool'" style="color:var(--muted)">›</span>
           </div>
         </div>
       </div>
@@ -25,6 +68,7 @@
     <span class="sp"></span>
     <button :disabled="scanning" @click="rescan">{{ scanning ? 'Scanning…' : 'Rescan' }}</button>
   </div>
+  </template>
 
   <div v-if="sheet" class="sheet-wrap" @click.self="closeSheet">
     <div class="sheet">
@@ -88,6 +132,7 @@ const data = ref(null)
 const filter = ref('all')
 const scanning = ref(false)
 const sheet = ref(null)
+const detail = ref(null)
 const hfToken = ref('')
 const sources = reactive({})
 const starting = ref(false)
@@ -132,6 +177,24 @@ function subFor(w) {
   return parts.join(' · ')
 }
 async function rescan() { scanning.value = true; try { data.value = await api.rescan() } catch (e) { alert(e.message) } finally { scanning.value = false } }
+
+async function openDetail(w) {
+  detail.value = { slug: w.slug, name: w.name, state: w.state, loading: true }
+  try { detail.value = await api.workflowDetail(w.slug) }
+  catch (e) { detail.value = { slug: w.slug, name: w.name, state: w.state, error: e.message } }
+}
+function modelSub(m) {
+  const parts = [m.folder || '']
+  if (!m.installed) parts.push(m.no_source ? 'missing · no known source' : 'missing')
+  if (m.gated) parts.push('gated')
+  if (!m.installed && m.source) parts.push(m.source)
+  return parts.filter(Boolean).join(' · ')
+}
+function openPlanFromDetail() {
+  const d = detail.value
+  detail.value = null
+  openPlan({ slug: d.slug, name: d.name })
+}
 
 async function openPlan(w) {
   sheet.value = { w, loading: true }
