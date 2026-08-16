@@ -67,6 +67,8 @@ a:hover { text-decoration: underline; }
 .tabs button { display: flex; align-items: center; gap: 5px; padding: 6px 8px 8px; font-size: 12px; color: var(--text3); border-bottom: 2px solid transparent; margin-bottom: -1px; border-radius: 0; }
 .tabs button:hover { color: var(--text2); }
 .tabs button.on { color: var(--text); border-bottom-color: var(--accent); }
+.tabs button.busy { color: var(--accent-hi); }
+.tabs button.attention { color: var(--amber-t); }
 .body { flex: 1; overflow: auto; padding: 4px 0 8px; }
 .foot { border-top: 1px solid var(--edge-subtle); padding: 8px 14px; font-size: 11px; color: var(--text3); display: flex; gap: 8px; align-items: center; }
 .foot .sp { flex: 1; }
@@ -160,5 +162,4 @@ a:hover { text-decoration: underline; }
 .sheet .cmd { margin-top: 8px; padding: 6px 8px; background: var(--base); border-radius: 4px; color: var(--text); font-size: 11.5px; user-select: all; overflow-x: auto; white-space: nowrap; }
 .pre { font-size: 11px; color: var(--text2); white-space: pre-wrap; word-break: break-word; background: var(--ov-subtle); border-radius: var(--r-md); padding: 8px 10px; max-height: 260px; overflow: auto; }
 .spin { display:inline-block; width: 12px; height: 12px; border: 2px solid var(--ov-light); border-top-color: var(--text2); border-radius: 50%; animation: sp .8s linear infinite; }
-.tab-spin { width: 9px; height: 9px; border-width: 1.5px; }
 @keyframes sp { to { transform: rotate(360deg); } }

@@ -4,15 +4,20 @@
       <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" style="color:var(--text2)" aria-hidden="true"><path d="M5.485 23.76c-.568 0-1.026-.207-1.325-.598-.307-.402-.387-.964-.22-1.54l.672-2.315a.605.605 0 00-.1-.536.622.622 0 00-.494-.243H2.085c-.568 0-1.026-.207-1.325-.598-.307-.403-.387-.964-.22-1.54l2.31-7.917.255-.87c.343-1.18 1.592-2.14 2.786-2.14h2.313c.276 0 .519-.18.595-.442l.764-2.633C9.906 1.208 11.155.249 12.35.249l4.945-.008h3.62c.568 0 1.027.206 1.325.597.307.402.387.964.22 1.54l-1.035 3.566c-.343 1.178-1.593 2.137-2.787 2.137l-4.956.01H11.37a.618.618 0 00-.594.441l-1.928 6.604a.605.605 0 00.1.537c.118.153.3.243.495.243l3.275-.006h3.61c.568 0 1.026.206 1.325.598.307.402.387.964.22 1.54l-1.036 3.565c-.342 1.179-1.592 2.138-2.786 2.138l-4.957.01h-3.61z"/></svg>
       <span class="name">ComfyUI</span>
       <span class="sp"></span>
-      <span class="state"><span v-if="overview?.state === 'in_progress'" class="spin"></span><span v-else class="dot" :class="stateDot"></span>{{ stateLabel }}</span>
+      <span v-if="overview?.state !== 'in_progress'" class="state"><span class="dot" :class="stateDot"></span>{{ stateLabel }}</span>
     </div>
     <div class="tabs">
-      <button v-for="t in tabs" :key="t.id" :class="{ on: tab === t.id }" @click="tab = t.id">
+      <button
+        v-for="t in tabs"
+        :key="t.id"
+        :class="{
+          on: tab === t.id,
+          busy: t.id === 'activity' && overview?.activity_active_count && !overview?.activity_attention_count,
+          attention: t.id === 'activity' && overview?.activity_attention_count,
+        }"
+        @click="tab = t.id"
+      >
         {{ t.label }}
-        <template v-if="t.id === 'activity'">
-          <span v-if="overview?.activity_attention_count" class="dot a" title="Activity needs attention"></span>
-          <span v-else-if="overview?.activity_active_count" class="spin tab-spin" title="Activity in progress"></span>
-        </template>
       </button>
     </div>
     <div v-if="overview && overview.summary && !['ready', 'in_progress'].includes(overview.state)" class="banner" :class="{ red: overview.state === 'error' }">
@@ -110,7 +115,6 @@ const stateLabel = computed(() => {
   const s = overview.value?.state
   if (!s) return '…'
   if (s === 'ready') return 'Ready'
-  if (s === 'in_progress') return 'In progress'
   if (s === 'warning') return 'Degraded'
   return 'Error'
 })
