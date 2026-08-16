@@ -12,12 +12,15 @@
         :key="t.id"
         :class="{
           on: tab === t.id,
-          busy: t.id === 'activity' && overview?.activity_active_count && !overview?.activity_attention_count,
           attention: t.id === 'activity' && overview?.activity_attention_count,
         }"
         @click="tab = t.id"
       >
         {{ t.label }}
+        <template v-if="t.id === 'activity'">
+          <span v-if="overview?.activity_attention_count" class="dot a" title="Activity needs attention"></span>
+          <span v-else-if="overview?.activity_active_count" class="spin tab-spin" title="Activity in progress"></span>
+        </template>
       </button>
     </div>
     <div v-if="overview && overview.summary && !['ready', 'in_progress'].includes(overview.state)" class="banner" :class="{ red: overview.state === 'error' }">
