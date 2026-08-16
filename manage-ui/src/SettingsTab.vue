@@ -24,8 +24,8 @@
           </div>
         </div>
         <div class="li">
-          <div class="t"><div class="a">{{ s.instances.length > 1 ? 'Restart all instances' : 'Restart ComfyUI' }}</div></div>
-          <div class="r"><button class="btn sm" @click="restart">Restart</button></div>
+          <div class="t"><div class="a">{{ s.instances.length > 1 ? 'Restart all instances' : 'Restart ComfyUI' }}</div><div v-if="restartError" class="b error">{{ restartError }}</div></div>
+          <div class="r"><button class="btn sm" :disabled="busy === 'restart'" @click="restart">{{ busy === 'restart' ? 'Restarting…' : 'Restart' }}</button></div>
         </div>
         <div class="li">
           <div class="t"><div class="a">Restore bundled workflows</div></div>
@@ -64,6 +64,7 @@ const emit = defineEmits(['refresh'])
 const s = ref(null)
 const upd = ref(null)
 const busy = ref('')
+const restartError = ref('')
 const editing = ref(null)
 const secret = ref('')
 let timer = null
@@ -91,7 +92,12 @@ const managerLabel = computed(() => {
 })
 function edit(which) { editing.value = which; secret.value = '' }
 async function saveSecret() { try { await api.setCredentials({ [editing.value]: secret.value }); editing.value = null; await load() } catch (e) { alert(e.message) } }
-async function restart() { if (!confirm('Restart ComfyUI?')) return; try { await api.restart('all') } catch (e) { alert(e.message) } }
+async function restart() {
+  busy.value = 'restart'
+  restartError.value = ''
+  try { await api.restart('all') }
+  catch (e) { restartError.value = e.message; busy.value = '' }
+}
 async function restore() { busy.value = 'restore'; try { await api.restoreBundled() } catch (e) { alert(e.message) } finally { busy.value = '' } }
 async function check() { busy.value = 'check'; try { upd.value = await api.updateStatus(true) } catch (e) { alert(e.message) } finally { busy.value = '' } }
 async function applyUpdate() { busy.value = 'update'; try { const r = await api.updateApply(); if (!r.ok) alert(r.error); await load(); emit('refresh') } catch (e) { alert(e.message) } finally { busy.value = '' } }

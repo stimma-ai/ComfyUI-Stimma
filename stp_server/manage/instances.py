@@ -96,13 +96,53 @@ def gpu_stats() -> List[Dict[str, Any]]:
                 "uuid": parts[1],
                 "name": parts[2],
                 "util": float(parts[3]) if parts[3] not in ("[N/A]", "") else None,
-                "mem_used": int(float(parts[4])) * 1024 * 1024,
-                "mem_total": int(float(parts[5])) * 1024 * 1024,
+                # GB10 reports utilization and temperature through nvidia-smi,
+                # but unified memory is [N/A]. Keep the GPU and let ComfyUI's
+                # /system_stats fill the memory fields below.
+                "mem_used": int(float(parts[4])) * 1024 * 1024 if parts[4] not in ("[N/A]", "") else None,
+                "mem_total": int(float(parts[5])) * 1024 * 1024 if parts[5] not in ("[N/A]", "") else None,
                 "temp": float(parts[6]) if parts[6] not in ("[N/A]", "") else None,
             })
         except ValueError:
             continue
     return gpus
+
+
+def merge_comfy_gpu_memory(gpus: List[Dict[str, Any]], devices: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    """Fill missing GPU memory from ComfyUI's /system_stats device records.
+
+    NVIDIA unified-memory systems such as GB10 intentionally return [N/A] for
+    nvidia-smi's framebuffer-memory query, while ComfyUI reports the shared
+    allocation as vram_total/vram_free. Dedicated-memory GPUs keep the more
+    precise nvidia-smi values.
+    """
+    result = [dict(g) for g in gpus]
+    by_index = {g.get("index"): g for g in result}
+    for device in devices:
+        if device.get("type") != "cuda":
+            continue
+        index = device.get("index")
+        gpu = by_index.get(index)
+        if gpu is None:
+            gpu = {
+                "index": index,
+                "uuid": None,
+                "name": str(device.get("name") or f"CUDA {index}"),
+                "util": None,
+                "mem_used": None,
+                "mem_total": None,
+                "temp": None,
+            }
+            result.append(gpu)
+            by_index[index] = gpu
+        total = device.get("vram_total")
+        free = device.get("vram_free")
+        if not gpu.get("mem_total") and isinstance(total, (int, float)) and total > 0:
+            gpu["mem_total"] = int(total)
+            if isinstance(free, (int, float)):
+                gpu["mem_used"] = max(0, int(total - free))
+            gpu["unified_memory"] = True
+    return result
 
 
 def disk_stats(paths: List[str]) -> List[Dict[str, Any]]:

@@ -17,7 +17,7 @@ import aiohttp
 
 from . import credentials, jobs, nodes as nodepacks, resolve, update as updater
 from .downloads import DownloadManager, probe_hf
-from .instances import InstanceMonitor, disk_stats, is_local_addr
+from .instances import InstanceMonitor, disk_stats, is_local_addr, merge_comfy_gpu_memory
 from .ops import OperationRegistry, Operation, STATE_QUEUED, STATE_RUNNING, STATE_DONE, STATE_FAILED, TERMINAL
 
 logger = logging.getLogger(__name__)
@@ -158,7 +158,13 @@ class Manager:
             if s.healthy:
                 h["reachable"] = True
         if "local" in hosts:
-            hosts["local"]["gpus"] = self.instances.gpus()
+            local = hosts["local"]
+            devices = [
+                device
+                for instance in local["instances"]
+                for device in (instance.get("devices") or [])
+            ]
+            local["gpus"] = merge_comfy_gpu_memory(self.instances.gpus(), devices)
         # Remote hosts: derive GPU cards from /system_stats devices (no util) or peer manage API
         for key, h in hosts.items():
             if key == "local":
@@ -551,6 +557,7 @@ class Manager:
     # ------------------------------------------------------------------ restart / update
     async def restart(self, scope: str = "all") -> dict:
         """Restart ComfyUI. Peers first (via their manage API), then ourselves via execv."""
+        self.log(f"restart requested: {scope}")
         op = self.ops.create("restart", "Restart ComfyUI", meta={"scope": scope})
         self.ops.update(op, state=STATE_RUNNING, detail=None)
         peers = []

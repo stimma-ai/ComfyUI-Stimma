@@ -11,13 +11,14 @@
     </div>
     <div v-if="overview && overview.summary && overview.state !== 'ready'" class="banner" :class="{ red: overview.state === 'error' }">
       <span>{{ bannerText }}</span>
-      <button v-if="overview.restart_needed && overview.restart_needed.length" class="lnk" @click="restart">Restart</button>
+      <button v-if="overview.restart_needed && overview.restart_needed.length" class="lnk" :disabled="restartBusy" @click="restart">{{ restartBusy ? 'Restarting…' : 'Restart' }}</button>
       <button v-else-if="overview.state !== 'ready'" class="lnk" @click="tab = overview.summary.toLowerCase().includes('download') ? 'activity' : 'overview'">Details</button>
     </div>
     <div v-else-if="overview && overview.restart_needed && overview.restart_needed.length" class="banner">
       <span>Restart ComfyUI to finish setup</span>
-      <button class="lnk" @click="restart">Restart</button>
+      <button class="lnk" :disabled="restartBusy" @click="restart">{{ restartBusy ? 'Restarting…' : 'Restart' }}</button>
     </div>
+    <div v-if="restartError" class="banner red"><span>{{ restartError }}</span><button class="lnk" @click="restartError = ''">Dismiss</button></div>
     <div v-if="managerNotice" class="capability" :class="{ red: managerNotice.state === 'failed' }">
       <div class="cap-text">
         <div>{{ managerNotice.title }}</div>
@@ -53,6 +54,8 @@ const initial = (location.hash || '').replace('#', '')
 const tab = ref(tabs.some(t => t.id === initial) ? initial : 'overview')
 const overview = ref(null)
 const managerBusy = ref(false)
+const restartBusy = ref(false)
+const restartError = ref('')
 let timer = null
 
 async function load() {
@@ -118,7 +121,12 @@ async function installManager() {
   finally { managerBusy.value = false }
 }
 async function restart() {
-  if (!confirm('Restart ComfyUI?')) return
-  try { await api.restart('all') } catch (e) { alert(e.message) }
+  restartBusy.value = true
+  restartError.value = ''
+  try { await api.restart('all') }
+  catch (e) {
+    restartError.value = e.message
+    restartBusy.value = false
+  }
 }
 </script>
