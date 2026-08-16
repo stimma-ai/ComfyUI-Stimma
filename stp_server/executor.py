@@ -1493,6 +1493,11 @@ async def _monitor_execution(ws, prompt_id: str, context: "ExecutionContext"):
     # instead of freezing on the last animation for the rest of the run.
     _VIDEO_MODE_TIMEOUT = 20.0
     _prompt_executing = False
+    # Previews flag is derived per-context by the executor entry point; this
+    # function is its own scope, so derive it the same way here (it was
+    # referenced below without a definition -> NameError on every preview
+    # frame, which failed the whole job).
+    _previews_enabled = getattr(context, "preview_frames", True)
 
     async for message in ws:
         if message.type == aiohttp.WSMsgType.TEXT:
