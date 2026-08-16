@@ -644,7 +644,7 @@ class Provider:
     async def send_state(self, state: str, summary: Optional[str] = None) -> None:
         """Send provider.state (capability `provider_state`).
 
-        state: "ready" | "warning" | "error". summary: optional one-liner.
+        state: "ready" | "in_progress" | "warning" | "error". summary: optional one-liner.
         """
         if not self._handler or not self._config.provider_state:
             return

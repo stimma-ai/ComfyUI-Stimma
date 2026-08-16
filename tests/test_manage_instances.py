@@ -13,6 +13,7 @@ if str(ROOT) not in sys.path:
 
 from stp_server.manage.instances import InstanceMonitor, InstanceStatus, gpu_stats, merge_comfy_gpu_memory
 from stp_server.manage.manager import Manager
+from stp_server.manage.ops import Operation, STATE_FAILED, STATE_PAUSED, STATE_RUNNING
 
 
 class TestGpuStats(unittest.TestCase):
@@ -73,6 +74,32 @@ class TestInstanceStartupState(unittest.TestCase):
         manager.ops = types.SimpleNamespace(all=lambda: [])
 
         self.assertEqual(manager.provider_state(), ("ready", None))
+
+    def _manager_with_ops(self, ops):
+        manager = object.__new__(Manager)
+        manager.instances = types.SimpleNamespace(summary=lambda: {
+            "total": 1, "healthy": 1, "checking": [], "down": [],
+        })
+        manager._restart_needed = []
+        manager._dismissed_failures = set()
+        manager.ops = types.SimpleNamespace(all=lambda: ops)
+        return manager
+
+    def test_running_management_operation_is_in_progress(self):
+        op = Operation(id="download", kind="download", title="Download MiniMax H3", state=STATE_RUNNING)
+        manager = self._manager_with_ops([op])
+
+        self.assertEqual(manager.provider_state(), ("in_progress", "Download MiniMax H3"))
+
+    def test_paused_or_failed_operation_takes_precedence(self):
+        running = Operation(id="running", kind="download", title="Download model", state=STATE_RUNNING)
+        paused = Operation(id="paused", kind="download", title="Download other model", state=STATE_PAUSED)
+        manager = self._manager_with_ops([running, paused])
+        self.assertEqual(manager.provider_state(), ("warning", "Download paused"))
+
+        failed = Operation(id="failed", kind="install_node", title="Install nodes", state=STATE_FAILED)
+        manager = self._manager_with_ops([running, failed])
+        self.assertEqual(manager.provider_state(), ("warning", "Operation failed"))
 
 
 if __name__ == "__main__":

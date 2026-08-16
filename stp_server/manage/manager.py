@@ -18,7 +18,10 @@ import aiohttp
 from . import credentials, jobs, nodes as nodepacks, resolve, update as updater
 from .downloads import DownloadManager, probe_hf
 from .instances import InstanceMonitor, disk_stats, is_local_addr, merge_comfy_gpu_memory
-from .ops import OperationRegistry, Operation, STATE_QUEUED, STATE_RUNNING, STATE_DONE, STATE_FAILED, TERMINAL
+from .ops import (
+    OperationRegistry, Operation, STATE_QUEUED, STATE_RUNNING, STATE_DONE,
+    STATE_FAILED, STATE_PAUSED,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -48,6 +51,7 @@ class Manager:
         self._tools_by_slug: Dict[str, Any] = {}
         self._restart_needed: List[str] = []   # reasons
         self._dismissed_failures: set = set()
+        self._op_states = {op.id: op.state for op in self.ops.all()}
         self._started = False
         self._session: Optional[aiohttp.ClientSession] = None
         self.ops.on_change(self._on_op_change)
@@ -112,12 +116,16 @@ class Manager:
         await self.provider.push_state()
 
     def _on_op_change(self, op: Operation):
+        previous_state = self._op_states.get(op.id)
+        self._op_states[op.id] = op.state
         if op.state == STATE_FAILED and op.kind == "download":
             asyncio.ensure_future(self.provider.notify(
                 id=f"download-failed:{op.id}", level="error",
                 title=f"Download failed: {op.title}", body=op.error, action="manage", anchor="activity",
             ))
-        if op.state in TERMINAL:
+        # Progress updates can fire many times per second. Provider state only
+        # changes when the operation itself changes lifecycle state.
+        if previous_state != op.state:
             asyncio.ensure_future(self.provider.push_state())
 
     async def _on_download_complete(self, op: Operation, ok: bool):
@@ -147,6 +155,14 @@ class Manager:
                   if o.state == STATE_FAILED and o.kind != "install_manager" and o.id not in self._dismissed_failures]
         if failed:
             return "warning", "Download failed" if failed[0].kind == "download" else "Operation failed"
+        paused = [o for o in self.ops.all() if o.state == STATE_PAUSED]
+        if paused:
+            return "warning", "Download paused" if paused[0].kind == "download" else "Operation paused"
+        active = [o for o in self.ops.all() if o.state in (STATE_QUEUED, STATE_RUNNING)]
+        if active:
+            if len(active) == 1:
+                return "in_progress", active[0].title
+            return "in_progress", f"{len(active)} operations in progress"
         return "ready", None
 
     # ------------------------------------------------------------------ overview
@@ -200,9 +216,15 @@ class Manager:
         upd = await updater.status()
         state, summary = self.provider_state()
         instance_summary = self.instances.summary()
+        active_ops = [o for o in self.ops.all() if o.state in (STATE_QUEUED, STATE_RUNNING)]
+        attention_ops = [o for o in self.ops.all()
+                         if o.state == STATE_PAUSED or
+                         (o.state == STATE_FAILED and o.id not in self._dismissed_failures)]
         return {
             "state": state, "summary": summary,
             "checking": bool(instance_summary["checking"]),
+            "activity_active_count": len(active_ops),
+            "activity_attention_count": len(attention_ops),
             "comfyui_manager": self.comfyui_manager_status(),
             "hosts": list(hosts.values()),
             "running": running, "pending": pending, "stp_queue": qs,
