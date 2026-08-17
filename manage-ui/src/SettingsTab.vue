@@ -33,7 +33,7 @@
         <div class="li">
           <div class="t"><div class="a">Update</div><div class="b mono">{{ updateLabel }}</div></div>
           <div class="r">
-            <button v-if="upd && upd.update_available" class="btn sm primary" :disabled="busy === 'update'" @click="applyUpdate">{{ busy === 'update' ? 'Updating…' : 'Update' }}</button>
+            <button v-if="upd && upd.update_available" class="btn sm primary" :disabled="busy === 'update'" @click="applyUpdate">{{ busy === 'update' ? 'Updating…' : 'Update & restart' }}</button>
             <button v-else class="btn sm" :disabled="busy === 'check'" @click="check">{{ busy === 'check' ? 'Checking…' : 'Check now' }}</button>
           </div>
         </div>
@@ -73,6 +73,7 @@ const updateLabel = computed(() => {
   if (!p) return '…'
   if (!p.git) return 'Not a git checkout'
   if (p.error) return `${p.head || '?'} · ${p.error}`
+  if (p.restart_required) return `${p.running_head} → ${p.head} · restart required`
   if (p.update_available) return [p.head, p.target].filter(Boolean).join(' → ')
   if (p.ahead) return `${p.head} · ahead of main`
   return `${p.head} · current`
@@ -102,6 +103,6 @@ async function restart() {
 }
 async function restore() { busy.value = 'restore'; try { await api.restoreBundled() } catch (e) { alert(e.message) } finally { busy.value = '' } }
 async function check() { busy.value = 'check'; try { upd.value = await api.updateStatus(true) } catch (e) { alert(e.message) } finally { busy.value = '' } }
-async function applyUpdate() { busy.value = 'update'; try { const r = await api.updateApply(); if (!r.ok) alert(r.error); await load(); emit('refresh') } catch (e) { alert(e.message) } finally { busy.value = '' } }
+async function applyUpdate() { busy.value = 'update'; try { const r = await api.updateApply(); if (!r.ok) alert(r.error); if (!r.restarting) await load(); emit('refresh') } catch (e) { alert(e.message) } finally { busy.value = '' } }
 async function installManager() { busy.value = 'manager'; try { await api.installManager(); await load(); emit('refresh') } catch (e) { alert(e.message) } finally { busy.value = '' } }
 </script>

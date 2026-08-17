@@ -21,6 +21,41 @@ _BRANCH = "main"
 _state = {"checked_at": 0.0, "result": None, "checking": False}
 
 
+def _checkout_head() -> str | None:
+    """Read the checked-out commit without invoking git."""
+    git_dir = _PLUGIN_DIR / ".git"
+    if git_dir.is_file():
+        try:
+            marker = git_dir.read_text().strip()
+            if marker.startswith("gitdir:"):
+                git_dir = (_PLUGIN_DIR / marker.split(":", 1)[1].strip()).resolve()
+        except OSError:
+            return None
+    try:
+        head = (git_dir / "HEAD").read_text().strip()
+    except OSError:
+        return None
+    if not head.startswith("ref:"):
+        return head[:7] if head else None
+    ref = head.split(":", 1)[1].strip()
+    try:
+        value = (git_dir / ref).read_text().strip()
+        return value[:7] if value else None
+    except OSError:
+        try:
+            for line in (git_dir / "packed-refs").read_text().splitlines():
+                if line and not line.startswith(("#", "^")):
+                    value, name = line.split(" ", 1)
+                    if name == ref:
+                        return value[:7]
+        except (OSError, ValueError):
+            pass
+    return None
+
+
+_RUNNING_HEAD = _checkout_head()
+
+
 async def _git(*args, timeout: float = 30) -> tuple:
     proc = await asyncio.create_subprocess_exec(
         "git", *args, cwd=str(_PLUGIN_DIR),
@@ -46,7 +81,18 @@ def cached_status() -> dict | None:
 async def status(force: bool = False) -> dict:
     """Cached (6h) update status."""
     now = time.time()
-    if not force and _state["result"] and now - _state["checked_at"] < 6 * 3600:
+    checkout_head = _checkout_head()
+    checkout_changed = bool(
+        _state["result"]
+        and checkout_head
+        and _state["result"].get("head") != checkout_head
+    )
+    if (
+        not force
+        and not checkout_changed
+        and _state["result"]
+        and now - _state["checked_at"] < 6 * 3600
+    ):
         return _state["result"]
     if _state["checking"] and _state["result"]:
         return _state["result"]
@@ -62,6 +108,7 @@ async def status(force: bool = False) -> dict:
 
 async def _compute() -> dict:
     base = {"version": PRODUCT_VERSION, "git": is_git_checkout(), "head": None,
+            "running_head": _RUNNING_HEAD, "restart_required": False,
             "target": None,
             "behind": 0, "ahead": 0, "update_available": False, "error": None,
             "checked_at": time.time()}
@@ -69,6 +116,9 @@ async def _compute() -> dict:
         return base
     rc, head, _ = await _git("rev-parse", "--short", "HEAD")
     base["head"] = head if rc == 0 else None
+    base["restart_required"] = bool(
+        base["running_head"] and base["head"] and base["running_head"] != base["head"]
+    )
     rc, _, err = await _git("fetch", "--quiet", "origin", _BRANCH, timeout=60)
     if rc != 0:
         base["error"] = f"git fetch failed: {err.splitlines()[-1] if err else rc}"

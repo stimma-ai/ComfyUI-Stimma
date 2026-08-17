@@ -47,7 +47,7 @@ const emit = defineEmits(['refresh', 'open'])
 const pendingTotal = computed(() => (props.overview?.pending || 0) + (props.overview?.stp_queue?.queued || 0))
 const pluginLabel = computed(() => {
   const p = props.overview?.plugin
-  return p?.git ? (p.head || '') : ''
+  return p?.git ? (p.running_head || p.head || '') : ''
 })
 function hostLabel(h) { return h.local ? (h.hostname || 'This machine') : h.host }
 function hostSub(h) {

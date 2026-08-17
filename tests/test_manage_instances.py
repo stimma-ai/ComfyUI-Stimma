@@ -5,7 +5,7 @@ import sys
 import types
 import unittest
 from pathlib import Path
-from unittest.mock import patch
+from unittest.mock import AsyncMock, MagicMock, patch
 
 ROOT = Path(__file__).resolve().parent.parent
 if str(ROOT) not in sys.path:
@@ -101,6 +101,19 @@ class TestInstanceStartupState(unittest.TestCase):
             self.assertEqual(manager.provider_state(), ("ready", None))
             self.assertEqual(manager.provider_attention(), "update_available")
 
+    def test_newer_checkout_requires_comfyui_restart(self):
+        manager = self._manager_with_ops([])
+
+        with patch(
+            "stp_server.manage.manager.updater.cached_status",
+            return_value={"restart_required": True},
+        ):
+            self.assertEqual(
+                manager.provider_state(),
+                ("warning", "Restart ComfyUI to load updated ComfyUI-Stimma"),
+            )
+            self.assertEqual(manager.restart_reasons(), ["update"])
+
     def test_paused_or_failed_operation_takes_precedence(self):
         running = Operation(id="running", kind="download", title="Download model", state=STATE_RUNNING)
         paused = Operation(id="paused", kind="download", title="Download other model", state=STATE_PAUSED)
@@ -110,6 +123,26 @@ class TestInstanceStartupState(unittest.TestCase):
         failed = Operation(id="failed", kind="install_node", title="Install nodes", state=STATE_FAILED)
         manager = self._manager_with_ops([running, failed])
         self.assertEqual(manager.provider_state(), ("warning", "Operation failed"))
+
+
+class TestManagedUpdate(unittest.IsolatedAsyncioTestCase):
+    async def test_update_restarts_comfyui_after_fast_forward(self):
+        manager = object.__new__(Manager)
+        operation = MagicMock()
+        manager.ops = MagicMock()
+        manager.ops.create.return_value = operation
+        manager.provider = types.SimpleNamespace(push_state=AsyncMock())
+        manager.restart = AsyncMock(return_value={"ok": True})
+
+        with patch(
+            "stp_server.manage.manager.updater.apply_update",
+            new=AsyncMock(),
+        ):
+            result = await manager.apply_update()
+
+        self.assertEqual(result, {"ok": True, "restarting": True})
+        manager.restart.assert_awaited_once_with()
+        manager.provider.push_state.assert_awaited_once_with(force=True)
 
 
 class TestRunningJobsView(unittest.TestCase):

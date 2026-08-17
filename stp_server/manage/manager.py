@@ -104,7 +104,9 @@ class Manager:
                 await self.provider.push_state()
             except Exception:
                 pass
-            await asyncio.sleep(6 * 3600)
+            # status() keeps remote checks cached for six hours, while this
+            # lightweight pass notices a locally updated checkout promptly.
+            await asyncio.sleep(30)
 
     def log(self, line: str):
         logger.info("[manage] %s", line)
@@ -175,6 +177,8 @@ class Manager:
             if "comfyui-manager" in self._restart_needed:
                 return "warning", "Restart ComfyUI to enable automatic custom-node setup"
             return "warning", "Restart ComfyUI to finish setup"
+        if self.plugin_restart_required():
+            return "warning", "Restart ComfyUI to load updated ComfyUI-Stimma"
         failed = [o for o in self.ops.all()
                   if o.state == STATE_FAILED and o.kind != "install_manager" and o.id not in self._dismissed_failures]
         if failed:
@@ -194,6 +198,16 @@ class Manager:
         if update_status and update_status.get("update_available"):
             return "update_available"
         return None
+
+    def plugin_restart_required(self):
+        update_status = updater.cached_status()
+        return bool(update_status and update_status.get("restart_required"))
+
+    def restart_reasons(self):
+        reasons = list(self._restart_needed)
+        if self.plugin_restart_required() and "update" not in reasons:
+            reasons.append("update")
+        return reasons
 
     # ------------------------------------------------------------------ overview
     async def overview(self) -> dict:
@@ -260,7 +274,7 @@ class Manager:
             "running": running, "pending": pending, "stp_queue": qs,
             "disk": disk_stats(resolve.model_dirs()),
             "plugin": upd,
-            "restart_needed": list(self._restart_needed),
+            "restart_needed": self.restart_reasons(),
             "tools_ready": sum(1 for w in self._workflows if not w.warnings and w.tool_info.get("slug")),
             "instances_total": len(st), "instances_healthy": sum(1 for s in st if s.healthy),
         }
@@ -615,7 +629,7 @@ class Manager:
     # ------------------------------------------------------------------ activity
     def activity(self) -> dict:
         return {"operations": [o.to_dict() for o in self.ops.all()],
-                "restart_needed": list(self._restart_needed)}
+                "restart_needed": self.restart_reasons()}
 
     # ------------------------------------------------------------------ restart / update
     async def restart(self, scope: str = "all") -> dict:
@@ -674,11 +688,11 @@ class Manager:
         self.ops.update(op, state=STATE_RUNNING, detail=None)
         try:
             await updater.apply_update(lambda l: self.ops.update(op, detail=str(l)[:120]))
-            self._restart_needed.append("update")
-            self.ops.update(op, state=STATE_DONE, detail="Updated · restart to load")
+            self.ops.update(op, state=STATE_DONE, detail="Updated · restarting")
             self.ops.save()
             await self.provider.push_state(force=True)
-            return {"ok": True, "restart_needed": True}
+            await self.restart()
+            return {"ok": True, "restarting": True}
         except Exception as e:
             self.ops.update(op, state=STATE_FAILED, error=str(e), error_kind="other", fix={"action": "retry"})
             self.ops.save()

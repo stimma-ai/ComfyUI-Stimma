@@ -30,7 +30,7 @@
         <div>{{ updateBusy ? 'Updating ComfyUI-Stimma' : 'ComfyUI-Stimma update available' }}</div>
         <div class="mono">{{ updateHashes }}</div>
       </div>
-      <button v-if="!updateBusy" class="btn sm update-cta" @click="applyUpdate">Update</button>
+      <button v-if="!updateBusy" class="btn sm update-cta" @click="applyUpdate">Update & restart</button>
     </div>
     <div v-if="overview && overview.summary && !['ready', 'in_progress'].includes(overview.state)" class="banner" :class="{ red: overview.state === 'error' }">
       <span>{{ bannerText }}</span>
@@ -151,6 +151,7 @@ const updateHashes = computed(() => {
 })
 const stateLabel = computed(() => {
   if (overview.value?.checking) return 'Checking'
+  if (overview.value?.plugin?.restart_required) return 'Restart required'
   const s = overview.value?.state
   if (!s) return '…'
   if (s === 'ready') return 'Ready'
@@ -176,7 +177,7 @@ async function applyUpdate() {
   try {
     const result = await api.updateApply()
     if (!result.ok) throw new Error(result.error || 'Update failed')
-    await load()
+    if (!result.restarting) await load()
   } catch (e) {
     alert(e.message)
   } finally {
