@@ -34,8 +34,7 @@
   <div class="foot" v-if="overview">
     <span>ComfyUI-Stimma <span class="mono">{{ pluginLabel }}</span></span>
     <span class="sp"></span>
-    <button v-if="overview.plugin && overview.plugin.update_available" @click="$emit('open', 'settings')" style="color:var(--accent-hi)">Update</button>
-    <span v-else-if="overview.disk && overview.disk.length" class="mono">{{ fmtBytes(overview.disk[0].free) }} free</span>
+    <span v-if="overview.disk && overview.disk.length" class="mono">{{ fmtBytes(overview.disk[0].free) }} free</span>
   </div>
 </template>
 
@@ -48,10 +47,7 @@ const emit = defineEmits(['refresh', 'open'])
 const pendingTotal = computed(() => (props.overview?.pending || 0) + (props.overview?.stp_queue?.queued || 0))
 const pluginLabel = computed(() => {
   const p = props.overview?.plugin
-  if (!p) return ''
-  if (!p.git) return p.version
-  if (p.update_available) return `${p.head} · ${p.behind} behind`
-  return p.head || ''
+  return p?.git ? (p.head || '') : ''
 })
 function hostLabel(h) { return h.local ? (h.hostname || 'This machine') : h.host }
 function hostSub(h) {

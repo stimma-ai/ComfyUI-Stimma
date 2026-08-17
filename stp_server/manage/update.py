@@ -38,6 +38,11 @@ def is_git_checkout() -> bool:
     return (_PLUGIN_DIR / ".git").exists()
 
 
+def cached_status() -> dict | None:
+    """Return the last completed update check without doing git I/O."""
+    return _state["result"]
+
+
 async def status(force: bool = False) -> dict:
     """Cached (6h) update status."""
     now = time.time()
@@ -57,6 +62,7 @@ async def status(force: bool = False) -> dict:
 
 async def _compute() -> dict:
     base = {"version": PRODUCT_VERSION, "git": is_git_checkout(), "head": None,
+            "target": None,
             "behind": 0, "ahead": 0, "update_available": False, "error": None,
             "checked_at": time.time()}
     if not base["git"]:
@@ -67,6 +73,8 @@ async def _compute() -> dict:
     if rc != 0:
         base["error"] = f"git fetch failed: {err.splitlines()[-1] if err else rc}"
         return base
+    rc, target, _ = await _git("rev-parse", "--short", f"origin/{_BRANCH}")
+    base["target"] = target if rc == 0 else None
     rc, behind, _ = await _git("rev-list", "--count", f"HEAD..origin/{_BRANCH}")
     if rc == 0 and behind.isdigit():
         base["behind"] = int(behind)
@@ -99,3 +107,4 @@ async def apply_update(log) -> None:
     if rc != 0:
         raise RuntimeError(f"git merge failed: {err}")
     _state["checked_at"] = 0
+    _state["result"] = None

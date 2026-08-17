@@ -23,6 +23,15 @@
         </template>
       </button>
     </div>
+    <div v-if="updateAvailable || updateBusy" class="update-notice" :class="{ running: updateBusy }">
+      <span v-if="updateBusy" class="spin update-spin" aria-hidden="true"></span>
+      <svg v-else viewBox="0 0 24 24" aria-hidden="true"><path d="M12 18V6m0 0-4.5 4.5M12 6l4.5 4.5" /></svg>
+      <div class="update-text">
+        <div>{{ updateBusy ? 'Updating ComfyUI-Stimma' : 'ComfyUI-Stimma update available' }}</div>
+        <div class="mono">{{ updateHashes }}</div>
+      </div>
+      <button v-if="!updateBusy" class="btn sm update-cta" @click="applyUpdate">Update</button>
+    </div>
     <div v-if="overview && overview.summary && !['ready', 'in_progress'].includes(overview.state)" class="banner" :class="{ red: overview.state === 'error' }">
       <span>{{ bannerText }}</span>
       <button v-if="overview.restart_needed && overview.restart_needed.length" class="lnk" :disabled="restartBusy" @click="restart">{{ restartBusy ? 'Restarting…' : 'Restart' }}</button>
@@ -68,6 +77,7 @@ const initial = (location.hash || '').replace('#', '')
 const tab = ref(tabs.some(t => t.id === initial) ? initial : 'overview')
 const overview = ref(null)
 const managerBusy = ref(false)
+const updateBusy = ref(false)
 const restartBusy = ref(false)
 const restartError = ref('')
 let timer = null
@@ -132,6 +142,13 @@ function onHostMessage(e) {
 }
 
 const stateDot = computed(() => overview.value?.checking ? 'z' : ({ ready: 'g', warning: 'a', error: 'r' }[overview.value?.state] || 'z'))
+const updateAvailable = computed(() => !!overview.value?.plugin?.update_available)
+const updateHashes = computed(() => {
+  const plugin = overview.value?.plugin
+  if (!plugin) return ''
+  if (updateBusy.value) return plugin.head || ''
+  return [plugin.head, plugin.target].filter(Boolean).join(' → ')
+})
 const stateLabel = computed(() => {
   if (overview.value?.checking) return 'Checking'
   const s = overview.value?.state
@@ -153,6 +170,18 @@ async function installManager() {
   try { await api.installManager(); await load() }
   catch (e) { overview.value = { ...(overview.value || {}), comfyui_manager: { state: 'failed', operation: { error: e.message } } } }
   finally { managerBusy.value = false }
+}
+async function applyUpdate() {
+  updateBusy.value = true
+  try {
+    const result = await api.updateApply()
+    if (!result.ok) throw new Error(result.error || 'Update failed')
+    await load()
+  } catch (e) {
+    alert(e.message)
+  } finally {
+    updateBusy.value = false
+  }
 }
 async function restart() {
   restartBusy.value = true

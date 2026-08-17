@@ -250,16 +250,18 @@ class StimmaPluginProvider(Provider):
     async def push_state(self, force: bool = False):
         """Compute and send provider.state if it changed (or force)."""
         state, summary = ("ready", None)
+        attention = None
         if self.manager is not None:
             try:
                 state, summary = self.manager.provider_state()
+                attention = self.manager.provider_attention()
             except Exception:
                 logger.debug("manager.provider_state failed", exc_info=True)
-        cur = (state, summary)
+        cur = (state, summary, attention)
         if force or cur != self._last_state:
             self._last_state = cur
             try:
-                await self.send_state(state, summary)
+                await self.send_state(state, summary, attention=attention)
             except Exception:
                 logger.debug("send_state failed", exc_info=True)
 

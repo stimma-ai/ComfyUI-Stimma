@@ -189,6 +189,12 @@ class Manager:
             return "in_progress", f"{len(active)} operations in progress"
         return "ready", None
 
+    def provider_attention(self):
+        update_status = updater.cached_status()
+        if update_status and update_status.get("update_available"):
+            return "update_available"
+        return None
+
     # ------------------------------------------------------------------ overview
     async def overview(self) -> dict:
         self.instances.touch()
@@ -235,6 +241,9 @@ class Manager:
         except Exception:
             qs = {"queued": 0, "running": 0}
         upd = await updater.status()
+        # A manager view can be the first thing to trigger the cached update
+        # check. Reflect its persistent attention state in the host immediately.
+        await self.provider.push_state()
         state, summary = self.provider_state()
         instance_summary = self.instances.summary()
         active_ops = [o for o in self.ops.all() if o.state in (STATE_QUEUED, STATE_RUNNING)]

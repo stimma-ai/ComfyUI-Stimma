@@ -641,16 +641,24 @@ class Provider:
         """
         pass
 
-    async def send_state(self, state: str, summary: Optional[str] = None) -> None:
+    async def send_state(
+        self,
+        state: str,
+        summary: Optional[str] = None,
+        attention: Optional[str] = None,
+    ) -> None:
         """Send provider.state (capability `provider_state`).
 
         state: "ready" | "in_progress" | "warning" | "error". summary: optional one-liner.
+        attention: optional persistent non-health state such as "update_available".
         """
         if not self._handler or not self._config.provider_state:
             return
         params: dict = {"state": state}
         if summary:
             params["summary"] = summary
+        if attention:
+            params["attention"] = attention
         await self._handler.send_notification("provider.state", params)
 
     async def notify(

@@ -91,6 +91,16 @@ class TestInstanceStartupState(unittest.TestCase):
 
         self.assertEqual(manager.provider_state(), ("in_progress", "Download MiniMax H3"))
 
+    def test_update_attention_does_not_change_provider_health(self):
+        manager = self._manager_with_ops([])
+
+        with patch(
+            "stp_server.manage.manager.updater.cached_status",
+            return_value={"update_available": True},
+        ):
+            self.assertEqual(manager.provider_state(), ("ready", None))
+            self.assertEqual(manager.provider_attention(), "update_available")
+
     def test_paused_or_failed_operation_takes_precedence(self):
         running = Operation(id="running", kind="download", title="Download model", state=STATE_RUNNING)
         paused = Operation(id="paused", kind="download", title="Download other model", state=STATE_PAUSED)

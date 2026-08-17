@@ -71,9 +71,9 @@ function srcNote(c) { return c.set && c.source && c.source !== 'config' ? ` · f
 const updateLabel = computed(() => {
   const p = upd.value
   if (!p) return '…'
-  if (!p.git) return p.version
+  if (!p.git) return 'Not a git checkout'
   if (p.error) return `${p.head || '?'} · ${p.error}`
-  if (p.update_available) return `${p.head} · ${p.behind} behind`
+  if (p.update_available) return [p.head, p.target].filter(Boolean).join(' → ')
   if (p.ahead) return `${p.head} · ahead of main`
   return `${p.head} · current`
 })
