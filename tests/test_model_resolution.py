@@ -189,6 +189,45 @@ class TestModelResolution(unittest.TestCase):
         self.assertIn("ambiguous matches", warnings[0])
         self.assertEqual(prompt["1"]["inputs"]["vae_name"], "vae.safetensors")
 
+    def test_empty_fresh_install_model_combos_are_missing(self):
+        prompt = {
+            "unet": {
+                "class_type": "UNETLoader",
+                "inputs": {"unet_name": "model.safetensors"},
+            },
+            "vae": {
+                "class_type": "VAELoader",
+                "inputs": {"vae_name": "vae.safetensors"},
+            },
+            "clip": {
+                "class_type": "CLIPLoader",
+                "inputs": {"clip_name": "clip.safetensors"},
+            },
+            "sampler": {
+                "class_type": "KSampler",
+                "inputs": {"sampler_name": "euler"},
+            },
+        }
+        object_info = {
+            "UNETLoader": {"input": {"required": {"unet_name": ([],)}}},
+            "VAELoader": {"input": {"required": {"vae_name": ([],)}}},
+            "CLIPLoader": {"input": {"required": {"clip_name": ([],)}}},
+            "KSampler": {"input": {"required": {"sampler_name": ([],)}}},
+        }
+        issues = []
+
+        warnings = _validate_workflow(prompt, object_info, issues)
+
+        self.assertEqual(len(warnings), 3)
+        self.assertEqual(
+            {(issue["name"], issue["folder"]) for issue in issues},
+            {
+                ("model.safetensors", "diffusion_models"),
+                ("vae.safetensors", "vae"),
+                ("clip.safetensors", "text_encoders"),
+            },
+        )
+
     def test_inactive_default_model_variant_is_optional(self):
         prompt = {
             "int8": {"class_type": "UNETLoader", "inputs": {

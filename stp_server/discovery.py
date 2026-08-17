@@ -472,7 +472,17 @@ def _validate_workflow(
                 spec = input_def.get(category, {}).get(input_name)
                 if spec is not None:
                     combo_values = _extract_combo_values_for_validation(spec)
-                    if combo_values and _is_model_combo(combo_values):
+                    # A fresh ComfyUI install exposes model loader COMBOs as
+                    # empty lists. Infer those from the loader/input mapping;
+                    # requiring an existing filename here incorrectly makes
+                    # every workflow look ready when models/ is empty.
+                    model_folder = (
+                        _guess_folder(class_type, input_name, combo_values)
+                        if combo_values is not None else None
+                    )
+                    if combo_values is not None and (
+                        _is_model_combo(combo_values) or model_folder is not None
+                    ):
                         resolved, ambiguous = _resolve_model_combo_value(
                             input_value, combo_values
                         )
@@ -502,9 +512,7 @@ def _validate_workflow(
                                     "name": input_value,
                                     "class_type": class_type,
                                     "input": input_name,
-                                    "folder": _guess_folder(
-                                        class_type, input_name, combo_values
-                                    ),
+                                    "folder": model_folder,
                                     "ambiguous": list(ambiguous) if ambiguous else [],
                                     "optional": optional,
                                 })
