@@ -110,7 +110,7 @@ class TestInstanceStartupState(unittest.TestCase):
         ):
             self.assertEqual(
                 manager.provider_state(),
-                ("warning", "Restart ComfyUI to load updated ComfyUI-Stimma"),
+                ("warning", "ComfyUI-Stimma updated. Restart ComfyUI to apply."),
             )
             self.assertEqual(manager.restart_reasons(), ["update"])
 

@@ -97,7 +97,6 @@ class Manager:
             await self._session.close()
 
     async def _background_update_check(self):
-        await asyncio.sleep(20)
         while True:
             try:
                 await updater.status()
@@ -178,7 +177,7 @@ class Manager:
                 return "warning", "Restart ComfyUI to enable automatic custom-node setup"
             return "warning", "Restart ComfyUI to finish setup"
         if self.plugin_restart_required():
-            return "warning", "Restart ComfyUI to load updated ComfyUI-Stimma"
+            return "warning", "ComfyUI-Stimma updated. Restart ComfyUI to apply."
         failed = [o for o in self.ops.all()
                   if o.state == STATE_FAILED and o.kind != "install_manager" and o.id not in self._dismissed_failures]
         if failed:
