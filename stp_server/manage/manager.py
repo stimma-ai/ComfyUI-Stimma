@@ -557,8 +557,6 @@ class Manager:
             self._restart_needed.append(f"install:{op.meta['url']}")
             self.ops.update(op, state=STATE_DONE, detail="Installed · restart to load")
             self.ops.save()
-            await self.provider.notify(id="restart-needed", level="warning", title="Restart ComfyUI to finish setup",
-                                       action="manage", anchor="overview")
             await self.provider.push_state(force=True)
         except Exception as e:
             self.ops.update(op, state=STATE_FAILED, error=str(e), error_kind="other",
@@ -610,11 +608,6 @@ class Manager:
                 self._restart_needed.append("comfyui-manager")
             self.ops.update(op, state=STATE_DONE, detail="Installed · restart to enable")
             self.ops.save()
-            await self.provider.notify(
-                id="comfyui-manager-restart", level="warning",
-                title="Restart ComfyUI to enable automatic custom-node setup",
-                action="manage", anchor="overview",
-            )
             await self.provider.push_state(force=True)
         except Exception as e:
             self.ops.update(op, state=STATE_FAILED, error=str(e), error_kind="other", fix={"action": "retry"})

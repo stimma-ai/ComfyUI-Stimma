@@ -5,14 +5,14 @@
       <div v-for="h in overview.hosts" :key="h.host" class="grp">
         <h4>{{ hostLabel(h) }} <span class="n">{{ hostSub(h) }}</span></h4>
         <div v-if="h.gpus && h.gpus.length" class="gpus">
-          <div v-for="g in h.gpus" :key="g.uuid || g.index" class="gpu" :class="{ down: !h.reachable }">
+          <div v-for="g in h.gpus" :key="g.uuid || g.index" class="gpu" :class="{ loading: h.checking && !h.reachable, down: !h.checking && !h.reachable }">
             <div class="k" :title="g.name">GPU {{ g.index }}</div>
             <div class="v mono">{{ h.reachable && g.util != null ? Math.round(g.util) + '%' : '—' }}</div>
-            <div class="bar"><i :style="{ width: memPct(g) + '%' }"></i></div>
+            <div class="bar" :class="{ ind: h.checking && !h.reachable }"><i :style="{ width: memPct(g) + '%' }"></i></div>
             <div class="k mono" style="margin-top:3px">{{ h.reachable ? mem(g) : '—' }}</div>
           </div>
         </div>
-        <div v-else class="li"><div class="t"><div class="b">{{ h.checking ? 'Checking…' : h.reachable ? '' : 'Unreachable' }}</div></div></div>
+        <div v-else class="li"><div class="t"><div class="b">{{ h.checking ? 'Loading machine info…' : h.reachable ? '' : 'Unreachable' }}</div></div></div>
       </div>
 
       <div class="grp">
@@ -53,7 +53,7 @@ function hostLabel(h) { return h.local ? (h.hostname || 'This machine') : h.host
 function hostSub(h) {
   const n = h.instances.length
   const up = h.instances.filter(i => i.healthy).length
-  if (h.checking && !h.reachable) return 'checking'
+  if (h.checking && !h.reachable) return 'loading'
   if (!h.reachable) { const ls = h.instances[0]?.last_seen; return 'unreachable' + (ls ? ` · last seen ${ago(ls)}` : '') }
   return `${n} instance${n === 1 ? '' : 's'}${up < n ? ` · ${n - up} down` : ''}`
 }
