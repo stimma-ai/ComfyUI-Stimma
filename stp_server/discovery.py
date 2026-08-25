@@ -718,7 +718,17 @@ def _convert_inner_node_widgets(
             if name in specs_by_name
         ]
         if named_specs:
-            specs = named_specs
+            # ComfyUI does not necessarily persist optional widgets in the
+            # node's named ``inputs`` list even though their values are present
+            # at the end of ``widgets_values``. Preserve the saved order for
+            # named widgets, then consume any remaining current specs from the
+            # remaining positional values. A genuinely old workflow has no
+            # remaining values, so newly appended widgets still cannot shift or
+            # reinterpret its saved values.
+            saved_names = {name for name, _ in named_specs}
+            specs = named_specs + [
+                (name, spec) for name, spec in specs if name not in saved_names
+            ]
     _CAG_STRINGS = frozenset(("randomize", "fixed", "increment", "decrement"))
 
     def _consume(inp_name, inp_spec):

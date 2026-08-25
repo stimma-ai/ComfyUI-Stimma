@@ -93,6 +93,47 @@ class TestReferenceToVideoDescriptor(unittest.TestCase):
 
 
 class TestSavedStimmaWidgetCompatibility(unittest.TestCase):
+    def test_optional_tool_identity_values_are_not_dropped(self):
+        workflow = {
+            "nodes": [{
+                "id": 1,
+                "type": "StimmaToolInfo",
+                # ComfyUI persists the required widgets here, but optional
+                # widget values may exist only in widgets_values.
+                "inputs": [
+                    {"name": "slug", "widget": {"name": "slug"}, "link": None},
+                    {"name": "display_name", "widget": {"name": "display_name"}, "link": None},
+                    {"name": "task_types", "widget": {"name": "task_types"}, "link": None},
+                    {"name": "badges", "widget": {"name": "badges"}, "link": None},
+                    {"name": "description", "widget": {"name": "description"}, "link": None},
+                ],
+                "widgets_values": [
+                    "ideogram4-t2i", "Ideogram 4.0", "text-to-image", "",
+                    "Structured captions", "ideogram", "ideogram-v4",
+                ],
+            }],
+            "links": [],
+        }
+        object_info = {
+            "StimmaToolInfo": {"input": {
+                "required": {
+                    "slug": ("STRING", {}),
+                    "display_name": ("STRING", {}),
+                    "task_types": ("STRING", {}),
+                    "badges": ("STRING", {}),
+                    "description": ("STRING", {}),
+                },
+                "optional": {
+                    "model_vendor": ("STRING", {}),
+                    "model": ("STRING", {}),
+                },
+            }},
+        }
+
+        api_prompt = _convert_ui_to_api(workflow, object_info)
+        self.assertEqual(api_prompt["1"]["inputs"]["model_vendor"], "ideogram")
+        self.assertEqual(api_prompt["1"]["inputs"]["model"], "ideogram-v4")
+
     def test_new_widget_does_not_shift_legacy_image_param_values(self):
         workflow = {
             "nodes": [
