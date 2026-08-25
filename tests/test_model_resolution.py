@@ -64,6 +64,9 @@ class TestModelResolution(unittest.TestCase):
             parameter.default,
             [{"name": r"anima\Studio_Ghibli.safetensors", "weight": 0.75}],
         )
+        weight_schema = parameter.items["properties"]["weight"]
+        self.assertEqual(weight_schema["minimum"], -10.0)
+        self.assertEqual(weight_schema["maximum"], 10.0)
 
     def test_exact_match_is_preserved(self):
         resolved, ambiguous = _resolve_model_combo_value(
