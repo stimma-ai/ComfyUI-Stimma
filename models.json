@@ -299,8 +299,8 @@
         "Stimma-LTX2.5-Stitch.json",
         "Stimma-LTX2.5-T2V.json"
       ],
-      "size": 15372971786,
-      "sha256": "09a89e084de1a149c3de60cfe9dfd3e5161967eb09eea39e806fcdeffdd568de",
+      "size": 15372969374,
+      "sha256": "6ce688a0aa98a5fa36a9f1e6c3f42152a498cc2b53ee8c15674c64244f91487f",
       "gated": true,
       "license_url": "https://huggingface.co/Lightricks/LTX-2.5",
       "note": "No non-gated mirror found for LTX-2.5 assets."
