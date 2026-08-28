@@ -178,13 +178,9 @@ class Manager:
             return "warning", "Restart ComfyUI to finish setup"
         if self.plugin_restart_required():
             return "warning", "ComfyUI-Stimma updated. Restart ComfyUI to apply."
-        failed = [o for o in self.ops.all()
-                  if o.state == STATE_FAILED and o.kind != "install_manager" and o.id not in self._dismissed_failures]
-        if failed:
-            return "warning", "Download failed" if failed[0].kind == "download" else "Operation failed"
-        paused = [o for o in self.ops.all() if o.state == STATE_PAUSED]
-        if paused:
-            return "warning", "Download paused" if paused[0].kind == "download" else "Operation paused"
+        # Historical or paused manager operations belong in Activity. They may
+        # need attention, but they do not impair a healthy ComfyUI provider.
+        # Keep provider health reserved for actual capability/reachability state.
         active = [o for o in self.ops.all() if o.state in (STATE_QUEUED, STATE_RUNNING)]
         if active:
             if len(active) == 1:

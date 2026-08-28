@@ -58,6 +58,10 @@
         <div class="field"><input v-model="url" placeholder="Download URL" spellcheck="false" /></div>
         <div class="acts"><button class="btn" @click="act(fixing, 'dismiss'); fixing = null">Remove</button><button class="btn primary" :disabled="!url.trim()" @click="redownload">Download</button></div>
       </template>
+      <template v-else-if="fixing.fix && fixing.fix.action === 'checksum'">
+        <p style="margin-top:6px">The file did not match the connector's model catalog. If retrying produces the same result, update ComfyUI-Stimma before trying again.</p>
+        <div class="acts"><button class="btn" @click="act(fixing, 'dismiss'); fixing = null">Remove</button><button class="btn primary" @click="act(fixing, 'retry'); fixing = null">Retry download</button></div>
+      </template>
       <template v-else-if="fixing.fix && fixing.fix.action === 'manual'">
         <p style="margin-top:6px">On the ComfyUI machine, then restart:</p>
         <div class="cmd mono">{{ fixing.fix.command }}</div>

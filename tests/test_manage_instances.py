@@ -114,15 +114,18 @@ class TestInstanceStartupState(unittest.TestCase):
             )
             self.assertEqual(manager.restart_reasons(), ["update"])
 
-    def test_paused_or_failed_operation_takes_precedence(self):
+    def test_paused_or_failed_operation_does_not_degrade_provider(self):
         running = Operation(id="running", kind="download", title="Download model", state=STATE_RUNNING)
         paused = Operation(id="paused", kind="download", title="Download other model", state=STATE_PAUSED)
         manager = self._manager_with_ops([running, paused])
-        self.assertEqual(manager.provider_state(), ("warning", "Download paused"))
+        self.assertEqual(manager.provider_state(), ("in_progress", "Download model"))
 
         failed = Operation(id="failed", kind="install_node", title="Install nodes", state=STATE_FAILED)
         manager = self._manager_with_ops([running, failed])
-        self.assertEqual(manager.provider_state(), ("warning", "Operation failed"))
+        self.assertEqual(manager.provider_state(), ("in_progress", "Download model"))
+
+        manager = self._manager_with_ops([paused, failed])
+        self.assertEqual(manager.provider_state(), ("ready", None))
 
 
 class TestManagedUpdate(unittest.IsolatedAsyncioTestCase):

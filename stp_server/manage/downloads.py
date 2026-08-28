@@ -319,7 +319,11 @@ class DownloadManager:
 
         if want_sha and hasher and hasher.hexdigest() != want_sha:
             part.unlink(missing_ok=True)
-            raise DownloadError("Checksum mismatch — file discarded.", "verify", {"action": "retry"})
+            raise DownloadError(
+                "Checksum mismatch — downloaded file was discarded. If this repeats, update ComfyUI-Stimma before retrying.",
+                "verify",
+                {"action": "checksum"},
+            )
 
         os.replace(part, dest)
 
