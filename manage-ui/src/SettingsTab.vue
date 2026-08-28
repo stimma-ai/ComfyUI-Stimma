@@ -20,8 +20,8 @@
           </div>
         </div>
         <div class="li">
-          <div class="t"><div class="a">{{ s.instances.length > 1 ? 'Restart all instances' : 'Restart ComfyUI' }}</div><div v-if="restartError" class="b error">{{ restartError }}</div></div>
-          <div class="r"><button class="btn sm" :disabled="busy === 'restart'" @click="restart">{{ busy === 'restart' ? 'Restarting…' : 'Restart' }}</button></div>
+          <div class="t"><div class="a">{{ s.instances.length > 1 ? 'Restart all instances' : 'Restart ComfyUI' }}</div></div>
+          <div class="r"><button class="btn sm" :disabled="restarting" @click="restart">{{ restarting ? 'Restarting…' : 'Restart' }}</button></div>
         </div>
         <div class="li">
           <div class="t"><div class="a">Restore bundled workflows</div></div>
@@ -54,12 +54,11 @@
 <script setup>
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { api } from './api'
-const props = defineProps({ overview: Object })
-const emit = defineEmits(['refresh'])
+const props = defineProps({ overview: Object, restarting: Boolean })
+const emit = defineEmits(['refresh', 'restart', 'reconnecting'])
 const s = ref(null)
 const upd = ref(null)
 const busy = ref('')
-const restartError = ref('')
 const editing = ref(null)
 const secret = ref('')
 let timer = null
@@ -96,13 +95,10 @@ const manager = computed(() => {
 function edit(which) { editing.value = which; secret.value = '' }
 async function saveSecret() { try { await api.setCredentials({ [editing.value]: secret.value }); editing.value = null; await load() } catch (e) { alert(e.message) } }
 async function restart() {
-  busy.value = 'restart'
-  restartError.value = ''
-  try { await api.restart('all') }
-  catch (e) { restartError.value = e.message; busy.value = '' }
+  emit('restart')
 }
 async function restore() { busy.value = 'restore'; try { await api.restoreBundled() } catch (e) { alert(e.message) } finally { busy.value = '' } }
 async function check() { busy.value = 'check'; try { upd.value = await api.updateStatus(true) } catch (e) { alert(e.message) } finally { busy.value = '' } }
-async function applyUpdate() { busy.value = 'update'; try { const r = await api.updateApply(); if (!r.ok) alert(r.error); if (!r.restarting) await load(); emit('refresh') } catch (e) { alert(e.message) } finally { busy.value = '' } }
+async function applyUpdate() { busy.value = 'update'; try { const r = await api.updateApply(); if (!r.ok) alert(r.error); if (r.restarting) emit('reconnecting'); else await load(); emit('refresh') } catch (e) { alert(e.message) } finally { busy.value = '' } }
 async function installManager() { busy.value = 'manager'; try { await api.installManager(); await load(); emit('refresh') } catch (e) { alert(e.message) } finally { busy.value = '' } }
 </script>

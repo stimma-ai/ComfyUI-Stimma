@@ -3,8 +3,8 @@
 const here = new URL('.', location.href)
 export const apiBase = new URL('api/', here).toString().replace(/\/$/, '')
 
-async function req(method, path, body) {
-  const opts = { method, headers: {} }
+async function req(method, path, body, requestOpts = {}) {
+  const opts = { method, headers: {}, cache: requestOpts.cache, signal: requestOpts.signal }
   if (body !== undefined) {
     opts.headers['Content-Type'] = 'application/json'
     opts.body = JSON.stringify(body)
@@ -22,7 +22,12 @@ async function req(method, path, body) {
 }
 
 export const api = {
-  overview: () => req('GET', '/overview'),
+  overview: (options = {}) => {
+    const controller = new AbortController()
+    const timer = options.timeout ? setTimeout(() => controller.abort(), options.timeout) : null
+    return req('GET', '/overview', undefined, { signal: controller.signal, cache: 'no-store' })
+      .finally(() => { if (timer) clearTimeout(timer) })
+  },
   workflows: () => req('GET', '/workflows'),
   rescan: () => req('POST', '/workflows/rescan'),
   plan: (slug) => req('GET', `/workflows/${encodeURIComponent(slug)}/plan`),

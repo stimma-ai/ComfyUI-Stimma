@@ -55,7 +55,14 @@
     <OverviewTab v-if="tab === 'overview'" :overview="overview" @refresh="load" @open="tab = $event" />
     <WorkflowsTab v-else-if="tab === 'workflows'" @activity="tab = 'activity'" />
     <ActivityTab v-else-if="tab === 'activity'" />
-    <SettingsTab v-else :overview="overview" @refresh="load" />
+    <SettingsTab v-else :overview="overview" :restarting="restartBusy" @refresh="load" @restart="restart" @reconnecting="beginReconnect" />
+
+    <div v-if="reconnectState" class="reconnect-overlay" role="status" aria-live="polite">
+      <span v-if="reconnectState !== 'timeout'" class="spin reconnect-spin" aria-hidden="true"></span>
+      <div class="reconnect-title">{{ reconnectTitle }}</div>
+      <div class="reconnect-detail">{{ reconnectDetail }}</div>
+      <button v-if="reconnectState === 'timeout'" class="btn" @click="retryReconnect">Try again</button>
+    </div>
   </div>
 </template>
 
@@ -82,6 +89,8 @@ const restartBusy = ref(false)
 const restartError = ref('')
 let timer = null
 let hostRefreshTimer = null
+let reconnectTimer = null
+let reconnectStartedAt = 0
 
 async function load() {
   try { overview.value = await api.overview() } catch (e) { overview.value = overview.value || { state: 'error', summary: 'Manager unavailable' } }
@@ -122,6 +131,7 @@ onMounted(() => {
 })
 onUnmounted(() => {
   clearInterval(timer)
+  clearTimeout(reconnectTimer)
   if (hostRefreshTimer) clearTimeout(hostRefreshTimer)
   sizeObs?.disconnect()
   window.removeEventListener('resize', reportSize)
@@ -177,7 +187,8 @@ async function applyUpdate() {
   try {
     const result = await api.updateApply()
     if (!result.ok) throw new Error(result.error || 'Update failed')
-    if (!result.restarting) await load()
+    if (result.restarting) beginReconnect()
+    else await load()
   } catch (e) {
     alert(e.message)
   } finally {
@@ -185,12 +196,52 @@ async function applyUpdate() {
   }
 }
 async function restart() {
+  if (restartBusy.value) return
   restartBusy.value = true
   restartError.value = ''
-  try { await api.restart('all') }
+  try {
+    await api.restart('all')
+    beginReconnect()
+  }
   catch (e) {
     restartError.value = e.message
     restartBusy.value = false
   }
+}
+
+const reconnectState = ref('')
+const reconnectTitle = computed(() => reconnectState.value === 'restarting' ? 'Restarting ComfyUI…' : reconnectState.value === 'timeout' ? 'ComfyUI is taking longer than expected' : 'Reconnecting to ComfyUI…')
+const reconnectDetail = computed(() => reconnectState.value === 'timeout' ? 'The manager will reload as soon as ComfyUI is reachable. You can also try again now.' : reconnectState.value === 'restarting' ? 'The manager may be unavailable for a moment.' : 'Waiting for the manager to come back online.')
+
+function beginReconnect() {
+  if (reconnectState.value && reconnectState.value !== 'timeout') return
+  restartBusy.value = true
+  reconnectState.value = 'restarting'
+  reconnectStartedAt = Date.now()
+  clearInterval(timer)
+  clearTimeout(reconnectTimer)
+  reconnectTimer = setTimeout(pollReconnect, 1200)
+}
+
+async function pollReconnect() {
+  reconnectState.value = 'reconnecting'
+  try {
+    await api.overview({ timeout: 2500 })
+    // Reload the whole iframe so updated backend and frontend assets are used.
+    window.location.reload()
+    return
+  } catch { /* expected while ComfyUI is restarting */ }
+  if (Date.now() - reconnectStartedAt >= 120000) {
+    reconnectState.value = 'timeout'
+    return
+  }
+  reconnectTimer = setTimeout(pollReconnect, 1000)
+}
+
+function retryReconnect() {
+  reconnectStartedAt = Date.now()
+  reconnectState.value = 'reconnecting'
+  clearTimeout(reconnectTimer)
+  pollReconnect()
 }
 </script>

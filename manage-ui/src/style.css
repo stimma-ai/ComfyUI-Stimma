@@ -59,6 +59,11 @@ a:hover { text-decoration: underline; }
 
 /* layout */
 .app { display: flex; flex-direction: column; height: 100%; }
+.reconnect-overlay { position: absolute; inset: 0; z-index: 20; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; padding: 24px; background: color-mix(in srgb, var(--surface) 94%, transparent); text-align: center; }
+.reconnect-spin { width: 18px; height: 18px; margin-bottom: 2px; border-color: var(--ov-light); border-top-color: var(--accent-hi); }
+.reconnect-title { color: var(--text); font-size: 13px; font-weight: 600; }
+.reconnect-detail { max-width: 300px; color: var(--text3); font-size: 11.5px; }
+.reconnect-overlay .btn { margin-top: 4px; }
 .head { display: flex; align-items: center; gap: 9px; padding: 12px 14px 4px; }
 .head .name { font-weight: 600; font-size: 13.5px; }
 .head .sp { flex: 1; }
