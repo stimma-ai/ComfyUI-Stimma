@@ -1199,13 +1199,13 @@
       },
       "widgets_values": [
         "raw_steps",
-        3,
+        4,
         1,
         16,
         1,
         "slider",
         25,
-        "Number of initial high-noise steps handled by RAW. Two or three is the fast default; larger values such as six give RAW more influence. Set it equal to total steps for a full-RAW pass."
+        "Number of initial high-noise steps handled by RAW. Four gives a balanced 4+4 split; two or three favors a cleaner Turbo finish, while six gives RAW more influence. Set it equal to total steps for a full-RAW pass."
       ]
     },
     {
@@ -1303,13 +1303,13 @@
       },
       "widgets_values": [
         "raw_guidance",
-        2.5,
+        3.0,
         1.0,
         5.0,
         0.1,
         "slider",
         30,
-        "Classifier-free guidance used only during the RAW stage. 2.5 is balanced; values above 5 are intentionally excluded."
+        "Classifier-free guidance used only during the RAW stage. 3.0 is the balanced community default; values above 5 are intentionally excluded."
       ]
     },
     {
@@ -2749,7 +2749,7 @@
               "Node name for S&R": "SplitSigmas"
             },
             "widgets_values": [
-              3
+              4
             ]
           },
           {
@@ -2852,7 +2852,7 @@
               "Node name for S&R": "CFGGuider"
             },
             "widgets_values": [
-              2.5
+              3.0
             ]
           },
           {

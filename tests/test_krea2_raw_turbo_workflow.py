@@ -101,9 +101,9 @@ class TestKrea2RawTurboWorkflow(unittest.TestCase):
         raw_steps = self.top_nodes[213]["widgets_values"]
         raw_guidance = self.top_nodes[214]["widgets_values"]
         self.assertEqual(steps[:5], ["steps", 8, 6, 16, 1])
-        self.assertEqual(raw_steps[:5], ["raw_steps", 3, 1, 16, 1])
+        self.assertEqual(raw_steps[:5], ["raw_steps", 4, 1, 16, 1])
         self.assertGreaterEqual(raw_steps[3], 6, "8-step 6+2 splits must be selectable")
-        self.assertEqual(raw_guidance[:5], ["raw_guidance", 2.5, 1.0, 5.0, 0.1])
+        self.assertEqual(raw_guidance[:5], ["raw_guidance", 3.0, 1.0, 5.0, 0.1])
 
     def test_one_schedule_is_split_between_two_samplers(self):
         scheduler = self.inner_nodes[31]
@@ -213,11 +213,11 @@ class TestKrea2RawTurboWorkflow(unittest.TestCase):
         self.assertEqual(prompt["30:31"]["inputs"]["steps"], 8)
         self.assertEqual(prompt["30:31"]["inputs"]["scheduler"], "simple")
         self.assertEqual(prompt["215"]["inputs"]["expression"], "min(a, b)")
-        self.assertEqual(prompt["215"]["inputs"]["values.a"], 3)
+        self.assertEqual(prompt["215"]["inputs"]["values.a"], 4)
         self.assertEqual(prompt["215"]["inputs"]["values.b"], 8)
         self.assertEqual(prompt["30:32"]["inputs"]["step"], ["215", 1])
         self.assertEqual(prompt["30:33"]["inputs"]["sampler_name"], "euler")
-        self.assertEqual(prompt["30:34"]["inputs"]["cfg"], 2.5)
+        self.assertEqual(prompt["30:34"]["inputs"]["cfg"], 3.0)
 
         broken = []
         for node_id, node in prompt.items():
