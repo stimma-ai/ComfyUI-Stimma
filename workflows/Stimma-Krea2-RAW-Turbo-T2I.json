@@ -1200,11 +1200,11 @@
         "raw_steps",
         3,
         1,
-        4,
+        16,
         1,
         "slider",
         25,
-        "Number of initial high-noise steps handled by RAW. Two or three is recommended; four gives RAW more influence."
+        "Number of initial high-noise steps handled by RAW. Two or three is the fast default; larger values such as six give RAW more influence. Set it equal to total steps for a full-RAW pass."
       ]
     },
     {
