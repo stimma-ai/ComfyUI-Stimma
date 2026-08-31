@@ -68,6 +68,10 @@ class TestKrea2RawTurboWorkflow(unittest.TestCase):
                 lora_name=(["krea2-system/krea2_turbo_lora_rank_64_bf16.safetensors"],),
                 strength_model=("FLOAT",),
             ),
+            "ComfyMathExpression": core(
+                expression=("STRING", {"default": "a + b", "multiline": True}),
+                values=("COMFY_AUTOGROW_V3",),
+            ),
             "EmptyLatentImage": core(width=("INT",), height=("INT",), batch_size=("INT",)),
             "CLIPTextEncode": core(clip=("CLIP",), text=("STRING",)),
             "VAEDecode": core(samples=("LATENT",), vae=("VAE",)),
@@ -208,7 +212,10 @@ class TestKrea2RawTurboWorkflow(unittest.TestCase):
         _resolve_stimma_links(prompt)
         self.assertEqual(prompt["30:31"]["inputs"]["steps"], 8)
         self.assertEqual(prompt["30:31"]["inputs"]["scheduler"], "simple")
-        self.assertEqual(prompt["30:32"]["inputs"]["step"], 3)
+        self.assertEqual(prompt["215"]["inputs"]["expression"], "min(a, b)")
+        self.assertEqual(prompt["215"]["inputs"]["values.a"], 3)
+        self.assertEqual(prompt["215"]["inputs"]["values.b"], 8)
+        self.assertEqual(prompt["30:32"]["inputs"]["step"], ["215", 1])
         self.assertEqual(prompt["30:33"]["inputs"]["sampler_name"], "euler")
         self.assertEqual(prompt["30:34"]["inputs"]["cfg"], 2.5)
 
