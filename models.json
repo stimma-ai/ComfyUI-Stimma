@@ -414,6 +414,35 @@
       "sha256": "eb4dd8c612cfd10f64f25b057e6e6bbcb5737c94a7372177e456dbf7579502f1",
       "gated": false
     },
+    "krea2_raw_fp8_scaled.safetensors": {
+      "directory": "diffusion_models",
+      "source": {
+        "type": "huggingface",
+        "repo": "Comfy-Org/Krea-2",
+        "path": "diffusion_models/krea2_raw_fp8_scaled.safetensors"
+      },
+      "used_by": [
+        "Stimma-Krea2-RAW-Turbo-T2I.json"
+      ],
+      "size": 13141730784,
+      "sha256": "48cd5d6c100297968349b41a8e77c6591d1dac18a215807f5f25f59e5c54cd61",
+      "gated": false
+    },
+    "krea2-system/krea2_turbo_lora_rank_64_bf16.safetensors": {
+      "directory": "loras",
+      "source": {
+        "type": "huggingface",
+        "repo": "Comfy-Org/Krea-2",
+        "path": "loras/krea2_turbo_lora_rank_64_bf16.safetensors"
+      },
+      "used_by": [
+        "Stimma-Krea2-RAW-Turbo-T2I.json"
+      ],
+      "size": 469423778,
+      "sha256": "db8c5bae0a415d448da9d842111d6e51f7d32e47143a3118eb267e5c4773de87",
+      "gated": false,
+      "note": "Fixed stage-2 distillation adapter, stored outside krea2/** so it is not exposed as a selectable style LoRA."
+    },
     "ltx-2.3-22b-dev-fp8.safetensors": {
       "directory": "checkpoints",
       "source": {
@@ -753,6 +782,7 @@
         "path": "text_encoders/qwen3vl_4b_fp8_scaled.safetensors"
       },
       "used_by": [
+        "Stimma-Krea2-RAW-Turbo-T2I.json",
         "Stimma-Krea2-Turbo-T2I.json"
       ],
       "size": 5242467968,
@@ -900,6 +930,7 @@
       },
       "used_by": [
         "Stimma-Anima.json",
+        "Stimma-Krea2-RAW-Turbo-T2I.json",
         "Stimma-Krea2-Turbo-T2I.json",
         "Stimma-Qwen-Image-2512.json",
         "Stimma-Qwen-Image-Edit-2509.json",
