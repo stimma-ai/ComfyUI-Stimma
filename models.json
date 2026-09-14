@@ -706,22 +706,6 @@
       "sha256": "9255f52b6677845ad238f20dfaafa94727053694127ab7f255c048f0f9365779",
       "gated": false
     },
-    "minimax_h3_turbo_4step_ema_ckpt850.safetensors": {
-      "directory": "loras",
-      "source": {
-        "type": "huggingface",
-        "repo": "larryvrh/MiniMax-H3-Turbo-Lora",
-        "path": "minimax_h3_turbo_4step_ema_ckpt850.safetensors"
-      },
-      "used_by": [
-        "Stimma-MiniMax-H3-I2V-Turbo.json",
-        "Stimma-MiniMax-H3-R2V-Turbo.json",
-        "Stimma-MiniMax-H3-T2V-Turbo.json"
-      ],
-      "size": 779849816,
-      "sha256": "5a6eeba171cf183020a4ad48774bb2968f29f8168afd6ec17a04987f3528b4ea",
-      "gated": false
-    },
     "minimax_h3_video_vae_fp16.safetensors": {
       "directory": "vae",
       "source": {
@@ -1248,6 +1232,35 @@
       ],
       "size": 12309866400,
       "sha256": "2407613050b809ffdff18a4ac99af83ea6b95443ecebdf80e064a79c825574a6",
+      "gated": false
+    },
+    "minimax_h3_fl2v_turbo_8step_v1.0_768p_comfyui_bf16.safetensors": {
+      "directory": "loras",
+      "source": {
+        "type": "huggingface",
+        "repo": "lightx2v/Minimax-h3-Turbo",
+        "path": "minimax_h3_fl2v_turbo_8step_v1.0_768p_comfyui_bf16.safetensors"
+      },
+      "used_by": [
+        "Stimma-MiniMax-H3-I2V-Turbo.json",
+        "Stimma-MiniMax-H3-T2V-Turbo.json"
+      ],
+      "size": 1956193000,
+      "sha256": "08cfe946033af7d27719b964b6e0a0e50c32138daabbd6ce4137e23df6bf9980",
+      "gated": false
+    },
+    "minimax_h3_ref2v_turbo_8step_v1.0_768p_comfyui_bf16.safetensors": {
+      "directory": "loras",
+      "source": {
+        "type": "huggingface",
+        "repo": "lightx2v/Minimax-h3-Turbo",
+        "path": "minimax_h3_ref2v_turbo_8step_v1.0_768p_comfyui_bf16.safetensors"
+      },
+      "used_by": [
+        "Stimma-MiniMax-H3-R2V-Turbo.json"
+      ],
+      "size": 1956193000,
+      "sha256": "6a56f41ab4229c9dd845b9501bbd475ee57e112d846cf2e819d534a1ae928c5a",
       "gated": false
     }
   },

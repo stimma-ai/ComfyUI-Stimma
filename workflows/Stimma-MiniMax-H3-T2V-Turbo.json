@@ -1,8 +1,8 @@
 {
-  "id": "94adbef6-4f5f-42a8-a663-a33c7a8bb515",
+  "id": "59140cfe-0175-5c94-b786-530d0df7b153",
   "revision": 0,
   "last_node_id": 144,
-  "last_link_id": 258,
+  "last_link_id": 257,
   "nodes": [
     {
       "id": 92,
@@ -34,7 +34,7 @@
       ],
       "properties": {},
       "widgets_values": [
-        "video/MiniMax_H3_Turbo",
+        "video/MiniMax_H3",
         "auto",
         "auto"
       ]
@@ -82,7 +82,7 @@
     },
     {
       "id": 105,
-      "type": "4c314f31-ecda-4b08-ae98-faaba1bf613f",
+      "type": "52b72a77-4a25-51e8-95c7-b6bdb84d240e",
       "pos": [
         -1180,
         4840
@@ -171,7 +171,7 @@
           "widget": {
             "name": "sampler_name"
           },
-          "link": null
+          "link": 234
         },
         {
           "name": "scheduler",
@@ -301,7 +301,7 @@
       "title": "Note: MiniMax H3",
       "properties": {},
       "widgets_values": [
-        "## ⚡ Turbo variant\n\nThis workflow applies the recommended MiniMax H3 Turbo EMA checkpoint at strength 1.0 and uses its adaptive four-step sampler. Four steps with the simple scheduler is the intended default. The current checkpoint is a preview and may produce plastic-looking skin or over-sharp grain.\n\n## MiniMax H3\n\n[MiniMax H3](https://www.minimax.io/blog/minimax-h3) is MiniMax's general-purpose, omni-modal generation model. It jointly understands text, image, video, and audio, and generates video with **native stereo audio**: voice, sound effects, and music are modeled jointly in a single forward pass, not layered on afterward. Output is up to 2K resolution, 24fps, and up to about 15 seconds.\n\n## ComfyUI links\n- [ComfyUI#15224](https://github.com/Comfy-Org/ComfyUI/pull/15224)\n- [🤗 Comfy-Org/MiniMax-H3](https://huggingface.co/Comfy-Org/MiniMax-H3)\n\n## About this workflow\n\n**Key inputs**\n\n- **prompt**: describe the shots, camera moves, and the accompanying audio (dialogue, SFX, music) in one block\n- **width / height**: set via Resolution Selector. H3's native canvas is a 768px short edge, capped at 768x1344 pixels, rounded to a multiple of 32\n- **duration (seconds)**: converted to a valid frame `length` by the Math Expression node, snapping up to the model's 17-frame-per-block (17k+5) grid at 24fps\n"
+        "## MiniMax H3\n\n[MiniMax H3](https://www.minimax.io/blog/minimax-h3) is MiniMax's general-purpose, omni-modal generation model. It jointly understands text, image, video, and audio, and generates video with **native stereo audio**: voice, sound effects, and music are modeled jointly in a single forward pass, not layered on afterward. Output is up to 2K resolution, 24fps, and up to about 15 seconds.\n\n## ComfyUI links\n- [ComfyUI#15224](https://github.com/Comfy-Org/ComfyUI/pull/15224)\n- [\ud83e\udd17 Comfy-Org/MiniMax-H3](https://huggingface.co/Comfy-Org/MiniMax-H3)\n\n## About this workflow\n\n**Key inputs**\n\n- **prompt**: describe the shots, camera moves, and the accompanying audio (dialogue, SFX, music) in one block\n- **width / height**: set via Resolution Selector. H3's native canvas is a 768px short edge, capped at 768x1344 pixels, rounded to a multiple of 32\n- **duration (seconds)**: converted to a valid frame `length` by the Math Expression node, snapping up to the model's 17-frame-per-block (17k+5) grid at 24fps\n"
       ],
       "color": "#222",
       "bgcolor": "#000"
@@ -325,7 +325,7 @@
       "title": "Note: Model Links",
       "properties": {},
       "widgets_values": [
-        "## Model Links\n\n**vae**\n\n- [minimax_h3_video_vae_fp16.safetensors](https://huggingface.co/Comfy-Org/MiniMax-H3/resolve/main/vae/minimax_h3_video_vae_fp16.safetensors)\n- [minimax_h3_audio_vae_fp32.safetensors](https://huggingface.co/Comfy-Org/MiniMax-H3/resolve/main/vae/minimax_h3_audio_vae_fp32.safetensors)\n\n**diffusion_models**\n\n- [minimax_h3_fl2va_pruned_int8_convrot.safetensors](https://huggingface.co/Comfy-Org/MiniMax-H3/resolve/main/diffusion_models/minimax_h3_fl2va_pruned_int8_convrot.safetensors) **(default)**\n- [minimax_h3_fl2va_pruned_fp8_scaled.safetensors](https://huggingface.co/Comfy-Org/MiniMax-H3/resolve/main/diffusion_models/minimax_h3_fl2va_pruned_fp8_scaled.safetensors)\n\n**text_encoders**\n\n- [qwen3vl_32b_minimax_h3_nvfp4_awq.safetensors](https://huggingface.co/Comfy-Org/MiniMax-H3/resolve/main/text_encoders/qwen3vl_32b_minimax_h3_nvfp4_awq.safetensors)\n\n\n## Model Storage Location\n\n```\n📂 ComfyUI/\n├── 📂 models/\n│   ├── 📂 vae/\n│   │   ├── minimax_h3_video_vae_fp16.safetensors\n│   │   └── minimax_h3_audio_vae_fp32.safetensors\n│   ├── 📂 diffusion_models/\n│   │   ├── minimax_h3_fl2va_pruned_int8_convrot.safetensors\n│   │   └── minimax_h3_fl2va_pruned_fp8_scaled.safetensors\n│   └── 📂 text_encoders/\n│       └── qwen3vl_32b_minimax_h3_nvfp4_awq.safetensors\n```\n\n## Report Issue\n\nNote: Please update ComfyUI first ([guide](https://docs.comfy.org/installation/update_comfyui)) and prepare required models. Desktop/Cloud updates follow stable releases, so some nightly-supported models may not be available yet.\n\n- Cannot run / runtime errors: [ComfyUI/issues](https://github.com/comfyanonymous/ComfyUI/issues)\n- UI / frontend issues: [ComfyUI_frontend/issues](https://github.com/Comfy-Org/ComfyUI_frontend/issues)\n- Workflow issues: [workflow_templates/issues](https://github.com/Comfy-Org/workflow_templates/issues)\n"
+        "## Model Links\n\n**vae**\n\n- [minimax_h3_video_vae_fp16.safetensors](https://huggingface.co/Comfy-Org/MiniMax-H3/resolve/main/vae/minimax_h3_video_vae_fp16.safetensors)\n- [minimax_h3_audio_vae_fp32.safetensors](https://huggingface.co/Comfy-Org/MiniMax-H3/resolve/main/vae/minimax_h3_audio_vae_fp32.safetensors)\n\n**diffusion_models**\n\n- [minimax_h3_fl2va_pruned_int8_convrot.safetensors](https://huggingface.co/Comfy-Org/MiniMax-H3/resolve/main/diffusion_models/minimax_h3_fl2va_pruned_int8_convrot.safetensors) **(default)**\n- [minimax_h3_fl2va_pruned_fp8_scaled.safetensors](https://huggingface.co/Comfy-Org/MiniMax-H3/resolve/main/diffusion_models/minimax_h3_fl2va_pruned_fp8_scaled.safetensors)\n\n**text_encoders**\n\n- [qwen3vl_32b_minimax_h3_nvfp4_awq.safetensors](https://huggingface.co/Comfy-Org/MiniMax-H3/resolve/main/text_encoders/qwen3vl_32b_minimax_h3_nvfp4_awq.safetensors)\n\n\n## Model Storage Location\n\n```\n\ud83d\udcc2 ComfyUI/\n\u251c\u2500\u2500 \ud83d\udcc2 models/\n\u2502   \u251c\u2500\u2500 \ud83d\udcc2 vae/\n\u2502   \u2502   \u251c\u2500\u2500 minimax_h3_video_vae_fp16.safetensors\n\u2502   \u2502   \u2514\u2500\u2500 minimax_h3_audio_vae_fp32.safetensors\n\u2502   \u251c\u2500\u2500 \ud83d\udcc2 diffusion_models/\n\u2502   \u2502   \u251c\u2500\u2500 minimax_h3_fl2va_pruned_int8_convrot.safetensors\n\u2502   \u2502   \u2514\u2500\u2500 minimax_h3_fl2va_pruned_fp8_scaled.safetensors\n\u2502   \u2514\u2500\u2500 \ud83d\udcc2 text_encoders/\n\u2502       \u2514\u2500\u2500 qwen3vl_32b_minimax_h3_nvfp4_awq.safetensors\n```\n\n## Report Issue\n\nNote: Please update ComfyUI first ([guide](https://docs.comfy.org/installation/update_comfyui)) and prepare required models. Desktop/Cloud updates follow stable releases, so some nightly-supported models may not be available yet.\n\n- Cannot run / runtime errors: [ComfyUI/issues](https://github.com/comfyanonymous/ComfyUI/issues)\n- UI / frontend issues: [ComfyUI_frontend/issues](https://github.com/Comfy-Org/ComfyUI_frontend/issues)\n- Workflow issues: [workflow_templates/issues](https://github.com/Comfy-Org/workflow_templates/issues)\n"
       ],
       "color": "#222",
       "bgcolor": "#000"
@@ -434,12 +434,12 @@
       },
       "widgets_values": [
         "minimax-h3-t2v-turbo",
-        "MiniMax H3 Text to Video ⚡",
+        "MiniMax H3 Text to Video \u26a1",
         "text-to-video",
-        "⚡ Turbo 4-Step\nOpen Weights\nNative Audio\nINT8 Default",
-        "Generate synchronized video and stereo audio from text with MiniMax H3 Turbo's four-step preview LoRA.",
+        "Open Weights\nNative Audio\nINT8 Default\nLightX2V 8-Step\nSol Attention",
+        "Generate video with synchronized stereo audio from a text prompt using MiniMax H3. LightX2V 768p eight-step adapter with conservative Sol attention.",
         "MiniMax",
-        "MiniMax H3 Turbo"
+        "MiniMax H3"
       ]
     },
     {
@@ -948,13 +948,81 @@
       },
       "widgets_values": [
         "steps",
-        4,
-        4,
+        8,
+        1,
         50,
         1,
         "slider",
         30,
-        "Turbo sampling steps. Four is recommended; additional steps may slightly improve detail."
+        "Number of diffusion sampling steps."
+      ]
+    },
+    {
+      "id": 126,
+      "type": "StimmaDropdownParam",
+      "pos": [
+        -300,
+        800
+      ],
+      "size": [
+        384,
+        228
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "name",
+          "type": "STRING",
+          "widget": {
+            "name": "name"
+          },
+          "link": null
+        },
+        {
+          "name": "value",
+          "type": "STRING",
+          "widget": {
+            "name": "value"
+          },
+          "link": null
+        },
+        {
+          "name": "ui_order",
+          "type": "INT",
+          "widget": {
+            "name": "ui_order"
+          },
+          "link": null
+        },
+        {
+          "name": "ui_description",
+          "type": "STRING",
+          "widget": {
+            "name": "ui_description"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "value",
+          "type": "*",
+          "links": [
+            234
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "StimmaDropdownParam"
+      },
+      "widgets_values": [
+        "sampler",
+        "euler",
+        40,
+        "Sampling algorithm."
       ]
     },
     {
@@ -1209,7 +1277,7 @@
       },
       "widgets_values": [
         "Advanced",
-        "steps\nscheduler\nseed",
+        "steps\nsampler\nscheduler\nseed",
         true,
         10
       ]
@@ -2529,6 +2597,14 @@
       "INT"
     ],
     [
+      234,
+      126,
+      0,
+      105,
+      9,
+      "STRING"
+    ],
+    [
       235,
       127,
       0,
@@ -2661,12 +2737,12 @@
   "definitions": {
     "subgraphs": [
       {
-        "id": "4c314f31-ecda-4b08-ae98-faaba1bf613f",
+        "id": "52b72a77-4a25-51e8-95c7-b6bdb84d240e",
         "version": 1,
         "state": {
           "lastGroupId": 4,
-          "lastNodeId": 127,
-          "lastLinkId": 258,
+          "lastNodeId": 129,
+          "lastLinkId": 260,
           "lastRerouteId": 0
         },
         "revision": 0,
@@ -2853,7 +2929,9 @@
             "id": "6a9c82c8-1cb5-49bb-bd55-792f850a9418",
             "name": "sampler_name",
             "type": "COMBO",
-            "linkIds": [],
+            "linkIds": [
+              230
+            ],
             "pos": [
               -2456,
               5004
@@ -3236,19 +3314,28 @@
           },
           {
             "id": 17,
-            "type": "MiniMaxH3TurboSampler",
+            "type": "KSamplerSelect",
             "pos": [
               -790,
               4910
             ],
             "size": [
-              300,
-              60
+              370,
+              70
             ],
             "flags": {},
             "order": 0,
             "mode": 0,
-            "inputs": [],
+            "inputs": [
+              {
+                "name": "sampler_name",
+                "type": "COMBO",
+                "widget": {
+                  "name": "sampler_name"
+                },
+                "link": 230
+              }
+            ],
             "outputs": [
               {
                 "localized_name": "SAMPLER",
@@ -3260,9 +3347,11 @@
               }
             ],
             "properties": {
-              "Node name for S&R": "MiniMaxH3TurboSampler"
+              "Node name for S&R": "KSamplerSelect"
             },
-            "widgets_values": []
+            "widgets_values": [
+              "euler"
+            ]
           },
           {
             "id": 9,
@@ -3317,7 +3406,7 @@
             },
             "widgets_values": [
               "simple",
-              20,
+              8,
               1
             ]
           },
@@ -3472,7 +3561,7 @@
                 "name": "MODEL",
                 "type": "MODEL",
                 "links": [
-                  255
+                  254
                 ]
               }
             ],
@@ -3851,14 +3940,14 @@
           },
           {
             "id": 119,
-            "type": "MiniMaxH3MemoryEfficientSageAttentionPatch",
+            "type": "ModelAttentionBackend",
             "pos": [
               -1340,
               4520
             ],
             "size": [
               470,
-              60
+              90
             ],
             "flags": {},
             "order": 15,
@@ -3868,7 +3957,7 @@
                 "localized_name": "model",
                 "name": "model",
                 "type": "MODEL",
-                "link": 254
+                "link": 259
               }
             ],
             "outputs": [
@@ -3877,15 +3966,16 @@
                 "name": "model",
                 "type": "MODEL",
                 "links": [
-                  258
+                  260
                 ]
               }
             ],
             "properties": {
-              "cnr_id": "ComfyUI-KJNodes",
-              "Node name for S&R": "MiniMaxH3MemoryEfficientSageAttentionPatch"
+              "Node name for S&R": "ModelAttentionBackend"
             },
-            "widgets_values": []
+            "widgets_values": [
+              "comfy kitchen attention"
+            ]
           },
           {
             "id": 122,
@@ -4184,82 +4274,6 @@
           },
           {
             "id": 123,
-            "type": "MiniMaxH3TurboLoRA",
-            "pos": [
-              -930,
-              4310
-            ],
-            "size": [
-              360,
-              110
-            ],
-            "flags": {},
-            "order": 15,
-            "mode": 0,
-            "inputs": [
-              {
-                "localized_name": "model",
-                "name": "model",
-                "type": "MODEL",
-                "link": 253
-              },
-              {
-                "localized_name": "lora_name",
-                "name": "lora_name",
-                "type": "COMBO",
-                "widget": {
-                  "name": "lora_name"
-                },
-                "link": null
-              },
-              {
-                "localized_name": "strength",
-                "name": "strength",
-                "type": "FLOAT",
-                "widget": {
-                  "name": "strength"
-                },
-                "link": null
-              },
-              {
-                "localized_name": "low_vram",
-                "name": "low_vram",
-                "type": "BOOLEAN",
-                "widget": {
-                  "name": "low_vram"
-                },
-                "link": null
-              }
-            ],
-            "outputs": [
-              {
-                "localized_name": "MODEL",
-                "name": "MODEL",
-                "type": "MODEL",
-                "slot_index": 0,
-                "links": [
-                  254
-                ]
-              }
-            ],
-            "properties": {
-              "Node name for S&R": "MiniMaxH3TurboLoRA",
-              "models": [
-                {
-                  "name": "minimax_h3_turbo_4step_ema_ckpt850.safetensors",
-                  "url": "https://huggingface.co/larryvrh/MiniMax-H3-Turbo-Lora/resolve/main/minimax_h3_turbo_4step_ema_ckpt850.safetensors",
-                  "directory": "loras"
-                }
-              ]
-            },
-            "widgets_values": [
-              "minimax_h3_turbo_4step_ema_ckpt850.safetensors",
-              1,
-              false
-            ]
-          },
-          {
-            "id": 124,
             "type": "UNETLoader",
             "pos": [
               -2020,
@@ -4298,7 +4312,7 @@
                 "name": "MODEL",
                 "type": "MODEL",
                 "links": [
-                  256
+                  255
                 ]
               }
             ],
@@ -4323,7 +4337,7 @@
             ]
           },
           {
-            "id": 125,
+            "id": 124,
             "type": "StringCompare",
             "pos": [
               -1480,
@@ -4380,7 +4394,7 @@
                 "name": "BOOLEAN",
                 "type": "BOOLEAN",
                 "links": [
-                  257
+                  256
                 ]
               }
             ],
@@ -4397,7 +4411,7 @@
             }
           },
           {
-            "id": 126,
+            "id": 125,
             "type": "ComfySwitchNode",
             "pos": [
               -1120,
@@ -4415,13 +4429,13 @@
                 "localized_name": "on_false",
                 "name": "on_false",
                 "type": "MODEL",
-                "link": 255
+                "link": 254
               },
               {
                 "localized_name": "on_true",
                 "name": "on_true",
                 "type": "MODEL",
-                "link": 256
+                "link": 255
               },
               {
                 "localized_name": "switch",
@@ -4430,7 +4444,7 @@
                 "widget": {
                   "name": "switch"
                 },
-                "link": 257
+                "link": 256
               }
             ],
             "outputs": [
@@ -4453,7 +4467,7 @@
             }
           },
           {
-            "id": 127,
+            "id": 126,
             "type": "SpectrumApplyMiniMaxH3",
             "pos": [
               -830,
@@ -4471,7 +4485,7 @@
                 "localized_name": "model",
                 "name": "model",
                 "type": "MODEL",
-                "link": 258
+                "link": 257
               },
               {
                 "localized_name": "enabled",
@@ -4601,6 +4615,130 @@
               "cnr_id": "ComfyUI-Spectrum-MiniMax-H3",
               "Node name for S&R": "SpectrumApplyMiniMaxH3"
             }
+          },
+          {
+            "id": 127,
+            "type": "LoraLoaderModelOnly",
+            "pos": [
+              -1340,
+              5560
+            ],
+            "size": [
+              430,
+              150
+            ],
+            "flags": {},
+            "order": 15,
+            "mode": 0,
+            "inputs": [
+              {
+                "name": "model",
+                "type": "MODEL",
+                "link": 253
+              }
+            ],
+            "outputs": [
+              {
+                "name": "MODEL",
+                "type": "MODEL",
+                "links": [
+                  258
+                ],
+                "slot_index": 0
+              }
+            ],
+            "properties": {
+              "Node name for S&R": "LoraLoaderModelOnly"
+            },
+            "widgets_values": [
+              "minimax_h3_fl2v_turbo_8step_v1.0_768p_comfyui_bf16.safetensors",
+              1.0
+            ]
+          },
+          {
+            "id": 128,
+            "type": "MiniMaxH3SigmaShift",
+            "pos": [
+              -840,
+              5560
+            ],
+            "size": [
+              430,
+              150
+            ],
+            "flags": {},
+            "order": 15,
+            "mode": 0,
+            "inputs": [
+              {
+                "name": "model",
+                "type": "MODEL",
+                "link": 258
+              }
+            ],
+            "outputs": [
+              {
+                "name": "MODEL",
+                "type": "MODEL",
+                "links": [
+                  259
+                ],
+                "slot_index": 0
+              }
+            ],
+            "properties": {
+              "Node name for S&R": "MiniMaxH3SigmaShift"
+            },
+            "widgets_values": [
+              6.0,
+              3.0
+            ]
+          },
+          {
+            "id": 129,
+            "type": "BlockSparseAttention",
+            "pos": [
+              -340,
+              5560
+            ],
+            "size": [
+              430,
+              330
+            ],
+            "flags": {},
+            "order": 15,
+            "mode": 0,
+            "inputs": [
+              {
+                "name": "model",
+                "type": "MODEL",
+                "link": 260
+              }
+            ],
+            "outputs": [
+              {
+                "name": "MODEL",
+                "type": "MODEL",
+                "links": [
+                  257
+                ],
+                "slot_index": 0
+              }
+            ],
+            "properties": {
+              "Node name for S&R": "BlockSparseAttention"
+            },
+            "widgets_values": [
+              "sol-attn",
+              1.0,
+              0.2,
+              0.9,
+              "0, 49",
+              0,
+              256,
+              "exact_kv_and_rows",
+              false
+            ]
           }
         ],
         "groups": [
@@ -4672,7 +4810,7 @@
           },
           {
             "id": 5,
-            "origin_id": 127,
+            "origin_id": 126,
             "origin_slot": 0,
             "target_id": 9,
             "target_slot": 0,
@@ -4720,7 +4858,7 @@
           },
           {
             "id": 193,
-            "origin_id": 127,
+            "origin_id": 126,
             "origin_slot": 0,
             "target_id": 16,
             "target_slot": 0,
@@ -4850,7 +4988,7 @@
             "id": 221,
             "origin_id": -10,
             "origin_slot": 7,
-            "target_id": 125,
+            "target_id": 124,
             "target_slot": 0,
             "type": "STRING"
           },
@@ -4911,6 +5049,14 @@
             "type": "INT"
           },
           {
+            "id": 230,
+            "origin_id": -10,
+            "origin_slot": 13,
+            "target_id": 17,
+            "target_slot": 0,
+            "type": "COMBO"
+          },
+          {
             "id": 231,
             "origin_id": -10,
             "origin_slot": 14,
@@ -4936,7 +5082,7 @@
           },
           {
             "id": 234,
-            "origin_id": 126,
+            "origin_id": 125,
             "origin_slot": 0,
             "target_id": 122,
             "target_slot": 0,
@@ -4946,7 +5092,7 @@
             "id": 241,
             "origin_id": -10,
             "origin_slot": 15,
-            "target_id": 127,
+            "target_id": 126,
             "target_slot": 1,
             "type": "BOOLEAN"
           },
@@ -4954,7 +5100,7 @@
             "id": 242,
             "origin_id": -10,
             "origin_slot": 16,
-            "target_id": 127,
+            "target_id": 126,
             "target_slot": 2,
             "type": "FLOAT"
           },
@@ -4962,7 +5108,7 @@
             "id": 243,
             "origin_id": -10,
             "origin_slot": 17,
-            "target_id": 127,
+            "target_id": 126,
             "target_slot": 3,
             "type": "INT"
           },
@@ -4970,7 +5116,7 @@
             "id": 244,
             "origin_id": -10,
             "origin_slot": 18,
-            "target_id": 127,
+            "target_id": 126,
             "target_slot": 4,
             "type": "FLOAT"
           },
@@ -4978,7 +5124,7 @@
             "id": 245,
             "origin_id": -10,
             "origin_slot": 19,
-            "target_id": 127,
+            "target_id": 126,
             "target_slot": 5,
             "type": "FLOAT"
           },
@@ -4986,7 +5132,7 @@
             "id": 246,
             "origin_id": -10,
             "origin_slot": 20,
-            "target_id": 127,
+            "target_id": 126,
             "target_slot": 6,
             "type": "FLOAT"
           },
@@ -4994,7 +5140,7 @@
             "id": 247,
             "origin_id": -10,
             "origin_slot": 21,
-            "target_id": 127,
+            "target_id": 126,
             "target_slot": 7,
             "type": "INT"
           },
@@ -5002,7 +5148,7 @@
             "id": 248,
             "origin_id": -10,
             "origin_slot": 22,
-            "target_id": 127,
+            "target_id": 126,
             "target_slot": 8,
             "type": "INT"
           },
@@ -5010,7 +5156,7 @@
             "id": 249,
             "origin_id": -10,
             "origin_slot": 23,
-            "target_id": 127,
+            "target_id": 126,
             "target_slot": 9,
             "type": "INT"
           },
@@ -5018,7 +5164,7 @@
             "id": 250,
             "origin_id": -10,
             "origin_slot": 24,
-            "target_id": 127,
+            "target_id": 126,
             "target_slot": 11,
             "type": "COMBO"
           },
@@ -5026,7 +5172,7 @@
             "id": 251,
             "origin_id": -10,
             "origin_slot": 25,
-            "target_id": 127,
+            "target_id": 126,
             "target_slot": 10,
             "type": "BOOLEAN"
           },
@@ -5042,47 +5188,63 @@
             "id": 253,
             "origin_id": 122,
             "origin_slot": 0,
-            "target_id": 123,
+            "target_id": 127,
             "target_slot": 0,
             "type": "MODEL"
           },
           {
             "id": 254,
-            "origin_id": 123,
+            "origin_id": 6,
             "origin_slot": 0,
-            "target_id": 119,
+            "target_id": 125,
             "target_slot": 0,
             "type": "MODEL"
           },
           {
             "id": 255,
-            "origin_id": 6,
+            "origin_id": 123,
             "origin_slot": 0,
-            "target_id": 126,
-            "target_slot": 0,
+            "target_id": 125,
+            "target_slot": 1,
             "type": "MODEL"
           },
           {
             "id": 256,
             "origin_id": 124,
             "origin_slot": 0,
-            "target_id": 126,
-            "target_slot": 1,
-            "type": "MODEL"
-          },
-          {
-            "id": 257,
-            "origin_id": 125,
-            "origin_slot": 0,
-            "target_id": 126,
+            "target_id": 125,
             "target_slot": 2,
             "type": "BOOLEAN"
           },
           {
+            "id": 257,
+            "origin_id": 129,
+            "origin_slot": 0,
+            "target_id": 126,
+            "target_slot": 0,
+            "type": "MODEL"
+          },
+          {
             "id": 258,
+            "origin_id": 127,
+            "origin_slot": 0,
+            "target_id": 128,
+            "target_slot": 0,
+            "type": "MODEL"
+          },
+          {
+            "id": 259,
+            "origin_id": 128,
+            "origin_slot": 0,
+            "target_id": 119,
+            "target_slot": 0,
+            "type": "MODEL"
+          },
+          {
+            "id": 260,
             "origin_id": 119,
             "origin_slot": 0,
-            "target_id": 127,
+            "target_id": 129,
             "target_slot": 0,
             "type": "MODEL"
           }
