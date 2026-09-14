@@ -36,6 +36,39 @@ def field(node_id, class_type, inputs):
 
 
 class TestReferenceToVideoDescriptor(unittest.TestCase):
+    def test_bundled_image_resolution_contract(self):
+        import importlib.util
+        spec = importlib.util.spec_from_file_location("resolution_params", Path(ROOT) / "nodes/params.py")
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        required = module.StimmaResolutionParam.INPUT_TYPES()["required"]
+        self.assertEqual(list(required)[:7], ["width", "height", "min_size", "max_size", "step", "supported_resolutions", "ui_order"])
+        self.assertEqual(list(required)[7], "slider_max_pixels")
+        count = 0
+        for path in (Path(ROOT) / "workflows").glob("*.json"):
+            nodes = json.loads(path.read_text())["nodes"]
+            if not any(n["type"] == "StimmaToolInfo" and "text-to-image" in n["widgets_values"][2] for n in nodes):
+                continue
+            for node in nodes:
+                if node["type"] != "StimmaResolutionParam":
+                    continue
+                converted = _convert_ui_to_api({"nodes": [node], "links": []},
+                    {"StimmaResolutionParam": {"input": {"required": required}}})
+                inputs = converted[str(node["id"])]["inputs"]
+                workflow = DiscoveredWorkflow(file_path=path.name, api_prompt={},
+                    tool_info={"slug": "resolution-test", "display_name": "Resolution", "task_types": ["text-to-image"], "description": ""},
+                    field_nodes=[field("size", "StimmaResolutionParam", inputs)])
+                descriptor = _build_single_tool(workflow, object_info=None, config=object(), provider=object()).to_descriptor()
+                props = descriptor.parameter_schema["properties"]
+                self.assertEqual(props["width"]["maximum"], 4096, path.name)
+                self.assertEqual(props["height"]["maximum"], 4096, path.name)
+                self.assertEqual(props["width"]["x-resolution-slider-max-pixels"], 4194304, path.name)
+                self.assertNotIn("x-supported_resolutions", props["width"], path.name)
+                self.assertEqual(module.StimmaResolutionParam().execute(3136, 1344, **{k: v for k, v in inputs.items() if k not in ("width", "height")}), (3136, 1344))
+                count += 1
+        self.assertEqual(count, 12)
+        self.assertEqual(module.StimmaResolutionParam().execute(1024, 1024, 256, 2048, 64, "", 3), (1024, 1024))
+
     def test_typed_sections_are_optional_but_one_is_required(self):
         fields = [field("prompt", "StimmaPromptParam", {
             "name": "prompt", "default_text": "", "required": True, "ui_order": 0,

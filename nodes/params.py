@@ -121,6 +121,7 @@ class StimmaResolutionParam:
                 "step": ("INT", {"default": 64, "min": 1, "max": 512, "display": "number"}),
                 "supported_resolutions": ("STRING", {"default": "", "multiline": True}),
                 "ui_order": ("INT", {"default": 0, "min": 0, "max": 100, "display": "number"}),
+                "slider_max_pixels": ("INT", {"default": 0, "min": 0, "max": 268435456, "display": "number"}),
             },
         }
 
@@ -129,7 +130,7 @@ class StimmaResolutionParam:
     FUNCTION = "execute"
     CATEGORY = "Stimma/Params"
 
-    def execute(self, width, height, min_size, max_size, step, supported_resolutions, ui_order):
+    def execute(self, width, height, min_size, max_size, step, supported_resolutions, ui_order, slider_max_pixels=0):
         return (width, height)
 
 

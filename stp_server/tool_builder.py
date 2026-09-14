@@ -357,6 +357,9 @@ def _build_field_parameter(node: Dict[str, Any]) -> Optional[ToolParameter]:
                         pass
 
         width_hints = {"control": "resolution", "step": step, "paired-with": "height"}
+        slider_max_pixels = inputs.get("slider_max_pixels", 0)
+        if isinstance(slider_max_pixels, (int, float)) and slider_max_pixels > 0:
+            width_hints["resolution-slider-max-pixels"] = slider_max_pixels
         if supported:
             width_hints["supported_resolutions"] = supported
 
