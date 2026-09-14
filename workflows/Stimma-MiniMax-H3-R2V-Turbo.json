@@ -944,7 +944,7 @@
         "MiniMax H3 Reference to Video \u26a1",
         "reference-to-video",
         "Open Weights\nNative Audio\nMultimodal References\nINT8 Default\nLightX2V 8-Step\nSol Attention",
-        "Generate video from ordered image, video, and audio references with synchronized stereo audio. Includes selectable INT8/FP8 precision, SageAttention, and opt-in Spectrum acceleration. LightX2V 768p eight-step adapter with conservative Sol attention.",
+        "Generate video from ordered image, video, and audio references with synchronized stereo audio. Includes selectable INT8/FP8 precision and Sol tuning. LightX2V 768p eight-step adapter with conservative Sol attention.",
         "MiniMax",
         "MiniMax H3 Ref2VA"
       ]
@@ -3346,74 +3346,6 @@
       ]
     },
     {
-      "id": 170,
-      "type": "StimmaBoolParam",
-      "pos": [
-        630,
-        6500
-      ],
-      "size": [
-        384,
-        180
-      ],
-      "flags": {},
-      "order": 0,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "name",
-          "type": "STRING",
-          "widget": {
-            "name": "name"
-          },
-          "link": null
-        },
-        {
-          "name": "value",
-          "type": "BOOLEAN",
-          "widget": {
-            "name": "value"
-          },
-          "link": null
-        },
-        {
-          "name": "ui_order",
-          "type": "INT",
-          "widget": {
-            "name": "ui_order"
-          },
-          "link": null
-        },
-        {
-          "name": "ui_description",
-          "type": "STRING",
-          "widget": {
-            "name": "ui_description"
-          },
-          "link": null
-        }
-      ],
-      "outputs": [
-        {
-          "name": "value",
-          "type": "BOOLEAN",
-          "links": [
-            313
-          ],
-          "slot_index": 0
-        }
-      ],
-      "properties": {
-        "Node name for S&R": "StimmaBoolParam"
-      },
-      "widgets_values": [
-        "spectrum",
-        false,
-        23,
-        "Forecast selected H3 transformer steps for higher throughput. This approximate mode can change motion, fine detail, and audio."
-      ]
-    },
-    {
       "id": 171,
       "type": "StimmaFloatParam",
       "pos": [
@@ -3507,222 +3439,14 @@
         "Node name for S&R": "StimmaFloatParam"
       },
       "widgets_values": [
-        "spectrum_blend",
-        0.5,
-        0,
-        1,
-        0.01,
+        "sol_sparsity",
+        1.0,
+        0.0,
+        2.0,
+        0.05,
         "slider",
         50,
-        "Spectrum polynomial share; the remainder uses a local linear forecast."
-      ]
-    },
-    {
-      "id": 172,
-      "type": "StimmaIntParam",
-      "pos": [
-        1490,
-        6500
-      ],
-      "size": [
-        384,
-        355
-      ],
-      "flags": {},
-      "order": 0,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "name",
-          "type": "STRING",
-          "widget": {
-            "name": "name"
-          },
-          "link": null
-        },
-        {
-          "name": "value",
-          "type": "INT",
-          "widget": {
-            "name": "value"
-          },
-          "link": null
-        },
-        {
-          "name": "minimum",
-          "type": "INT",
-          "widget": {
-            "name": "minimum"
-          },
-          "link": null
-        },
-        {
-          "name": "maximum",
-          "type": "INT",
-          "widget": {
-            "name": "maximum"
-          },
-          "link": null
-        },
-        {
-          "name": "step",
-          "type": "INT",
-          "widget": {
-            "name": "step"
-          },
-          "link": null
-        },
-        {
-          "name": "ui_control",
-          "type": "COMBO",
-          "widget": {
-            "name": "ui_control"
-          },
-          "link": null
-        },
-        {
-          "name": "ui_order",
-          "type": "INT",
-          "widget": {
-            "name": "ui_order"
-          },
-          "link": null
-        },
-        {
-          "name": "ui_description",
-          "type": "STRING",
-          "widget": {
-            "name": "ui_description"
-          },
-          "link": null
-        }
-      ],
-      "outputs": [
-        {
-          "name": "value",
-          "type": "INT",
-          "links": [
-            315
-          ],
-          "slot_index": 0
-        }
-      ],
-      "properties": {
-        "Node name for S&R": "StimmaIntParam"
-      },
-      "widgets_values": [
-        "spectrum_degree",
-        4,
-        1,
-        16,
-        1,
-        "slider",
-        51,
-        "Maximum Chebyshev polynomial degree."
-      ]
-    },
-    {
-      "id": 173,
-      "type": "StimmaFloatParam",
-      "pos": [
-        200,
-        6890
-      ],
-      "size": [
-        384,
-        355
-      ],
-      "flags": {},
-      "order": 0,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "name",
-          "type": "STRING",
-          "widget": {
-            "name": "name"
-          },
-          "link": null
-        },
-        {
-          "name": "value",
-          "type": "FLOAT",
-          "widget": {
-            "name": "value"
-          },
-          "link": null
-        },
-        {
-          "name": "minimum",
-          "type": "FLOAT",
-          "widget": {
-            "name": "minimum"
-          },
-          "link": null
-        },
-        {
-          "name": "maximum",
-          "type": "FLOAT",
-          "widget": {
-            "name": "maximum"
-          },
-          "link": null
-        },
-        {
-          "name": "step",
-          "type": "FLOAT",
-          "widget": {
-            "name": "step"
-          },
-          "link": null
-        },
-        {
-          "name": "ui_control",
-          "type": "COMBO",
-          "widget": {
-            "name": "ui_control"
-          },
-          "link": null
-        },
-        {
-          "name": "ui_order",
-          "type": "INT",
-          "widget": {
-            "name": "ui_order"
-          },
-          "link": null
-        },
-        {
-          "name": "ui_description",
-          "type": "STRING",
-          "widget": {
-            "name": "ui_description"
-          },
-          "link": null
-        }
-      ],
-      "outputs": [
-        {
-          "name": "value",
-          "type": "FLOAT",
-          "links": [
-            316
-          ],
-          "slot_index": 0
-        }
-      ],
-      "properties": {
-        "Node name for S&R": "StimmaFloatParam"
-      },
-      "widgets_values": [
-        "spectrum_ridge",
-        0.1,
-        0,
-        10,
-        0.01,
-        "slider",
-        52,
-        "Ridge regularization applied to Spectrum's regression fit."
+        "Higher values trade detail for speed. 1.0 is the tested Sol setting."
       ]
     },
     {
@@ -3819,14 +3543,14 @@
         "Node name for S&R": "StimmaFloatParam"
       },
       "widgets_values": [
-        "spectrum_window",
-        2,
-        1,
-        16,
+        "sol_start",
+        0.2,
+        0.0,
+        1.0,
         0.05,
         "slider",
-        53,
-        "Initial interval between actual transformer evaluations."
+        51,
+        "Fraction of the denoising schedule before Sol begins; earlier steps use dense attention."
       ]
     },
     {
@@ -3923,462 +3647,14 @@
         "Node name for S&R": "StimmaFloatParam"
       },
       "widgets_values": [
-        "spectrum_flex_window",
-        0.75,
-        0,
-        8,
+        "sol_end",
+        0.9,
+        0.0,
+        1.0,
         0.05,
         "slider",
-        54,
-        "Interval growth after each scheduled actual evaluation; larger values are more aggressive."
-      ]
-    },
-    {
-      "id": 176,
-      "type": "StimmaIntParam",
-      "pos": [
-        1490,
-        6890
-      ],
-      "size": [
-        384,
-        355
-      ],
-      "flags": {},
-      "order": 0,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "name",
-          "type": "STRING",
-          "widget": {
-            "name": "name"
-          },
-          "link": null
-        },
-        {
-          "name": "value",
-          "type": "INT",
-          "widget": {
-            "name": "value"
-          },
-          "link": null
-        },
-        {
-          "name": "minimum",
-          "type": "INT",
-          "widget": {
-            "name": "minimum"
-          },
-          "link": null
-        },
-        {
-          "name": "maximum",
-          "type": "INT",
-          "widget": {
-            "name": "maximum"
-          },
-          "link": null
-        },
-        {
-          "name": "step",
-          "type": "INT",
-          "widget": {
-            "name": "step"
-          },
-          "link": null
-        },
-        {
-          "name": "ui_control",
-          "type": "COMBO",
-          "widget": {
-            "name": "ui_control"
-          },
-          "link": null
-        },
-        {
-          "name": "ui_order",
-          "type": "INT",
-          "widget": {
-            "name": "ui_order"
-          },
-          "link": null
-        },
-        {
-          "name": "ui_description",
-          "type": "STRING",
-          "widget": {
-            "name": "ui_description"
-          },
-          "link": null
-        }
-      ],
-      "outputs": [
-        {
-          "name": "value",
-          "type": "INT",
-          "links": [
-            319
-          ],
-          "slot_index": 0
-        }
-      ],
-      "properties": {
-        "Node name for S&R": "StimmaIntParam"
-      },
-      "widgets_values": [
-        "spectrum_warmup_steps",
-        5,
-        0,
-        64,
-        1,
-        "slider",
-        55,
-        "Initial solver steps that always run the full transformer."
-      ]
-    },
-    {
-      "id": 177,
-      "type": "StimmaIntParam",
-      "pos": [
-        200,
-        7280
-      ],
-      "size": [
-        384,
-        355
-      ],
-      "flags": {},
-      "order": 0,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "name",
-          "type": "STRING",
-          "widget": {
-            "name": "name"
-          },
-          "link": null
-        },
-        {
-          "name": "value",
-          "type": "INT",
-          "widget": {
-            "name": "value"
-          },
-          "link": null
-        },
-        {
-          "name": "minimum",
-          "type": "INT",
-          "widget": {
-            "name": "minimum"
-          },
-          "link": null
-        },
-        {
-          "name": "maximum",
-          "type": "INT",
-          "widget": {
-            "name": "maximum"
-          },
-          "link": null
-        },
-        {
-          "name": "step",
-          "type": "INT",
-          "widget": {
-            "name": "step"
-          },
-          "link": null
-        },
-        {
-          "name": "ui_control",
-          "type": "COMBO",
-          "widget": {
-            "name": "ui_control"
-          },
-          "link": null
-        },
-        {
-          "name": "ui_order",
-          "type": "INT",
-          "widget": {
-            "name": "ui_order"
-          },
-          "link": null
-        },
-        {
-          "name": "ui_description",
-          "type": "STRING",
-          "widget": {
-            "name": "ui_description"
-          },
-          "link": null
-        }
-      ],
-      "outputs": [
-        {
-          "name": "value",
-          "type": "INT",
-          "links": [
-            320
-          ],
-          "slot_index": 0
-        }
-      ],
-      "properties": {
-        "Node name for S&R": "StimmaIntParam"
-      },
-      "widgets_values": [
-        "spectrum_tail_steps",
-        1,
-        0,
-        64,
-        1,
-        "slider",
-        56,
-        "Requested final full-transformer steps; supported samplers may enforce a safer minimum."
-      ]
-    },
-    {
-      "id": 178,
-      "type": "StimmaIntParam",
-      "pos": [
-        630,
-        7280
-      ],
-      "size": [
-        384,
-        355
-      ],
-      "flags": {},
-      "order": 0,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "name",
-          "type": "STRING",
-          "widget": {
-            "name": "name"
-          },
-          "link": null
-        },
-        {
-          "name": "value",
-          "type": "INT",
-          "widget": {
-            "name": "value"
-          },
-          "link": null
-        },
-        {
-          "name": "minimum",
-          "type": "INT",
-          "widget": {
-            "name": "minimum"
-          },
-          "link": null
-        },
-        {
-          "name": "maximum",
-          "type": "INT",
-          "widget": {
-            "name": "maximum"
-          },
-          "link": null
-        },
-        {
-          "name": "step",
-          "type": "INT",
-          "widget": {
-            "name": "step"
-          },
-          "link": null
-        },
-        {
-          "name": "ui_control",
-          "type": "COMBO",
-          "widget": {
-            "name": "ui_control"
-          },
-          "link": null
-        },
-        {
-          "name": "ui_order",
-          "type": "INT",
-          "widget": {
-            "name": "ui_order"
-          },
-          "link": null
-        },
-        {
-          "name": "ui_description",
-          "type": "STRING",
-          "widget": {
-            "name": "ui_description"
-          },
-          "link": null
-        }
-      ],
-      "outputs": [
-        {
-          "name": "value",
-          "type": "INT",
-          "links": [
-            321
-          ],
-          "slot_index": 0
-        }
-      ],
-      "properties": {
-        "Node name for S&R": "StimmaIntParam"
-      },
-      "widgets_values": [
-        "spectrum_max_history",
-        8,
-        2,
-        64,
-        1,
-        "slider",
-        57,
-        "Maximum actual feature snapshots retained; must be greater than the polynomial degree."
-      ]
-    },
-    {
-      "id": 179,
-      "type": "StimmaDropdownParam",
-      "pos": [
-        1060,
-        7280
-      ],
-      "size": [
-        384,
-        228
-      ],
-      "flags": {},
-      "order": 0,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "name",
-          "type": "STRING",
-          "widget": {
-            "name": "name"
-          },
-          "link": null
-        },
-        {
-          "name": "value",
-          "type": "STRING",
-          "widget": {
-            "name": "value"
-          },
-          "link": null
-        },
-        {
-          "name": "ui_order",
-          "type": "INT",
-          "widget": {
-            "name": "ui_order"
-          },
-          "link": null
-        },
-        {
-          "name": "ui_description",
-          "type": "STRING",
-          "widget": {
-            "name": "ui_description"
-          },
-          "link": null
-        }
-      ],
-      "outputs": [
-        {
-          "name": "value",
-          "type": "*",
-          "links": [
-            322
-          ],
-          "slot_index": 0
-        }
-      ],
-      "properties": {
-        "Node name for S&R": "StimmaDropdownParam"
-      },
-      "widgets_values": [
-        "spectrum_history_storage",
-        "system_ram",
-        58,
-        "Store Spectrum history in system RAM or VRAM. VRAM can avoid transfers but consumes several additional GiB."
-      ]
-    },
-    {
-      "id": 180,
-      "type": "StimmaBoolParam",
-      "pos": [
-        1490,
-        7280
-      ],
-      "size": [
-        384,
-        180
-      ],
-      "flags": {},
-      "order": 0,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "name",
-          "type": "STRING",
-          "widget": {
-            "name": "name"
-          },
-          "link": null
-        },
-        {
-          "name": "value",
-          "type": "BOOLEAN",
-          "widget": {
-            "name": "value"
-          },
-          "link": null
-        },
-        {
-          "name": "ui_order",
-          "type": "INT",
-          "widget": {
-            "name": "ui_order"
-          },
-          "link": null
-        },
-        {
-          "name": "ui_description",
-          "type": "STRING",
-          "widget": {
-            "name": "ui_description"
-          },
-          "link": null
-        }
-      ],
-      "outputs": [
-        {
-          "name": "value",
-          "type": "BOOLEAN",
-          "links": [
-            323
-          ],
-          "slot_index": 0
-        }
-      ],
-      "properties": {
-        "Node name for S&R": "StimmaBoolParam"
-      },
-      "widgets_values": [
-        "spectrum_debug",
-        false,
-        59,
-        "Write detailed Spectrum scheduling and fallback diagnostics to the ComfyUI log."
+        52,
+        "Fraction of the denoising schedule where Sol ends; later steps use dense attention."
       ]
     },
     {
@@ -4435,7 +3711,7 @@
       },
       "widgets_values": [
         "Performance",
-        "model_precision\nspectrum",
+        "model_precision",
         false,
         7
       ]
@@ -4493,8 +3769,8 @@
         "Node name for S&R": "StimmaLayoutGroup"
       },
       "widgets_values": [
-        "Spectrum Tuning",
-        "spectrum_blend\nspectrum_degree\nspectrum_ridge\nspectrum_window\nspectrum_flex_window\nspectrum_warmup_steps\nspectrum_tail_steps\nspectrum_max_history\nspectrum_history_storage\nspectrum_debug",
+        "Sol Tuning",
+        "sol_sparsity\nsol_start\nsol_end",
         true,
         8
       ]
@@ -5028,156 +4304,6 @@
       }
     },
     {
-      "id": 188,
-      "type": "SpectrumApplyMiniMaxH3",
-      "pos": [
-        -290,
-        4810
-      ],
-      "size": [
-        430,
-        300
-      ],
-      "flags": {},
-      "order": 16,
-      "mode": 0,
-      "inputs": [
-        {
-          "localized_name": "model",
-          "name": "model",
-          "type": "MODEL",
-          "link": 330
-        },
-        {
-          "localized_name": "enabled",
-          "name": "enabled",
-          "type": "BOOLEAN",
-          "widget": {
-            "name": "enabled"
-          },
-          "link": 313
-        },
-        {
-          "localized_name": "blend_weight",
-          "name": "blend_weight",
-          "type": "FLOAT",
-          "widget": {
-            "name": "blend_weight"
-          },
-          "link": 314
-        },
-        {
-          "localized_name": "degree",
-          "name": "degree",
-          "type": "INT",
-          "widget": {
-            "name": "degree"
-          },
-          "link": 315
-        },
-        {
-          "localized_name": "ridge_lambda",
-          "name": "ridge_lambda",
-          "type": "FLOAT",
-          "widget": {
-            "name": "ridge_lambda"
-          },
-          "link": 316
-        },
-        {
-          "localized_name": "window_size",
-          "name": "window_size",
-          "type": "FLOAT",
-          "widget": {
-            "name": "window_size"
-          },
-          "link": 317
-        },
-        {
-          "localized_name": "flex_window",
-          "name": "flex_window",
-          "type": "FLOAT",
-          "widget": {
-            "name": "flex_window"
-          },
-          "link": 318
-        },
-        {
-          "localized_name": "warmup_steps",
-          "name": "warmup_steps",
-          "type": "INT",
-          "widget": {
-            "name": "warmup_steps"
-          },
-          "link": 319
-        },
-        {
-          "localized_name": "tail_actual_steps",
-          "name": "tail_actual_steps",
-          "type": "INT",
-          "widget": {
-            "name": "tail_actual_steps"
-          },
-          "link": 320
-        },
-        {
-          "localized_name": "max_history",
-          "name": "max_history",
-          "type": "INT",
-          "widget": {
-            "name": "max_history"
-          },
-          "link": 321
-        },
-        {
-          "localized_name": "debug",
-          "name": "debug",
-          "type": "BOOLEAN",
-          "widget": {
-            "name": "debug"
-          },
-          "link": 323
-        },
-        {
-          "localized_name": "history_storage",
-          "name": "history_storage",
-          "type": "COMBO",
-          "widget": {
-            "name": "history_storage"
-          },
-          "link": 322
-        }
-      ],
-      "outputs": [
-        {
-          "localized_name": "model",
-          "name": "model",
-          "type": "MODEL",
-          "links": [
-            252,
-            257
-          ]
-        }
-      ],
-      "widgets_values": [
-        true,
-        0.5,
-        4,
-        0.1,
-        2,
-        0.75,
-        5,
-        1,
-        8,
-        false,
-        "system_ram"
-      ],
-      "properties": {
-        "cnr_id": "ComfyUI-Spectrum-MiniMax-H3",
-        "Node name for S&R": "SpectrumApplyMiniMaxH3"
-      }
-    },
-    {
       "id": 189,
       "type": "LoraLoaderModelOnly",
       "pos": [
@@ -5274,6 +4400,30 @@
           "name": "model",
           "type": "MODEL",
           "link": 333
+        },
+        {
+          "name": "selection.tau",
+          "type": "FLOAT",
+          "widget": {
+            "name": "selection.tau"
+          },
+          "link": 314
+        },
+        {
+          "name": "start_percent",
+          "type": "FLOAT",
+          "widget": {
+            "name": "start_percent"
+          },
+          "link": 317
+        },
+        {
+          "name": "end_percent",
+          "type": "FLOAT",
+          "widget": {
+            "name": "end_percent"
+          },
+          "link": 318
         }
       ],
       "outputs": [
@@ -5281,7 +4431,8 @@
           "name": "MODEL",
           "type": "MODEL",
           "links": [
-            330
+            252,
+            257
           ],
           "slot_index": 0
         }
@@ -5321,7 +4472,7 @@
     ],
     [
       252,
-      188,
+      191,
       0,
       124,
       0,
@@ -5361,7 +4512,7 @@
     ],
     [
       257,
-      188,
+      191,
       0,
       126,
       0,
@@ -5680,92 +4831,28 @@
       "STRING"
     ],
     [
-      313,
-      170,
-      0,
-      188,
-      1,
-      "BOOLEAN"
-    ],
-    [
       314,
       171,
       0,
-      188,
-      2,
-      "FLOAT"
-    ],
-    [
-      315,
-      172,
-      0,
-      188,
-      3,
-      "INT"
-    ],
-    [
-      316,
-      173,
-      0,
-      188,
-      4,
+      191,
+      1,
       "FLOAT"
     ],
     [
       317,
       174,
       0,
-      188,
-      5,
+      191,
+      2,
       "FLOAT"
     ],
     [
       318,
       175,
       0,
-      188,
-      6,
+      191,
+      3,
       "FLOAT"
-    ],
-    [
-      319,
-      176,
-      0,
-      188,
-      7,
-      "INT"
-    ],
-    [
-      320,
-      177,
-      0,
-      188,
-      8,
-      "INT"
-    ],
-    [
-      321,
-      178,
-      0,
-      188,
-      9,
-      "INT"
-    ],
-    [
-      322,
-      179,
-      0,
-      188,
-      11,
-      "STRING"
-    ],
-    [
-      323,
-      180,
-      0,
-      188,
-      10,
-      "BOOLEAN"
     ],
     [
       324,
@@ -5814,14 +4901,6 @@
       187,
       2,
       "BOOLEAN"
-    ],
-    [
-      330,
-      191,
-      0,
-      188,
-      0,
-      "MODEL"
     ],
     [
       331,

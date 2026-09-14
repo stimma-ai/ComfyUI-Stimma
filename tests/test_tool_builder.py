@@ -525,7 +525,7 @@ class TestReferenceToVideoWorkflow(unittest.TestCase):
 
 
 class TestMiniMaxH3TurboWorkflows(unittest.TestCase):
-    def test_turbo_preserves_base_fields_parameters_and_loras(self):
+    def test_turbo_preserves_generation_features_without_spectrum_controls(self):
         workflow_dir = Path(ROOT) / "workflows"
         paths = sorted(workflow_dir.glob("Stimma-MiniMax-H3-*-Turbo.json"))
         self.assertEqual(len(paths), 3)
@@ -544,6 +544,10 @@ class TestMiniMaxH3TurboWorkflows(unittest.TestCase):
                         continue
                     expected = json.loads(json.dumps(node))
                     values = expected.get("widgets_values", [])
+                    if values and (str(values[0]).startswith("spectrum") or values[0] == "Spectrum Tuning"):
+                        continue
+                    if values and values[0] == "Performance":
+                        values[1] = "model_precision"
                     if values and values[0] == "steps":
                         values[1] = 8
                     elif values and values[0] == "sampler":
@@ -569,6 +573,7 @@ class TestMiniMaxH3TurboWorkflows(unittest.TestCase):
                 nodes = {n["type"]: n for n in graph["nodes"]}
                 self.assertNotIn("MiniMaxH3TurboLoRA", nodes)
                 self.assertNotIn("MiniMaxH3TurboSampler", nodes)
+                self.assertNotIn("spectrum", json.dumps(workflow).lower())
                 self.assertEqual(nodes["MiniMaxH3SigmaShift"]["widgets_values"], [6.0, 3.0])
                 self.assertEqual(nodes["KSamplerSelect"]["widgets_values"], ["euler"])
                 self.assertEqual(nodes["BlockSparseAttention"]["widgets_values"],
@@ -582,13 +587,47 @@ class TestMiniMaxH3TurboWorkflows(unittest.TestCase):
                 self.assertEqual(len(registry[filename]["sha256"]), 64)
                 links = {l["id"] if isinstance(l, dict) else l[0]: l for l in graph["links"]}
                 for left, right in zip(
-                    ("StimmaLoraLoader", "LoraLoaderModelOnly", "MiniMaxH3SigmaShift", "ModelAttentionBackend", "BlockSparseAttention"),
-                    ("LoraLoaderModelOnly", "MiniMaxH3SigmaShift", "ModelAttentionBackend", "BlockSparseAttention", "SpectrumApplyMiniMaxH3"),
+                    ("StimmaLoraLoader", "LoraLoaderModelOnly", "MiniMaxH3SigmaShift", "ModelAttentionBackend"),
+                    ("LoraLoaderModelOnly", "MiniMaxH3SigmaShift", "ModelAttentionBackend", "BlockSparseAttention"),
                 ):
                     model_input = next(i for i in nodes[right]["inputs"] if i["name"] == "model")
                     link = links[model_input["link"]]
                     source = link["origin_id"] if isinstance(link, dict) else link[1]
                     self.assertEqual(source, nodes[left]["id"])
+
+
+    def test_sol_controls_are_connected_to_attention(self):
+        for task in ("I2V", "T2V", "R2V"):
+            with self.subTest(task=task):
+                w = json.loads((Path(ROOT) / "workflows" / f"Stimma-MiniMax-H3-{task}-Turbo.json").read_text())
+                params = {n["widgets_values"][0]: n for n in w["nodes"]
+                          if n["type"] == "StimmaFloatParam"}
+                graph = next(g for g in [w] + w.get("definitions", {}).get("subgraphs", [])
+                             if any(n["type"] == "BlockSparseAttention" for n in g["nodes"]))
+                sol = next(n for n in graph["nodes"] if n["type"] == "BlockSparseAttention")
+                links = {l["id"] if isinstance(l, dict) else l[0]: l for l in graph["links"]}
+                for name, target, default in (("sol_sparsity", "selection.tau", 1.0),
+                                               ("sol_start", "start_percent", .2),
+                                               ("sol_end", "end_percent", .9)):
+                    self.assertEqual(params[name]["widgets_values"][1], default)
+                    slot = next(i for i in sol["inputs"] if i["name"] == target)
+                    link = links[slot["link"]]
+                    if isinstance(link, dict):
+                        self.assertEqual(link["origin_id"], graph["inputNode"]["id"])
+                        self.assertEqual(graph["inputs"][link["origin_slot"]]["name"], name)
+                        instance = next(n for n in w["nodes"] if n["type"] == graph["id"])
+                        inp = next(i for i in instance["inputs"] if i["name"] == name)
+                        root_link = next(l for l in w["links"] if l[0] == inp["link"])
+                        self.assertEqual(root_link[1], params[name]["id"])
+                    else:
+                        self.assertEqual(link[1], params[name]["id"])
+                by_id = {n["id"]: n for n in graph["nodes"]}
+                consumers = set()
+                for lid in sol["outputs"][0]["links"]:
+                    link = links[lid]
+                    target = link["target_id"] if isinstance(link, dict) else link[3]
+                    consumers.add(by_id[target]["type"])
+                self.assertEqual(consumers, {"BasicGuider", "BasicScheduler"})
 
 
 class TestLTXLoraWorkflows(unittest.TestCase):

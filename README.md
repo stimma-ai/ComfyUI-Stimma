@@ -31,8 +31,10 @@ The separate H3 ⚡ tools use LightX2V eight-step 768p adapters with conservativ
 native Sol attention. Standard H3 workflows are unchanged. I2V retains optional
 last-frame conditioning; T2V generates without an image; R2V retains image,
 video and audio references. Precision selection, user LoRA slots, resolution,
-duration, audio, seed, sampler/scheduler and Spectrum controls match the standard
-tools. Defaults are eight steps, Euler/simple, shifts 6/3 and Spectrum off.
+duration, audio, seed and sampler/scheduler controls match the standard tools.
+A collapsed Sol Tuning group exposes sparsity and its start/end window, with the
+benchmarked defaults. Spectrum is not part of the ⚡ graphs or their UI.
+Defaults are eight steps, Euler/simple and shifts 6/3.
 
 I2V and T2V use `minimax_h3_fl2v_turbo_8step_v1.0_768p_comfyui_bf16.safetensors`;
 R2V uses the dedicated `minimax_h3_ref2v_turbo_8step_v1.0_768p_comfyui_bf16.safetensors`.
@@ -43,8 +45,8 @@ earlier four-step H3 turbo recipes and no longer require Larry's Turbo node pack
 Use a current ComfyUI build with native `ModelAttentionBackend`,
 `MiniMaxH3SigmaShift` and `BlockSparseAttention` support, including the Comfy Kitchen
 Sol kernels. The presets use tau 1.0, sparse attention from 20–90%, dense first/last
-blocks, 256 extra tokens and dense conditioning/audio rows. Spectrum remains an
-optional additional approximation; combining it with Sol is not the tested default.
+blocks, 256 extra tokens and dense conditioning/audio rows. The standard H3
+workflows retain their separate Spectrum controls.
 The recipe was evaluated at 1344×768; other sizes and extra LoRAs remain available
 for experimentation. Ref2v uses its own adapter and needs separate quality judgment
 from the i2v comparison.
