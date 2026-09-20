@@ -33,6 +33,13 @@ and so on. Edit output follows the first image's aspect ratio. Both tools use
 the official INT8 weights, 25 Euler/simple steps, CFG 1, and optional LoRAs
 from `qwen-2.1/`. Negative prompts take effect when CFG is greater than 1.
 
+The edit workflow derives its sampler seed from the requested seed and the
+first reference image's pixels. Reusing the exact generation noise to edit a
+Qwen-generated image can cause severe sharpening and changes to untouched
+backgrounds. Image-dependent edit noise avoids that reuse, including across
+successive edits, while keeping the same inputs and seed reproducible. The
+requested seed therefore differs from the raw KSampler seed in this workflow.
+
 Update ComfyUI to a build containing `TextEncodeQwenImage21`. The manager can
 download the three required files from
 [Comfy-Org/Qwen-Image-2.1](https://huggingface.co/Comfy-Org/Qwen-Image-2.1).

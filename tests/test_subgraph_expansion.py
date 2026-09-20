@@ -158,7 +158,7 @@ def run_tests():
     # --- Stimma nodes extractable ---
     stimma = _extract_stimma_nodes(result)
     check("stimma_extractable",
-          stimma is not None and stimma["tool_info"]["slug"] == "qwen-image-2512",
+          stimma is not None and stimma["tool_info"]["slug"] == "qwen-image-2512-t2i",
           f"stimma={stimma}")
     if stimma:
         check("stimma_has_output",

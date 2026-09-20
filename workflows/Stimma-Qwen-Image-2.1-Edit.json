@@ -1,8 +1,8 @@
 {
   "id": "307f312b-3a8a-496d-9fa7-4f4bca8c215e",
   "revision": 0,
-  "last_node_id": 39,
-  "last_link_id": 27,
+  "last_node_id": 40,
+  "last_link_id": 29,
   "nodes": [
     {
       "id": 1,
@@ -1012,7 +1012,7 @@
           "name": "seed",
           "type": "INT",
           "links": [
-            11
+            28
           ],
           "slot_index": 0
         }
@@ -1536,7 +1536,8 @@
           "name": "image",
           "type": "IMAGE",
           "links": [
-            18
+            18,
+            29
           ],
           "slot_index": 0
         },
@@ -2405,6 +2406,47 @@
         true
       ],
       "title": "Image 10 (optional reference)"
+    },
+    {
+      "id": 40,
+      "type": "StimmaImageSeed",
+      "pos": [
+        550,
+        650
+      ],
+      "size": [
+        290,
+        80
+      ],
+      "flags": {},
+      "order": 26,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "seed",
+          "type": "INT",
+          "link": 28
+        },
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "link": 29
+        }
+      ],
+      "outputs": [
+        {
+          "name": "seed",
+          "type": "INT",
+          "links": [
+            11
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "StimmaImageSeed"
+      },
+      "widgets_values": []
     }
   ],
   "links": [
@@ -2490,7 +2532,7 @@
     ],
     [
       11,
-      14,
+      40,
       0,
       6,
       1,
@@ -2622,6 +2664,22 @@
       0,
       5,
       14,
+      "IMAGE"
+    ],
+    [
+      28,
+      14,
+      0,
+      40,
+      0,
+      "INT"
+    ],
+    [
+      29,
+      30,
+      0,
+      40,
+      1,
       "IMAGE"
     ]
   ],
