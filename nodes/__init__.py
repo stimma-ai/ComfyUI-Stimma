@@ -27,6 +27,7 @@ from .layout import StimmaLayoutGroup
 from .stitch_assembler import StimmaVideoStitchAssembler
 from .outpaint import StimmaOutpaintPadding
 from .image_seed import StimmaImageSeed
+from .image_latent import StimmaImageModeLatent
 
 NODE_CLASS_MAPPINGS = {
     "StimmaToolInfo": StimmaToolInfo,
@@ -39,6 +40,7 @@ NODE_CLASS_MAPPINGS = {
     "StimmaAudioParam": StimmaAudioParam,
     "StimmaSeedParam": StimmaSeedParam,
     "StimmaImageSeed": StimmaImageSeed,
+    "StimmaImageModeLatent": StimmaImageModeLatent,
     "StimmaIntParam": StimmaIntParam,
     "StimmaFloatParam": StimmaFloatParam,
     "StimmaStringParam": StimmaStringParam,
@@ -67,6 +69,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "StimmaAudioParam": "Stimma Audio",
     "StimmaSeedParam": "Stimma Seed",
     "StimmaImageSeed": "Stimma Image Edit Seed",
+    "StimmaImageModeLatent": "Stimma Generation / Edit Canvas",
     "StimmaIntParam": "Stimma Int",
     "StimmaFloatParam": "Stimma Float",
     "StimmaStringParam": "Stimma String",

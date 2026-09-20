@@ -17,6 +17,10 @@ logger = logging.getLogger(__name__)
 _MANIFEST_NAME = ".stimma-manifest.json"
 _MANIFEST_VERSION = 1
 
+# These bundled tools have been consolidated into another bundled workflow.
+# Only remove our unchanged installed copies; user-authored edits are preserved.
+_RETIRED_WORKFLOWS = {"Stimma-Qwen-Image-2.1-Edit.json"}
+
 
 def _sha256(path: str) -> str:
     h = hashlib.sha256()
@@ -57,7 +61,8 @@ def sync_bundled_workflows(restore_deleted: bool = False):
     - Source updated, dest unchanged from our last write → update it
     - Source updated, dest modified by user → leave it alone
     - Dest deleted by user → mark deleted, never re-copy
-    - Source removed from plugin → leave dest alone
+    - Explicitly retired source, dest unchanged from our last write → remove it
+    - Other source removed from plugin → leave dest alone
     """
     try:
         import folder_paths
@@ -78,6 +83,20 @@ def sync_bundled_workflows(restore_deleted: bool = False):
     manifest = _load_manifest(manifest_path)
     files = manifest["files"]
     changed = False
+
+    for name in _RETIRED_WORKFLOWS:
+        entry = files.get(name)
+        if entry is None:
+            continue
+        dst_path = os.path.join(dest_dir, name)
+        if os.path.exists(dst_path):
+            if _sha256(dst_path) != entry.get("hash"):
+                logger.info(f"Retired workflow {name} modified by user, preserving it")
+                continue
+            os.remove(dst_path)
+            logger.info(f"Removed retired bundled workflow: {name}")
+        del files[name]
+        changed = True
 
     for name in sorted(os.listdir(source_dir)):
         if not name.endswith(".json"):

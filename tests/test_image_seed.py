@@ -12,6 +12,12 @@ spec = importlib.util.spec_from_file_location(
 module = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(module)
 
+latent_spec = importlib.util.spec_from_file_location(
+    "image_latent", Path(__file__).resolve().parents[1] / "nodes" / "image_latent.py"
+)
+latent_module = importlib.util.module_from_spec(latent_spec)
+latent_spec.loader.exec_module(latent_module)
+
 
 class ImageSeedTests(unittest.TestCase):
     def setUp(self):
@@ -23,6 +29,10 @@ class ImageSeedTests(unittest.TestCase):
         self.assertEqual(actual, self.node.execute(2142, self.image.clone()))
         self.assertNotEqual(actual, (2142,))
         self.assertTrue(0 <= actual[0] <= 0xFFFFFFFFFFFFFFFF)
+
+    def test_generation_without_image_preserves_requested_seed(self):
+        self.assertEqual(self.node.execute(2142), (2142,))
+        self.assertIn("image", self.node.INPUT_TYPES()["optional"])
 
     def test_new_reference_or_requested_seed_changes_noise(self):
         original = self.node.execute(2142, self.image)
@@ -44,6 +54,22 @@ class ImageSeedTests(unittest.TestCase):
         self.node.execute(0xFFFFFFFFFFFFFFFF, self.image)
         self.assertTrue(torch.equal(before, self.image))
         self.assertTrue(torch.equal(state, torch.random.get_rng_state()))
+
+
+class ImageModeLatentTests(unittest.TestCase):
+    def test_generation_uses_requested_canvas(self):
+        generation = {"samples": torch.zeros(1, 4, 64, 96)}
+        edit = {"samples": torch.zeros(1, 64, 64, 64)}
+        actual = latent_module.StimmaImageModeLatent().execute(generation, edit)
+        self.assertIs(actual[0], generation)
+
+    def test_even_black_reference_uses_reference_canvas(self):
+        generation = {"samples": torch.zeros(1, 4, 64, 96)}
+        edit = {"samples": torch.zeros(1, 64, 64, 64)}
+        actual = latent_module.StimmaImageModeLatent().execute(
+            generation, edit, torch.zeros(1, 1024, 1024, 3)
+        )
+        self.assertIs(actual[0], edit)
 
 
 if __name__ == "__main__":

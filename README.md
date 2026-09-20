@@ -25,20 +25,36 @@ pip install -r ComfyUI-Stimma/requirements.txt
 
 Restart ComfyUI. The plugin registers its nodes and starts the STP server automatically.
 
-## Qwen Image 2.1 workflows
+## Qwen Image 2.1
 
-`Qwen Image 2.1` generates images; `Qwen Image 2.1 Edit` edits one image with
-up to nine additional references. Mention references as `<image1>`, `<image2>`,
-and so on. Edit output follows the first image's aspect ratio. Both tools use
-the official INT8 weights, 25 Euler/simple steps, CFG 1, and optional LoRAs
-from `qwen-2.1/`. Negative prompts take effect when CFG is greater than 1.
+`Qwen Image 2.1` (`qwen-image-2.1`) is one unified generation/editing tool.
+With no images it generates using width/height (default 2048 × 2048).
+With 1–10 images it edits the first image using the others as references.
+Mention references as `<image1>`, `<image2>`, and so on. Edits follow the first
+image's aspect ratio; `reference_resolution` controls the pixel budget
+(default 1024, approximately one megapixel; 0 preserves input size).
+Width/height apply only when generating without an image.
 
-The edit workflow derives its sampler seed from the requested seed and the
-first reference image's pixels. Reusing the exact generation noise to edit a
-Qwen-generated image can cause severe sharpening and changes to untouched
-backgrounds. Image-dependent edit noise avoids that reuse, including across
+The workflow uses the official INT8 weights and defaults to 40 Euler/simple
+steps. Steps, sampler, scheduler, reference resolution, optional LoRAs from
+`qwen-2.1/`, and seed are exposed under Advanced. CFG is fixed at 1, negative
+conditioning is empty, and denoise is fixed at 1. Qwen's intended operating
+mode uses no classifier-free guidance; there is no CFG, guidance, negative
+prompt, or denoise control. Sampler/scheduler alternatives are available for
+experimentation; Euler/simple is the default path.
+
+When images are supplied, the workflow derives its sampler seed from the
+requested seed and the first reference image's pixels. Reusing the exact
+generation noise to edit a Qwen-generated image can cause severe sharpening
+and changes to untouched backgrounds. Image-dependent edit noise avoids that reuse, including across
 successive edits, while keeping the same inputs and seed reproducible. The
-requested seed therefore differs from the raw KSampler seed in this workflow.
+requested seed therefore differs from the raw KSampler seed during editing.
+Without an image, the requested seed passes through unchanged.
+
+This replaces `qwen-image-2.1-t2i` and `qwen-image-2.1-edit`. On startup, the
+installer updates the generation workflow and removes the obsolete edit
+workflow only if its installed copy is unchanged. User-modified copies are
+preserved and can be migrated manually.
 
 Update ComfyUI to a build containing `TextEncodeQwenImage21`. The manager can
 download the three required files from

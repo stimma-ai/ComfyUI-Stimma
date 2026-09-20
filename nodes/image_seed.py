@@ -11,6 +11,7 @@ class StimmaImageSeed:
     def INPUT_TYPES(cls):
         return {"required": {
             "seed": ("INT", {"forceInput": True, "min": 0, "max": 0xFFFFFFFFFFFFFFFF}),
+        }, "optional": {
             "image": ("IMAGE",),
         }}
 
@@ -25,7 +26,9 @@ class StimmaImageSeed:
         "when editing a generated image or applying successive edits."
     )
 
-    def execute(self, seed, image):
+    def execute(self, seed, image=None):
+        if image is None:
+            return (seed,)
         # Canonical CPU float32 bytes make this independent of device, strides,
         # tensor precision, and host byte order. No global random state changes.
         pixels = image.detach().cpu().float().contiguous().numpy().astype("<f4", copy=False)
