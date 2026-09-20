@@ -25,6 +25,20 @@ pip install -r ComfyUI-Stimma/requirements.txt
 
 Restart ComfyUI. The plugin registers its nodes and starts the STP server automatically.
 
+## Qwen Image 2.1 workflows
+
+`Qwen Image 2.1` generates images; `Qwen Image 2.1 Edit` edits one image with
+up to nine additional references. Mention references as `<image1>`, `<image2>`,
+and so on. Edit output follows the first image's aspect ratio. Both tools use
+the official INT8 weights, 25 Euler/simple steps, CFG 1, and optional LoRAs
+from `qwen-2.1/`. Negative prompts take effect when CFG is greater than 1.
+
+Update ComfyUI to a build containing `TextEncodeQwenImage21`. The manager can
+download the three required files from
+[Comfy-Org/Qwen-Image-2.1](https://huggingface.co/Comfy-Org/Qwen-Image-2.1).
+For transparent output, request an RGBA image with an alpha channel and a
+transparent background; the output PNG preserves alpha.
+
 ## MiniMax H3 ⚡ workflows
 
 The separate H3 ⚡ tools use LightX2V eight-step 768p adapters with conservative

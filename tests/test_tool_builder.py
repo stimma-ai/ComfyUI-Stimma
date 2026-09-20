@@ -66,7 +66,7 @@ class TestReferenceToVideoDescriptor(unittest.TestCase):
                 self.assertNotIn("x-supported_resolutions", props["width"], path.name)
                 self.assertEqual(module.StimmaResolutionParam().execute(3136, 1344, **{k: v for k, v in inputs.items() if k not in ("width", "height")}), (3136, 1344))
                 count += 1
-        self.assertEqual(count, 12)
+        self.assertEqual(count, 13)
         self.assertEqual(module.StimmaResolutionParam().execute(1024, 1024, 256, 2048, 64, "", 3), (1024, 1024))
 
     def test_typed_sections_are_optional_but_one_is_required(self):

@@ -1,0 +1,1634 @@
+{
+  "id": "b6d19995-5cac-4362-a4ee-1dc9c98dddfd",
+  "revision": 0,
+  "last_node_id": 18,
+  "last_link_id": 18,
+  "nodes": [
+    {
+      "id": 1,
+      "type": "StimmaToolInfo",
+      "pos": [
+        -800,
+        -400
+      ],
+      "size": [
+        360,
+        257
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "slug",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "slug"
+          }
+        },
+        {
+          "name": "display_name",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "display_name"
+          }
+        },
+        {
+          "name": "task_types",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "task_types"
+          }
+        },
+        {
+          "name": "badges",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "badges"
+          }
+        },
+        {
+          "name": "description",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "description"
+          }
+        },
+        {
+          "name": "model_vendor",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "model_vendor"
+          },
+          "shape": 7
+        },
+        {
+          "name": "model",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "model"
+          },
+          "shape": 7
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "Node name for S&R": "StimmaToolInfo"
+      },
+      "widgets_values": [
+        "qwen-image-2.1-t2i",
+        "Qwen Image 2.1",
+        "text-to-image",
+        "Open Weights",
+        "Generate images with Qwen Image 2.1, including native transparent PNGs. For transparency, ask for an RGBA image with an alpha channel and a transparent background.",
+        "alibaba",
+        "qwen-image-2.1"
+      ]
+    },
+    {
+      "id": 2,
+      "type": "UNETLoader",
+      "pos": [
+        0,
+        0
+      ],
+      "size": [
+        360,
+        127
+      ],
+      "flags": {},
+      "order": 1,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "unet_name",
+          "type": "COMBO",
+          "link": null,
+          "widget": {
+            "name": "unet_name"
+          }
+        },
+        {
+          "name": "weight_dtype",
+          "type": "COMBO",
+          "link": null,
+          "widget": {
+            "name": "weight_dtype"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "MODEL",
+          "type": "MODEL",
+          "links": [
+            1
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "UNETLoader",
+        "models": [
+          {
+            "name": "qwen_image_2.1_int8_convrot.safetensors",
+            "url": "https://huggingface.co/Comfy-Org/Qwen-Image-2.1/resolve/main/diffusion_models/qwen_image_2.1_int8_convrot.safetensors",
+            "directory": "diffusion_models"
+          }
+        ]
+      },
+      "widgets_values": [
+        "qwen_image_2.1_int8_convrot.safetensors",
+        "default"
+      ]
+    },
+    {
+      "id": 3,
+      "type": "CLIPLoader",
+      "pos": [
+        0,
+        250
+      ],
+      "size": [
+        360,
+        153
+      ],
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "clip_name",
+          "type": "COMBO",
+          "link": null,
+          "widget": {
+            "name": "clip_name"
+          }
+        },
+        {
+          "name": "type",
+          "type": "COMBO",
+          "link": null,
+          "widget": {
+            "name": "type"
+          }
+        },
+        {
+          "name": "device",
+          "type": "COMBO",
+          "link": null,
+          "widget": {
+            "name": "device"
+          },
+          "shape": 7
+        }
+      ],
+      "outputs": [
+        {
+          "name": "CLIP",
+          "type": "CLIP",
+          "links": [
+            2
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "CLIPLoader",
+        "models": [
+          {
+            "name": "qwen3vl_8b_int8_convrot.safetensors",
+            "url": "https://huggingface.co/Comfy-Org/Qwen-Image-2.1/resolve/main/text_encoders/qwen3vl_8b_int8_convrot.safetensors",
+            "directory": "text_encoders"
+          }
+        ]
+      },
+      "widgets_values": [
+        "qwen3vl_8b_int8_convrot.safetensors",
+        "qwen_image",
+        "default"
+      ]
+    },
+    {
+      "id": 4,
+      "type": "VAELoader",
+      "pos": [
+        0,
+        500
+      ],
+      "size": [
+        360,
+        101
+      ],
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "vae_name",
+          "type": "COMBO",
+          "link": null,
+          "widget": {
+            "name": "vae_name"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "VAE",
+          "type": "VAE",
+          "links": [
+            5,
+            6
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "VAELoader",
+        "models": [
+          {
+            "name": "qwen_image_2.1_vae_bf16.safetensors",
+            "url": "https://huggingface.co/Comfy-Org/Qwen-Image-2.1/resolve/main/vae/qwen_image_2.1_vae_bf16.safetensors",
+            "directory": "vae"
+          }
+        ]
+      },
+      "widgets_values": [
+        "qwen_image_2.1_vae_bf16.safetensors"
+      ]
+    },
+    {
+      "id": 5,
+      "type": "TextEncodeQwenImage21",
+      "pos": [
+        450,
+        200
+      ],
+      "size": [
+        360,
+        153
+      ],
+      "flags": {},
+      "order": 4,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "clip",
+          "type": "CLIP",
+          "link": 4
+        },
+        {
+          "name": "prompt",
+          "type": "STRING",
+          "link": 7,
+          "widget": {
+            "name": "prompt"
+          }
+        },
+        {
+          "name": "negative_prompt",
+          "type": "STRING",
+          "link": 8,
+          "widget": {
+            "name": "negative_prompt"
+          }
+        },
+        {
+          "name": "resolution",
+          "type": "INT",
+          "link": null,
+          "widget": {
+            "name": "resolution"
+          }
+        },
+        {
+          "name": "vae",
+          "type": "VAE",
+          "link": 5,
+          "shape": 7
+        }
+      ],
+      "outputs": [
+        {
+          "name": "positive",
+          "type": "CONDITIONING",
+          "links": [
+            12
+          ],
+          "slot_index": 0
+        },
+        {
+          "name": "negative",
+          "type": "CONDITIONING",
+          "links": [
+            13
+          ],
+          "slot_index": 1
+        },
+        {
+          "name": "latent",
+          "type": "LATENT",
+          "links": [],
+          "slot_index": 2
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "TextEncodeQwenImage21"
+      },
+      "widgets_values": [
+        "",
+        "",
+        1024
+      ]
+    },
+    {
+      "id": 6,
+      "type": "KSampler",
+      "pos": [
+        950,
+        0
+      ],
+      "size": [
+        360,
+        257
+      ],
+      "flags": {},
+      "order": 5,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "model",
+          "type": "MODEL",
+          "link": 3
+        },
+        {
+          "name": "seed",
+          "type": "INT",
+          "link": 11,
+          "widget": {
+            "name": "seed"
+          }
+        },
+        {
+          "name": "steps",
+          "type": "INT",
+          "link": 9,
+          "widget": {
+            "name": "steps"
+          }
+        },
+        {
+          "name": "cfg",
+          "type": "FLOAT",
+          "link": 10,
+          "widget": {
+            "name": "cfg"
+          }
+        },
+        {
+          "name": "sampler_name",
+          "type": "COMBO",
+          "link": null,
+          "widget": {
+            "name": "sampler_name"
+          }
+        },
+        {
+          "name": "scheduler",
+          "type": "COMBO",
+          "link": null,
+          "widget": {
+            "name": "scheduler"
+          }
+        },
+        {
+          "name": "positive",
+          "type": "CONDITIONING",
+          "link": 12
+        },
+        {
+          "name": "negative",
+          "type": "CONDITIONING",
+          "link": 13
+        },
+        {
+          "name": "latent_image",
+          "type": "LATENT",
+          "link": 18
+        },
+        {
+          "name": "denoise",
+          "type": "FLOAT",
+          "link": null,
+          "widget": {
+            "name": "denoise"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "LATENT",
+          "type": "LATENT",
+          "links": [
+            14
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "KSampler"
+      },
+      "widgets_values": [
+        0,
+        "fixed",
+        25,
+        1.0,
+        "euler",
+        "simple",
+        1.0
+      ]
+    },
+    {
+      "id": 7,
+      "type": "VAEDecode",
+      "pos": [
+        1350,
+        0
+      ],
+      "size": [
+        360,
+        100
+      ],
+      "flags": {},
+      "order": 6,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "samples",
+          "type": "LATENT",
+          "link": 14
+        },
+        {
+          "name": "vae",
+          "type": "VAE",
+          "link": 6
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            15
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "VAEDecode"
+      },
+      "widgets_values": []
+    },
+    {
+      "id": 8,
+      "type": "StimmaImageOutput",
+      "pos": [
+        1750,
+        0
+      ],
+      "size": [
+        360,
+        127
+      ],
+      "flags": {},
+      "order": 7,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 15
+        },
+        {
+          "name": "filename_prefix",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "filename_prefix"
+          }
+        },
+        {
+          "name": "_stimma_output_dir",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "_stimma_output_dir"
+          },
+          "shape": 7
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "Node name for S&R": "StimmaImageOutput"
+      },
+      "widgets_values": [
+        "Qwen-Image-2.1",
+        ""
+      ]
+    },
+    {
+      "id": 10,
+      "type": "StimmaPromptParam",
+      "pos": [
+        -800,
+        0
+      ],
+      "size": [
+        360,
+        205
+      ],
+      "flags": {},
+      "order": 8,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "name",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "name"
+          }
+        },
+        {
+          "name": "default_text",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "default_text"
+          }
+        },
+        {
+          "name": "required",
+          "type": "BOOLEAN",
+          "link": null,
+          "widget": {
+            "name": "required"
+          }
+        },
+        {
+          "name": "ui_order",
+          "type": "INT",
+          "link": null,
+          "widget": {
+            "name": "ui_order"
+          }
+        },
+        {
+          "name": "ui_description",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "ui_description"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "text",
+          "type": "STRING",
+          "links": [
+            7
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "StimmaPromptParam"
+      },
+      "widgets_values": [
+        "prompt",
+        "A red ceramic mug on a wooden table beside a window, soft morning light, product photography.",
+        true,
+        0,
+        "Describe the image to generate"
+      ]
+    },
+    {
+      "id": 11,
+      "type": "StimmaPromptParam",
+      "pos": [
+        -800,
+        400
+      ],
+      "size": [
+        360,
+        205
+      ],
+      "flags": {},
+      "order": 9,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "name",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "name"
+          }
+        },
+        {
+          "name": "default_text",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "default_text"
+          }
+        },
+        {
+          "name": "required",
+          "type": "BOOLEAN",
+          "link": null,
+          "widget": {
+            "name": "required"
+          }
+        },
+        {
+          "name": "ui_order",
+          "type": "INT",
+          "link": null,
+          "widget": {
+            "name": "ui_order"
+          }
+        },
+        {
+          "name": "ui_description",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "ui_description"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "text",
+          "type": "STRING",
+          "links": [
+            8
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "StimmaPromptParam"
+      },
+      "widgets_values": [
+        "negative_prompt",
+        "",
+        false,
+        20,
+        "Used only when CFG is greater than 1"
+      ]
+    },
+    {
+      "id": 12,
+      "type": "StimmaIntParam",
+      "pos": [
+        -800,
+        750
+      ],
+      "size": [
+        360,
+        309
+      ],
+      "flags": {},
+      "order": 10,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "name",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "name"
+          }
+        },
+        {
+          "name": "value",
+          "type": "INT",
+          "link": null,
+          "widget": {
+            "name": "value"
+          }
+        },
+        {
+          "name": "minimum",
+          "type": "INT",
+          "link": null,
+          "widget": {
+            "name": "minimum"
+          }
+        },
+        {
+          "name": "maximum",
+          "type": "INT",
+          "link": null,
+          "widget": {
+            "name": "maximum"
+          }
+        },
+        {
+          "name": "step",
+          "type": "INT",
+          "link": null,
+          "widget": {
+            "name": "step"
+          }
+        },
+        {
+          "name": "ui_control",
+          "type": "COMBO",
+          "link": null,
+          "widget": {
+            "name": "ui_control"
+          }
+        },
+        {
+          "name": "ui_order",
+          "type": "INT",
+          "link": null,
+          "widget": {
+            "name": "ui_order"
+          }
+        },
+        {
+          "name": "ui_description",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "ui_description"
+          }
+        },
+        {
+          "name": "ui_format",
+          "type": "COMBO",
+          "link": null,
+          "widget": {
+            "name": "ui_format"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "value",
+          "type": "INT",
+          "links": [
+            9
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "StimmaIntParam"
+      },
+      "widgets_values": [
+        "steps",
+        25,
+        1,
+        100,
+        1,
+        "input",
+        30,
+        "",
+        ""
+      ]
+    },
+    {
+      "id": 13,
+      "type": "StimmaFloatParam",
+      "pos": [
+        -800,
+        1100
+      ],
+      "size": [
+        360,
+        283
+      ],
+      "flags": {},
+      "order": 11,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "name",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "name"
+          }
+        },
+        {
+          "name": "value",
+          "type": "FLOAT",
+          "link": null,
+          "widget": {
+            "name": "value"
+          }
+        },
+        {
+          "name": "minimum",
+          "type": "FLOAT",
+          "link": null,
+          "widget": {
+            "name": "minimum"
+          }
+        },
+        {
+          "name": "maximum",
+          "type": "FLOAT",
+          "link": null,
+          "widget": {
+            "name": "maximum"
+          }
+        },
+        {
+          "name": "step",
+          "type": "FLOAT",
+          "link": null,
+          "widget": {
+            "name": "step"
+          }
+        },
+        {
+          "name": "ui_control",
+          "type": "COMBO",
+          "link": null,
+          "widget": {
+            "name": "ui_control"
+          }
+        },
+        {
+          "name": "ui_order",
+          "type": "INT",
+          "link": null,
+          "widget": {
+            "name": "ui_order"
+          }
+        },
+        {
+          "name": "ui_description",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "ui_description"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "value",
+          "type": "FLOAT",
+          "links": [
+            10
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "StimmaFloatParam"
+      },
+      "widgets_values": [
+        "cfg_scale",
+        1.0,
+        1.0,
+        20.0,
+        0.1,
+        "input",
+        40,
+        ""
+      ]
+    },
+    {
+      "id": 14,
+      "type": "StimmaSeedParam",
+      "pos": [
+        -800,
+        1450
+      ],
+      "size": [
+        360,
+        153
+      ],
+      "flags": {},
+      "order": 12,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "name",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "name"
+          }
+        },
+        {
+          "name": "value",
+          "type": "INT",
+          "link": null,
+          "widget": {
+            "name": "value"
+          }
+        },
+        {
+          "name": "ui_order",
+          "type": "INT",
+          "link": null,
+          "widget": {
+            "name": "ui_order"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "seed",
+          "type": "INT",
+          "links": [
+            11
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "StimmaSeedParam"
+      },
+      "widgets_values": [
+        "seed",
+        0,
+        80
+      ]
+    },
+    {
+      "id": 15,
+      "type": "StimmaLayoutGroup",
+      "pos": [
+        -800,
+        1750
+      ],
+      "size": [
+        360,
+        179
+      ],
+      "flags": {},
+      "order": 13,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "group_label",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "group_label"
+          }
+        },
+        {
+          "name": "param_names",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "param_names"
+          }
+        },
+        {
+          "name": "collapsed",
+          "type": "BOOLEAN",
+          "link": null,
+          "widget": {
+            "name": "collapsed"
+          }
+        },
+        {
+          "name": "ui_order",
+          "type": "INT",
+          "link": null,
+          "widget": {
+            "name": "ui_order"
+          }
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "Node name for S&R": "StimmaLayoutGroup"
+      },
+      "widgets_values": [
+        "Advanced",
+        "negative_prompt\nsteps\ncfg_scale\nseed",
+        true,
+        90
+      ]
+    },
+    {
+      "id": 16,
+      "type": "StimmaLoraLoader",
+      "pos": [
+        0,
+        750
+      ],
+      "size": [
+        360,
+        647
+      ],
+      "flags": {},
+      "order": 14,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "model",
+          "type": "MODEL",
+          "link": 1
+        },
+        {
+          "name": "clip",
+          "type": "CLIP",
+          "link": 2
+        },
+        {
+          "name": "path_filter",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "path_filter"
+          }
+        },
+        {
+          "name": "ui_order",
+          "type": "INT",
+          "link": null,
+          "widget": {
+            "name": "ui_order"
+          }
+        },
+        {
+          "name": "lora_1",
+          "type": "COMBO",
+          "link": null,
+          "widget": {
+            "name": "lora_1"
+          },
+          "shape": 7
+        },
+        {
+          "name": "strength_1",
+          "type": "FLOAT",
+          "link": null,
+          "widget": {
+            "name": "strength_1"
+          },
+          "shape": 7
+        },
+        {
+          "name": "lora_2",
+          "type": "COMBO",
+          "link": null,
+          "widget": {
+            "name": "lora_2"
+          },
+          "shape": 7
+        },
+        {
+          "name": "strength_2",
+          "type": "FLOAT",
+          "link": null,
+          "widget": {
+            "name": "strength_2"
+          },
+          "shape": 7
+        },
+        {
+          "name": "lora_3",
+          "type": "COMBO",
+          "link": null,
+          "widget": {
+            "name": "lora_3"
+          },
+          "shape": 7
+        },
+        {
+          "name": "strength_3",
+          "type": "FLOAT",
+          "link": null,
+          "widget": {
+            "name": "strength_3"
+          },
+          "shape": 7
+        },
+        {
+          "name": "lora_4",
+          "type": "COMBO",
+          "link": null,
+          "widget": {
+            "name": "lora_4"
+          },
+          "shape": 7
+        },
+        {
+          "name": "strength_4",
+          "type": "FLOAT",
+          "link": null,
+          "widget": {
+            "name": "strength_4"
+          },
+          "shape": 7
+        },
+        {
+          "name": "lora_5",
+          "type": "COMBO",
+          "link": null,
+          "widget": {
+            "name": "lora_5"
+          },
+          "shape": 7
+        },
+        {
+          "name": "strength_5",
+          "type": "FLOAT",
+          "link": null,
+          "widget": {
+            "name": "strength_5"
+          },
+          "shape": 7
+        },
+        {
+          "name": "lora_6",
+          "type": "COMBO",
+          "link": null,
+          "widget": {
+            "name": "lora_6"
+          },
+          "shape": 7
+        },
+        {
+          "name": "strength_6",
+          "type": "FLOAT",
+          "link": null,
+          "widget": {
+            "name": "strength_6"
+          },
+          "shape": 7
+        },
+        {
+          "name": "lora_7",
+          "type": "COMBO",
+          "link": null,
+          "widget": {
+            "name": "lora_7"
+          },
+          "shape": 7
+        },
+        {
+          "name": "strength_7",
+          "type": "FLOAT",
+          "link": null,
+          "widget": {
+            "name": "strength_7"
+          },
+          "shape": 7
+        },
+        {
+          "name": "lora_8",
+          "type": "COMBO",
+          "link": null,
+          "widget": {
+            "name": "lora_8"
+          },
+          "shape": 7
+        },
+        {
+          "name": "strength_8",
+          "type": "FLOAT",
+          "link": null,
+          "widget": {
+            "name": "strength_8"
+          },
+          "shape": 7
+        },
+        {
+          "name": "lora_9",
+          "type": "COMBO",
+          "link": null,
+          "widget": {
+            "name": "lora_9"
+          },
+          "shape": 7
+        },
+        {
+          "name": "strength_9",
+          "type": "FLOAT",
+          "link": null,
+          "widget": {
+            "name": "strength_9"
+          },
+          "shape": 7
+        },
+        {
+          "name": "lora_10",
+          "type": "COMBO",
+          "link": null,
+          "widget": {
+            "name": "lora_10"
+          },
+          "shape": 7
+        },
+        {
+          "name": "strength_10",
+          "type": "FLOAT",
+          "link": null,
+          "widget": {
+            "name": "strength_10"
+          },
+          "shape": 7
+        }
+      ],
+      "outputs": [
+        {
+          "name": "model",
+          "type": "MODEL",
+          "links": [
+            3
+          ],
+          "slot_index": 0
+        },
+        {
+          "name": "clip",
+          "type": "CLIP",
+          "links": [
+            4
+          ],
+          "slot_index": 1
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "StimmaLoraLoader"
+      },
+      "widgets_values": [
+        "qwen-2.1/**",
+        60,
+        "None",
+        1.0,
+        "None",
+        1.0,
+        "None",
+        1.0,
+        "None",
+        1.0,
+        "None",
+        1.0,
+        "None",
+        1.0,
+        "None",
+        1.0,
+        "None",
+        1.0,
+        "None",
+        1.0,
+        "None",
+        1.0
+      ]
+    },
+    {
+      "id": 17,
+      "type": "StimmaResolutionParam",
+      "pos": [
+        -1250,
+        0
+      ],
+      "size": [
+        360,
+        283
+      ],
+      "flags": {},
+      "order": 15,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "width",
+          "type": "INT",
+          "link": null,
+          "widget": {
+            "name": "width"
+          }
+        },
+        {
+          "name": "height",
+          "type": "INT",
+          "link": null,
+          "widget": {
+            "name": "height"
+          }
+        },
+        {
+          "name": "min_size",
+          "type": "INT",
+          "link": null,
+          "widget": {
+            "name": "min_size"
+          }
+        },
+        {
+          "name": "max_size",
+          "type": "INT",
+          "link": null,
+          "widget": {
+            "name": "max_size"
+          }
+        },
+        {
+          "name": "step",
+          "type": "INT",
+          "link": null,
+          "widget": {
+            "name": "step"
+          }
+        },
+        {
+          "name": "supported_resolutions",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "supported_resolutions"
+          }
+        },
+        {
+          "name": "ui_order",
+          "type": "INT",
+          "link": null,
+          "widget": {
+            "name": "ui_order"
+          }
+        },
+        {
+          "name": "slider_max_pixels",
+          "type": "INT",
+          "link": null,
+          "widget": {
+            "name": "slider_max_pixels"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "width",
+          "type": "INT",
+          "links": [
+            16
+          ],
+          "slot_index": 0
+        },
+        {
+          "name": "height",
+          "type": "INT",
+          "links": [
+            17
+          ],
+          "slot_index": 1
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "StimmaResolutionParam"
+      },
+      "widgets_values": [
+        1024,
+        1024,
+        256,
+        4096,
+        32,
+        "",
+        1,
+        4194304
+      ]
+    },
+    {
+      "id": 18,
+      "type": "EmptyLatentImage",
+      "pos": [
+        450,
+        600
+      ],
+      "size": [
+        360,
+        153
+      ],
+      "flags": {},
+      "order": 16,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "width",
+          "type": "INT",
+          "link": 16,
+          "widget": {
+            "name": "width"
+          }
+        },
+        {
+          "name": "height",
+          "type": "INT",
+          "link": 17,
+          "widget": {
+            "name": "height"
+          }
+        },
+        {
+          "name": "batch_size",
+          "type": "INT",
+          "link": null,
+          "widget": {
+            "name": "batch_size"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "LATENT",
+          "type": "LATENT",
+          "links": [
+            18
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "EmptyLatentImage"
+      },
+      "widgets_values": [
+        1024,
+        1024,
+        1
+      ]
+    }
+  ],
+  "links": [
+    [
+      1,
+      2,
+      0,
+      16,
+      0,
+      "MODEL"
+    ],
+    [
+      2,
+      3,
+      0,
+      16,
+      1,
+      "CLIP"
+    ],
+    [
+      3,
+      16,
+      0,
+      6,
+      0,
+      "MODEL"
+    ],
+    [
+      4,
+      16,
+      1,
+      5,
+      0,
+      "CLIP"
+    ],
+    [
+      5,
+      4,
+      0,
+      5,
+      4,
+      "VAE"
+    ],
+    [
+      6,
+      4,
+      0,
+      7,
+      1,
+      "VAE"
+    ],
+    [
+      7,
+      10,
+      0,
+      5,
+      1,
+      "STRING"
+    ],
+    [
+      8,
+      11,
+      0,
+      5,
+      2,
+      "STRING"
+    ],
+    [
+      9,
+      12,
+      0,
+      6,
+      2,
+      "INT"
+    ],
+    [
+      10,
+      13,
+      0,
+      6,
+      3,
+      "FLOAT"
+    ],
+    [
+      11,
+      14,
+      0,
+      6,
+      1,
+      "INT"
+    ],
+    [
+      12,
+      5,
+      0,
+      6,
+      6,
+      "CONDITIONING"
+    ],
+    [
+      13,
+      5,
+      1,
+      6,
+      7,
+      "CONDITIONING"
+    ],
+    [
+      14,
+      6,
+      0,
+      7,
+      0,
+      "LATENT"
+    ],
+    [
+      15,
+      7,
+      0,
+      8,
+      0,
+      "IMAGE"
+    ],
+    [
+      16,
+      17,
+      0,
+      18,
+      0,
+      "INT"
+    ],
+    [
+      17,
+      17,
+      1,
+      18,
+      1,
+      "INT"
+    ],
+    [
+      18,
+      18,
+      0,
+      6,
+      8,
+      "LATENT"
+    ]
+  ],
+  "groups": [],
+  "config": {},
+  "extra": {
+    "ds": {
+      "scale": 0.6,
+      "offset": [
+        1300,
+        400
+      ]
+    }
+  },
+  "version": 0.4
+}

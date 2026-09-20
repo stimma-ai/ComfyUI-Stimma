@@ -121,6 +121,17 @@ MOCK_OBJECT_INFO = {
 
 
 class TestIsInputRequired(unittest.TestCase):
+    def test_zero_minimum_autogrow_references_are_optional(self):
+        info = {"TextEncodeQwenImage21": {"input": {"required": {
+            "images": ["COMFY_AUTOGROW_V3", {"template": {
+                "names": ["image_1", "image_2"], "min": 0,
+            }}],
+        }}}}
+        self.assertFalse(_is_input_required("TextEncodeQwenImage21", "images.image_2", info))
+        self.assertTrue(_is_input_required("TextEncodeQwenImage21", "images.unknown", info))
+        info["TextEncodeQwenImage21"]["input"]["required"]["images"][1]["template"]["min"] = 1
+        self.assertTrue(_is_input_required("TextEncodeQwenImage21", "images.image_1", info))
+
     def test_required_input(self):
         self.assertTrue(
             _is_input_required("ImageScaleToTotalPixels", "image", MOCK_OBJECT_INFO)
