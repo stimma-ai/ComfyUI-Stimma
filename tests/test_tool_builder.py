@@ -463,13 +463,13 @@ class TestReferenceToVideoWorkflow(unittest.TestCase):
             node for node in workflow["nodes"]
             if node["type"] == "ComfySwitchNode"
         )
-        sage = next(
+        backend = next(
             node for node in workflow["nodes"]
-            if node["type"] == "MiniMaxH3MemoryEfficientSageAttentionPatch"
+            if node["type"] == "ModelAttentionBackend"
         )
-        spectrum = next(
+        sol = next(
             node for node in workflow["nodes"]
-            if node["type"] == "SpectrumApplyMiniMaxH3"
+            if node["type"] == "BlockSparseAttention"
         )
         lora = next(
             node for node in workflow["nodes"]
@@ -489,24 +489,16 @@ class TestReferenceToVideoWorkflow(unittest.TestCase):
         }
         expected_parameters = {
             "model_precision",
-            "spectrum",
-            "spectrum_blend",
-            "spectrum_degree",
-            "spectrum_ridge",
-            "spectrum_window",
-            "spectrum_flex_window",
-            "spectrum_warmup_steps",
-            "spectrum_tail_steps",
-            "spectrum_max_history",
-            "spectrum_history_storage",
-            "spectrum_debug",
+            "sol_sparsity",
+            "sol_start",
+            "sol_end",
         }
         self.assertTrue(expected_parameters.issubset(parameter_nodes))
         self.assertEqual(
             parameter_nodes["model_precision"]["widgets_values"][1],
             "INT8 ConvRot",
         )
-        self.assertIs(parameter_nodes["spectrum"]["widgets_values"][1], False)
+        self.assertNotIn("spectrum", json.dumps(workflow).lower())
 
         precision_link = links[precision_compare["inputs"][0]["link"]]
         self.assertEqual(precision_link[1], parameter_nodes["model_precision"]["id"])
@@ -521,40 +513,32 @@ class TestReferenceToVideoWorkflow(unittest.TestCase):
         self.assertEqual(int8_switch_link[1], loader["id"])
         self.assertEqual(int8_switch_link[3], model_switch["id"])
 
-        model_link = links[sage["inputs"][0]["link"]]
+        model_link = links[backend["inputs"][0]["link"]]
         self.assertEqual(model_link[1], lora["id"])
-        self.assertEqual(model_link[3], sage["id"])
+        self.assertEqual(model_link[3], backend["id"])
 
-        spectrum_model_link = links[spectrum["inputs"][0]["link"]]
-        self.assertEqual(spectrum_model_link[1], sage["id"])
-        self.assertEqual(spectrum_model_link[3], spectrum["id"])
+        sol_model_link = links[sol["inputs"][0]["link"]]
+        self.assertEqual(sol_model_link[1], backend["id"])
+        self.assertEqual(sol_model_link[3], sol["id"])
 
         consumer_types = {
             nodes[links[link_id][3]]["type"]
-            for link_id in spectrum["outputs"][0]["links"]
+            for link_id in sol["outputs"][0]["links"]
         }
         self.assertEqual(consumer_types, {"BasicScheduler", "BasicGuider"})
 
-        spectrum_inputs = {
-            "enabled": "spectrum",
-            "blend_weight": "spectrum_blend",
-            "degree": "spectrum_degree",
-            "ridge_lambda": "spectrum_ridge",
-            "window_size": "spectrum_window",
-            "flex_window": "spectrum_flex_window",
-            "warmup_steps": "spectrum_warmup_steps",
-            "tail_actual_steps": "spectrum_tail_steps",
-            "max_history": "spectrum_max_history",
-            "history_storage": "spectrum_history_storage",
-            "debug": "spectrum_debug",
+        sol_inputs = {
+            "selection.tau": "sol_sparsity",
+            "start_percent": "sol_start",
+            "end_percent": "sol_end",
         }
-        for spectrum_input, parameter_name in spectrum_inputs.items():
+        for sol_input, parameter_name in sol_inputs.items():
             input_slot = next(
-                item for item in spectrum["inputs"] if item["name"] == spectrum_input
+                item for item in sol["inputs"] if item["name"] == sol_input
             )
             link = links[input_slot["link"]]
             self.assertEqual(link[1], parameter_nodes[parameter_name]["id"])
-            self.assertEqual(link[3], spectrum["id"])
+            self.assertEqual(link[3], sol["id"])
 
 
 class TestMiniMaxH3TurboWorkflows(unittest.TestCase):
@@ -629,38 +613,49 @@ class TestMiniMaxH3TurboWorkflows(unittest.TestCase):
                     self.assertEqual(source, nodes[left]["id"])
 
 
-    def test_sol_controls_are_connected_to_attention(self):
+    def test_sol_controls_are_connected_to_all_h3_attention_graphs(self):
         for task in ("I2V", "T2V", "R2V"):
-            with self.subTest(task=task):
-                w = json.loads((Path(ROOT) / "workflows" / f"Stimma-MiniMax-H3-{task}-Turbo.json").read_text())
-                params = {n["widgets_values"][0]: n for n in w["nodes"]
-                          if n["type"] == "StimmaFloatParam"}
-                graph = next(g for g in [w] + w.get("definitions", {}).get("subgraphs", [])
-                             if any(n["type"] == "BlockSparseAttention" for n in g["nodes"]))
-                sol = next(n for n in graph["nodes"] if n["type"] == "BlockSparseAttention")
-                links = {l["id"] if isinstance(l, dict) else l[0]: l for l in graph["links"]}
-                for name, target, default in (("sol_sparsity", "selection.tau", 1.0),
-                                               ("sol_start", "start_percent", .2),
-                                               ("sol_end", "end_percent", .9)):
-                    self.assertEqual(params[name]["widgets_values"][1], default)
-                    slot = next(i for i in sol["inputs"] if i["name"] == target)
-                    link = links[slot["link"]]
-                    if isinstance(link, dict):
-                        self.assertEqual(link["origin_id"], graph["inputNode"]["id"])
-                        self.assertEqual(graph["inputs"][link["origin_slot"]]["name"], name)
-                        instance = next(n for n in w["nodes"] if n["type"] == graph["id"])
-                        inp = next(i for i in instance["inputs"] if i["name"] == name)
-                        root_link = next(l for l in w["links"] if l[0] == inp["link"])
-                        self.assertEqual(root_link[1], params[name]["id"])
-                    else:
-                        self.assertEqual(link[1], params[name]["id"])
-                by_id = {n["id"]: n for n in graph["nodes"]}
-                consumers = set()
-                for lid in sol["outputs"][0]["links"]:
-                    link = links[lid]
-                    target = link["target_id"] if isinstance(link, dict) else link[3]
-                    consumers.add(by_id[target]["type"])
-                self.assertEqual(consumers, {"BasicGuider", "BasicScheduler"})
+            for suffix in ("", "-Turbo"):
+                with self.subTest(task=task, suffix=suffix):
+                    w = json.loads((Path(ROOT) / "workflows" / f"Stimma-MiniMax-H3-{task}{suffix}.json").read_text())
+                    self.assertNotIn("spectrum", json.dumps(w).lower())
+                    self.assertFalse(any(
+                        n["type"] == "MiniMaxH3MemoryEfficientSageAttentionPatch"
+                        for g in [w] + w.get("definitions", {}).get("subgraphs", [])
+                        for n in g["nodes"]
+                    ))
+                    params = {n["widgets_values"][0]: n for n in w["nodes"]
+                              if n["type"] == "StimmaFloatParam"}
+                    graph = next(g for g in [w] + w.get("definitions", {}).get("subgraphs", [])
+                                 if any(n["type"] == "BlockSparseAttention" for n in g["nodes"]))
+                    sol = next(n for n in graph["nodes"] if n["type"] == "BlockSparseAttention")
+                    backend = next(n for n in graph["nodes"] if n["type"] == "ModelAttentionBackend")
+                    links = {l["id"] if isinstance(l, dict) else l[0]: l for l in graph["links"]}
+                    for name, target, default in (("sol_sparsity", "selection.tau", 1.0),
+                                                   ("sol_start", "start_percent", .2),
+                                                   ("sol_end", "end_percent", .9)):
+                        self.assertEqual(params[name]["widgets_values"][1], default)
+                        slot = next(i for i in sol["inputs"] if i["name"] == target)
+                        link = links[slot["link"]]
+                        if isinstance(link, dict):
+                            self.assertEqual(link["origin_id"], graph["inputNode"]["id"])
+                            self.assertEqual(graph["inputs"][link["origin_slot"]]["name"], name)
+                            instance = next(n for n in w["nodes"] if n["type"] == graph["id"])
+                            inp = next(i for i in instance["inputs"] if i["name"] == name)
+                            root_link = next(l for l in w["links"] if l[0] == inp["link"])
+                            self.assertEqual(root_link[1], params[name]["id"])
+                        else:
+                            self.assertEqual(link[1], params[name]["id"])
+                    by_id = {n["id"]: n for n in graph["nodes"]}
+                    sol_model_link = links[sol["inputs"][0]["link"]]
+                    sol_model_source = sol_model_link["origin_id"] if isinstance(sol_model_link, dict) else sol_model_link[1]
+                    self.assertEqual(sol_model_source, backend["id"])
+                    consumers = set()
+                    for lid in sol["outputs"][0]["links"]:
+                        link = links[lid]
+                        target = link["target_id"] if isinstance(link, dict) else link[3]
+                        consumers.add(by_id[target]["type"])
+                    self.assertEqual(consumers, {"BasicGuider", "BasicScheduler"})
 
 
 class TestLTXLoraWorkflows(unittest.TestCase):

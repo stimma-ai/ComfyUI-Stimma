@@ -62,16 +62,17 @@ download the three required files from
 For transparent output, request an RGBA image with an alpha channel and a
 transparent background; the output PNG preserves alpha.
 
-## MiniMax H3 ⚡ workflows
+## MiniMax H3 workflows
 
-The separate H3 ⚡ tools use LightX2V eight-step 768p adapters with conservative
-native Sol attention. Standard H3 workflows are unchanged. I2V retains optional
-last-frame conditioning; T2V generates without an image; R2V retains image,
-video and audio references. Precision selection, user LoRA slots, resolution,
-duration, audio, seed and sampler/scheduler controls match the standard tools.
+All H3 tools use conservative native Sol attention. I2V retains optional last-frame
+conditioning; T2V generates without an image; R2V retains image, video and audio
+references. Precision selection, user LoRA slots, resolution, duration, audio,
+seed and sampler/scheduler controls are shared across the standard and ⚡ tools.
 A collapsed Sol Tuning group exposes sparsity and its start/end window, with the
-benchmarked defaults. Spectrum is not part of the ⚡ graphs or their UI.
-Defaults are eight steps, Euler/simple and shifts 6/3.
+benchmarked defaults. Spectrum is not part of the bundled H3 graphs or their UI.
+
+The separate H3 ⚡ tools add LightX2V eight-step 768p adapters. Their generation
+defaults are eight steps, Euler/simple and shifts 6/3.
 
 I2V and T2V use `minimax_h3_fl2v_turbo_8step_v1.0_768p_comfyui_bf16.safetensors`;
 R2V uses the dedicated `minimax_h3_ref2v_turbo_8step_v1.0_768p_comfyui_bf16.safetensors`.
@@ -82,8 +83,7 @@ earlier four-step H3 turbo recipes and no longer require Larry's Turbo node pack
 Use a current ComfyUI build with native `ModelAttentionBackend`,
 `MiniMaxH3SigmaShift` and `BlockSparseAttention` support, including the Comfy Kitchen
 Sol kernels. The presets use tau 1.0, sparse attention from 20–90%, dense first/last
-blocks, 256 extra tokens and dense conditioning/audio rows. The standard H3
-workflows retain their separate Spectrum controls.
+blocks, 256 extra tokens and dense conditioning/audio rows.
 The recipe was evaluated at 1344×768; other sizes and extra LoRAs remain available
 for experimentation. Ref2v uses its own adapter and needs separate quality judgment
 from the i2v comparison.
