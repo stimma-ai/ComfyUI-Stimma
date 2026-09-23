@@ -1,8 +1,8 @@
 {
   "id": "b6d19995-5cac-4362-a4ee-1dc9c98dddfd",
   "revision": 1,
-  "last_node_id": 45,
-  "last_link_id": 34,
+  "last_node_id": 47,
+  "last_link_id": 36,
   "nodes": [
     {
       "id": 1,
@@ -296,7 +296,7 @@
         {
           "name": "negative_prompt",
           "type": "STRING",
-          "link": null,
+          "link": 36,
           "widget": {
             "name": "negative_prompt"
           }
@@ -440,7 +440,7 @@
         {
           "name": "cfg",
           "type": "FLOAT",
-          "link": null,
+          "link": 35,
           "widget": {
             "name": "cfg"
           }
@@ -501,7 +501,7 @@
       "widgets_values": [
         0,
         "fixed",
-        40,
+        25,
         1.0,
         "euler",
         "simple",
@@ -776,13 +776,13 @@
       },
       "widgets_values": [
         "steps",
-        40,
+        25,
         1,
         100,
         1,
         "slider",
         30,
-        "Number of diffusion steps; official baseline is 40",
+        "Number of diffusion steps; current official ComfyUI baseline is 25",
         ""
       ]
     },
@@ -899,7 +899,7 @@
       },
       "widgets_values": [
         "Advanced",
-        "steps\nsampler\nscheduler\nreference_resolution\nloras\nseed",
+        "steps\ncfg\nnegative_prompt !full_width\nsampler\nscheduler\nreference_resolution\nloras\nseed",
         true,
         90
       ]
@@ -2622,6 +2622,196 @@
         45,
         "Noise schedule"
       ]
+    },
+    {
+      "id": 46,
+      "type": "StimmaFloatParam",
+      "pos": [
+        -800,
+        1150
+      ],
+      "size": [
+        384,
+        355
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "name",
+          "type": "STRING",
+          "widget": {
+            "name": "name"
+          },
+          "link": null
+        },
+        {
+          "name": "value",
+          "type": "FLOAT",
+          "widget": {
+            "name": "value"
+          },
+          "link": null
+        },
+        {
+          "name": "minimum",
+          "type": "FLOAT",
+          "widget": {
+            "name": "minimum"
+          },
+          "link": null
+        },
+        {
+          "name": "maximum",
+          "type": "FLOAT",
+          "widget": {
+            "name": "maximum"
+          },
+          "link": null
+        },
+        {
+          "name": "step",
+          "type": "FLOAT",
+          "widget": {
+            "name": "step"
+          },
+          "link": null
+        },
+        {
+          "name": "ui_control",
+          "type": "COMBO",
+          "widget": {
+            "name": "ui_control"
+          },
+          "link": null
+        },
+        {
+          "name": "ui_order",
+          "type": "INT",
+          "widget": {
+            "name": "ui_order"
+          },
+          "link": null
+        },
+        {
+          "name": "ui_description",
+          "type": "STRING",
+          "widget": {
+            "name": "ui_description"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "value",
+          "type": "FLOAT",
+          "links": [
+            35
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "StimmaFloatParam"
+      },
+      "widgets_values": [
+        "cfg",
+        1.0,
+        1.0,
+        10.0,
+        0.1,
+        "slider",
+        35,
+        "Classifier-free guidance; 1 is the official default. Values above 1 use the negative prompt and cost more compute."
+      ]
+    },
+    {
+      "id": 47,
+      "type": "StimmaStringParam",
+      "pos": [
+        -800,
+        1350
+      ],
+      "size": [
+        384,
+        355
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "name",
+          "type": "STRING",
+          "widget": {
+            "name": "name"
+          },
+          "link": null
+        },
+        {
+          "name": "value",
+          "type": "STRING",
+          "widget": {
+            "name": "value"
+          },
+          "link": null
+        },
+        {
+          "name": "enum_values",
+          "type": "STRING",
+          "widget": {
+            "name": "enum_values"
+          },
+          "link": null
+        },
+        {
+          "name": "ui_control",
+          "type": "COMBO",
+          "widget": {
+            "name": "ui_control"
+          },
+          "link": null
+        },
+        {
+          "name": "ui_order",
+          "type": "INT",
+          "widget": {
+            "name": "ui_order"
+          },
+          "link": null
+        },
+        {
+          "name": "ui_description",
+          "type": "STRING",
+          "widget": {
+            "name": "ui_description"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "value",
+          "type": "STRING",
+          "links": [
+            36
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "StimmaStringParam"
+      },
+      "widgets_values": [
+        "negative_prompt",
+        "",
+        "",
+        "textarea",
+        36,
+        "Optional negative prompt for CFG above 1; ignored at CFG 1."
+      ]
     }
   ],
   "links": [
@@ -2896,6 +3086,22 @@
       6,
       5,
       "*"
+    ],
+    [
+      35,
+      46,
+      0,
+      6,
+      3,
+      "FLOAT"
+    ],
+    [
+      36,
+      47,
+      0,
+      5,
+      2,
+      "STRING"
     ]
   ],
   "groups": [],

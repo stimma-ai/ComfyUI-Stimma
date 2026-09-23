@@ -35,13 +35,14 @@ image's aspect ratio; `reference_resolution` controls the pixel budget
 (default 1024, approximately one megapixel; 0 preserves input size).
 Width/height apply only when generating without an image.
 
-The workflow uses the official INT8 weights and defaults to 40 Euler/simple
-steps. Steps, sampler, scheduler, reference resolution, optional LoRAs from
-`qwen-2.1/`, and seed are exposed under Advanced. CFG is fixed at 1, negative
-conditioning is empty, and denoise is fixed at 1. Qwen's intended operating
-mode uses no classifier-free guidance; there is no CFG, guidance, negative
-prompt, or denoise control. Sampler/scheduler alternatives are available for
-experimentation; Euler/simple is the default path.
+The workflow uses the official INT8 weights and defaults to 25 Euler/simple
+steps, matching the current ComfyUI templates. Steps, CFG, negative prompt,
+sampler, scheduler, reference resolution, optional LoRAs from `qwen-2.1/`,
+and seed are exposed under Advanced. CFG defaults to 1, as Qwen Image 2.1 is
+intended to sample without classifier-free guidance. For a LoRA or prompt that
+benefits from guidance, set CFG above 1 and optionally enter a negative prompt;
+this increases work per sampling step. At CFG 1 the negative prompt has no
+effect. Denoise remains fixed at 1. Euler/simple is the default path.
 
 When images are supplied, the workflow derives its sampler seed from the
 requested seed and the first reference image's pixels. Reusing the exact
