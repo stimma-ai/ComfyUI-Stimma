@@ -249,6 +249,20 @@ class SingleComfy:
         except aiohttp.ClientError:
             return False
 
+    async def cancel_prompt(self, prompt_id: str) -> None:
+        """Cancel only this job, whether it is pending or currently executing."""
+        timeout = aiohttp.ClientTimeout(total=10)
+        await self._request("POST", "/queue", json={"delete": [prompt_id]}, timeout=timeout)
+        await self._request("POST", "/interrupt", json={"prompt_id": prompt_id}, timeout=timeout)
+        # Keep the worker lease until the interrupted node has cleaned up its
+        # subprocess/GPU allocation. Do not release it while MOSS is still alive.
+        for _ in range(50):
+            queue = await self._request("GET", "/queue", timeout=timeout)
+            if not any(item[1] == prompt_id for item in queue.get("queue_running", []) + queue.get("queue_pending", [])):
+                return
+            await asyncio.sleep(0.2)
+        logger.warning("Prompt %s is still stopping on %s", prompt_id, self.addr)
+
     async def clear_queue(self) -> bool:
         """Clear all pending prompts."""
         try:

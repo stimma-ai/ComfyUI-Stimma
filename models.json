@@ -1307,6 +1307,49 @@
       "size": 675509688,
       "sha256": "bb21f7473051e1ac368515dd3f2e15cd44d7a11748ee8823e1ddca3e4876b7c9",
       "gated": false
+    },
+    "stable_audio_3_medium.safetensors": {
+      "directory": "checkpoints",
+      "source": {
+        "type": "huggingface",
+        "repo": "Comfy-Org/stable-audio-3",
+        "path": "checkpoints/stable_audio_3_medium.safetensors"
+      },
+      "used_by": [
+        "Stimma-Stable-Audio-3-Medium.json"
+      ],
+      "size": 9222116660,
+      "sha256": "48d9c65e290e7bcd5194e0633bfc2424a59ee9683f5c2d58762d997b7d8ce0b5",
+      "gated": false
+    },
+    "stable_audio_3_medium_base.safetensors": {
+      "directory": "checkpoints",
+      "source": {
+        "type": "huggingface",
+        "repo": "Comfy-Org/stable-audio-3",
+        "path": "checkpoints/stable_audio_3_medium_base.safetensors"
+      },
+      "used_by": [
+        "Stimma-Stable-Audio-3-Medium-Base.json"
+      ],
+      "size": 9222116660,
+      "sha256": "c443fcc4d491475064cd0ff3eb92459b1e5f5060e86d96d016f048e528e24195",
+      "gated": false
+    },
+    "t5gemma_b_b_ul2.safetensors": {
+      "directory": "text_encoders",
+      "source": {
+        "type": "huggingface",
+        "repo": "Comfy-Org/stable-audio-3",
+        "path": "text_encoders/t5gemma_b_b_ul2.safetensors"
+      },
+      "used_by": [
+        "Stimma-Stable-Audio-3-Medium.json",
+        "Stimma-Stable-Audio-3-Medium-Base.json"
+      ],
+      "size": 1187264003,
+      "sha256": "1e1eba25be8872edb0d3c6335c6658fd6388e7b14b60da6e454e404cfcd8150e",
+      "gated": false
     }
   },
   "unresolved": [

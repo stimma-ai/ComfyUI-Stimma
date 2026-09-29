@@ -1,0 +1,1111 @@
+{
+  "last_node_id": 21,
+  "last_link_id": 9,
+  "nodes": [
+    {
+      "id": 1,
+      "type": "StimmaToolInfo",
+      "pos": [
+        0,
+        0
+      ],
+      "size": [
+        480,
+        220
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "slug",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "slug"
+          }
+        },
+        {
+          "name": "display_name",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "display_name"
+          }
+        },
+        {
+          "name": "task_types",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "task_types"
+          }
+        },
+        {
+          "name": "badges",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "badges"
+          }
+        },
+        {
+          "name": "description",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "description"
+          }
+        },
+        {
+          "name": "model_vendor",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "model_vendor"
+          }
+        },
+        {
+          "name": "model",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "model"
+          }
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "Node name for S&R": "StimmaToolInfo"
+      },
+      "widgets_values": [
+        "moss-soundeffect-v2",
+        "MOSS SoundEffect v2",
+        "text-to-audio",
+        "",
+        "Generate sound effects, foley, and environmental ambience from English or Chinese descriptions. 48 kHz mono audio, up to 30 seconds.",
+        "OpenMOSS",
+        "MOSS-SoundEffect-v2.0"
+      ]
+    },
+    {
+      "id": 2,
+      "type": "StimmaPromptParam",
+      "pos": [
+        0,
+        260
+      ],
+      "size": [
+        480,
+        220
+      ],
+      "flags": {},
+      "order": 1,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "name",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "name"
+          }
+        },
+        {
+          "name": "default_text",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "default_text"
+          }
+        },
+        {
+          "name": "required",
+          "type": "BOOLEAN",
+          "link": null,
+          "widget": {
+            "name": "required"
+          }
+        },
+        {
+          "name": "ui_order",
+          "type": "INT",
+          "link": null,
+          "widget": {
+            "name": "ui_order"
+          }
+        },
+        {
+          "name": "ui_description",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "ui_description"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "text",
+          "type": "STRING",
+          "links": [
+            1
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "StimmaPromptParam"
+      },
+      "widgets_values": [
+        "prompt",
+        "",
+        true,
+        0,
+        "Describe sound effects or ambience in English or Chinese, including the source, action, environment, and timing."
+      ]
+    },
+    {
+      "id": 3,
+      "type": "StimmaFloatParam",
+      "pos": [
+        0,
+        520
+      ],
+      "size": [
+        480,
+        220
+      ],
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "name",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "name"
+          }
+        },
+        {
+          "name": "value",
+          "type": "FLOAT",
+          "link": null,
+          "widget": {
+            "name": "value"
+          }
+        },
+        {
+          "name": "minimum",
+          "type": "FLOAT",
+          "link": null,
+          "widget": {
+            "name": "minimum"
+          }
+        },
+        {
+          "name": "maximum",
+          "type": "FLOAT",
+          "link": null,
+          "widget": {
+            "name": "maximum"
+          }
+        },
+        {
+          "name": "step",
+          "type": "FLOAT",
+          "link": null,
+          "widget": {
+            "name": "step"
+          }
+        },
+        {
+          "name": "ui_control",
+          "type": "COMBO",
+          "link": null,
+          "widget": {
+            "name": "ui_control"
+          }
+        },
+        {
+          "name": "ui_order",
+          "type": "INT",
+          "link": null,
+          "widget": {
+            "name": "ui_order"
+          }
+        },
+        {
+          "name": "ui_description",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "ui_description"
+          }
+        },
+        {
+          "name": "ui_format",
+          "type": "COMBO",
+          "link": null,
+          "widget": {
+            "name": "ui_format"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "FLOAT",
+          "type": "FLOAT",
+          "links": [
+            2
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "StimmaFloatParam"
+      },
+      "widgets_values": [
+        "duration",
+        10.0,
+        0.1,
+        30.0,
+        0.1,
+        "slider",
+        1,
+        "Output length in seconds.",
+        "seconds"
+      ]
+    },
+    {
+      "id": 4,
+      "type": "StimmaSeedParam",
+      "pos": [
+        0,
+        780
+      ],
+      "size": [
+        480,
+        220
+      ],
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "name",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "name"
+          }
+        },
+        {
+          "name": "value",
+          "type": "INT",
+          "link": null,
+          "widget": {
+            "name": "value"
+          }
+        },
+        {
+          "name": "ui_order",
+          "type": "INT",
+          "link": null,
+          "widget": {
+            "name": "ui_order"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "seed",
+          "type": "INT",
+          "links": [
+            6
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "StimmaSeedParam"
+      },
+      "widgets_values": [
+        "seed",
+        0,
+        99
+      ]
+    },
+    {
+      "id": 5,
+      "type": "StimmaIntParam",
+      "pos": [
+        0,
+        1040
+      ],
+      "size": [
+        480,
+        220
+      ],
+      "flags": {},
+      "order": 4,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "name",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "name"
+          }
+        },
+        {
+          "name": "value",
+          "type": "INT",
+          "link": null,
+          "widget": {
+            "name": "value"
+          }
+        },
+        {
+          "name": "minimum",
+          "type": "INT",
+          "link": null,
+          "widget": {
+            "name": "minimum"
+          }
+        },
+        {
+          "name": "maximum",
+          "type": "INT",
+          "link": null,
+          "widget": {
+            "name": "maximum"
+          }
+        },
+        {
+          "name": "step",
+          "type": "INT",
+          "link": null,
+          "widget": {
+            "name": "step"
+          }
+        },
+        {
+          "name": "ui_control",
+          "type": "COMBO",
+          "link": null,
+          "widget": {
+            "name": "ui_control"
+          }
+        },
+        {
+          "name": "ui_order",
+          "type": "INT",
+          "link": null,
+          "widget": {
+            "name": "ui_order"
+          }
+        },
+        {
+          "name": "ui_description",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "ui_description"
+          }
+        },
+        {
+          "name": "ui_format",
+          "type": "COMBO",
+          "link": null,
+          "widget": {
+            "name": "ui_format"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "value",
+          "type": "INT",
+          "links": [
+            3
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "StimmaIntParam"
+      },
+      "widgets_values": [
+        "steps",
+        100,
+        1,
+        300,
+        1,
+        "slider",
+        10,
+        "Diffusion steps. The upstream default is 100; fewer steps are faster.",
+        ""
+      ]
+    },
+    {
+      "id": 6,
+      "type": "StimmaFloatParam",
+      "pos": [
+        0,
+        1300
+      ],
+      "size": [
+        480,
+        220
+      ],
+      "flags": {},
+      "order": 5,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "name",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "name"
+          }
+        },
+        {
+          "name": "value",
+          "type": "FLOAT",
+          "link": null,
+          "widget": {
+            "name": "value"
+          }
+        },
+        {
+          "name": "minimum",
+          "type": "FLOAT",
+          "link": null,
+          "widget": {
+            "name": "minimum"
+          }
+        },
+        {
+          "name": "maximum",
+          "type": "FLOAT",
+          "link": null,
+          "widget": {
+            "name": "maximum"
+          }
+        },
+        {
+          "name": "step",
+          "type": "FLOAT",
+          "link": null,
+          "widget": {
+            "name": "step"
+          }
+        },
+        {
+          "name": "ui_control",
+          "type": "COMBO",
+          "link": null,
+          "widget": {
+            "name": "ui_control"
+          }
+        },
+        {
+          "name": "ui_order",
+          "type": "INT",
+          "link": null,
+          "widget": {
+            "name": "ui_order"
+          }
+        },
+        {
+          "name": "ui_description",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "ui_description"
+          }
+        },
+        {
+          "name": "ui_format",
+          "type": "COMBO",
+          "link": null,
+          "widget": {
+            "name": "ui_format"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "FLOAT",
+          "type": "FLOAT",
+          "links": [
+            4
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "StimmaFloatParam"
+      },
+      "widgets_values": [
+        "cfg",
+        4.0,
+        0.0,
+        20.0,
+        0.1,
+        "slider",
+        11,
+        "Prompt guidance strength. Upstream default: 4.",
+        ""
+      ]
+    },
+    {
+      "id": 7,
+      "type": "StimmaFloatParam",
+      "pos": [
+        0,
+        1560
+      ],
+      "size": [
+        480,
+        220
+      ],
+      "flags": {},
+      "order": 6,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "name",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "name"
+          }
+        },
+        {
+          "name": "value",
+          "type": "FLOAT",
+          "link": null,
+          "widget": {
+            "name": "value"
+          }
+        },
+        {
+          "name": "minimum",
+          "type": "FLOAT",
+          "link": null,
+          "widget": {
+            "name": "minimum"
+          }
+        },
+        {
+          "name": "maximum",
+          "type": "FLOAT",
+          "link": null,
+          "widget": {
+            "name": "maximum"
+          }
+        },
+        {
+          "name": "step",
+          "type": "FLOAT",
+          "link": null,
+          "widget": {
+            "name": "step"
+          }
+        },
+        {
+          "name": "ui_control",
+          "type": "COMBO",
+          "link": null,
+          "widget": {
+            "name": "ui_control"
+          }
+        },
+        {
+          "name": "ui_order",
+          "type": "INT",
+          "link": null,
+          "widget": {
+            "name": "ui_order"
+          }
+        },
+        {
+          "name": "ui_description",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "ui_description"
+          }
+        },
+        {
+          "name": "ui_format",
+          "type": "COMBO",
+          "link": null,
+          "widget": {
+            "name": "ui_format"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "FLOAT",
+          "type": "FLOAT",
+          "links": [
+            5
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "StimmaFloatParam"
+      },
+      "widgets_values": [
+        "sigma_shift",
+        5.0,
+        0.1,
+        20.0,
+        0.1,
+        "slider",
+        12,
+        "Flow-matching schedule shift. Upstream default: 5.",
+        ""
+      ]
+    },
+    {
+      "id": 8,
+      "type": "StimmaStringParam",
+      "pos": [
+        0,
+        1820
+      ],
+      "size": [
+        480,
+        220
+      ],
+      "flags": {},
+      "order": 7,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "name",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "name"
+          }
+        },
+        {
+          "name": "value",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "value"
+          }
+        },
+        {
+          "name": "enum_values",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "enum_values"
+          }
+        },
+        {
+          "name": "ui_control",
+          "type": "COMBO",
+          "link": null,
+          "widget": {
+            "name": "ui_control"
+          }
+        },
+        {
+          "name": "ui_order",
+          "type": "INT",
+          "link": null,
+          "widget": {
+            "name": "ui_order"
+          }
+        },
+        {
+          "name": "ui_description",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "ui_description"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "value",
+          "type": "STRING",
+          "links": [
+            7
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "StimmaStringParam"
+      },
+      "widgets_values": [
+        "negative_prompt",
+        "",
+        "",
+        "textarea",
+        13,
+        "Sounds or qualities to avoid, for example speech, music, or background hiss."
+      ]
+    },
+    {
+      "id": 9,
+      "type": "StimmaBoolParam",
+      "pos": [
+        0,
+        2080
+      ],
+      "size": [
+        480,
+        220
+      ],
+      "flags": {},
+      "order": 8,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "name",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "name"
+          }
+        },
+        {
+          "name": "value",
+          "type": "BOOLEAN",
+          "link": null,
+          "widget": {
+            "name": "value"
+          }
+        },
+        {
+          "name": "ui_order",
+          "type": "INT",
+          "link": null,
+          "widget": {
+            "name": "ui_order"
+          }
+        },
+        {
+          "name": "ui_description",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "ui_description"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "value",
+          "type": "BOOLEAN",
+          "links": [
+            8
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "StimmaBoolParam"
+      },
+      "widgets_values": [
+        "append_duration_suffix",
+        true,
+        14,
+        "Append the requested duration to the prompt, matching the model training convention."
+      ]
+    },
+    {
+      "id": 10,
+      "type": "StimmaLayoutGroup",
+      "pos": [
+        0,
+        2340
+      ],
+      "size": [
+        480,
+        220
+      ],
+      "flags": {},
+      "order": 9,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "group_label",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "group_label"
+          }
+        },
+        {
+          "name": "param_names",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "param_names"
+          }
+        },
+        {
+          "name": "collapsed",
+          "type": "BOOLEAN",
+          "link": null,
+          "widget": {
+            "name": "collapsed"
+          }
+        },
+        {
+          "name": "ui_order",
+          "type": "INT",
+          "link": null,
+          "widget": {
+            "name": "ui_order"
+          }
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "Node name for S&R": "StimmaLayoutGroup"
+      },
+      "widgets_values": [
+        "Advanced",
+        "steps\ncfg\nnegative_prompt\nsigma_shift\nappend_duration_suffix\nseed",
+        true,
+        10
+      ]
+    },
+    {
+      "id": 20,
+      "type": "StimmaMossSoundEffect",
+      "pos": [
+        570,
+        0
+      ],
+      "size": [
+        480,
+        220
+      ],
+      "flags": {},
+      "order": 10,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "prompt",
+          "type": "STRING",
+          "link": 1,
+          "widget": {
+            "name": "prompt"
+          }
+        },
+        {
+          "name": "seconds",
+          "type": "FLOAT",
+          "link": 2,
+          "widget": {
+            "name": "seconds"
+          }
+        },
+        {
+          "name": "steps",
+          "type": "INT",
+          "link": 3,
+          "widget": {
+            "name": "steps"
+          }
+        },
+        {
+          "name": "cfg",
+          "type": "FLOAT",
+          "link": 4,
+          "widget": {
+            "name": "cfg"
+          }
+        },
+        {
+          "name": "sigma_shift",
+          "type": "FLOAT",
+          "link": 5,
+          "widget": {
+            "name": "sigma_shift"
+          }
+        },
+        {
+          "name": "seed",
+          "type": "INT",
+          "link": 6,
+          "widget": {
+            "name": "seed"
+          }
+        },
+        {
+          "name": "negative_prompt",
+          "type": "STRING",
+          "link": 7,
+          "widget": {
+            "name": "negative_prompt"
+          }
+        },
+        {
+          "name": "append_duration_suffix",
+          "type": "BOOLEAN",
+          "link": 8,
+          "widget": {
+            "name": "append_duration_suffix"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "AUDIO",
+          "type": "AUDIO",
+          "links": [
+            9
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "StimmaMossSoundEffect"
+      },
+      "widgets_values": [
+        "",
+        10.0,
+        100,
+        4.0,
+        5.0,
+        0,
+        "",
+        true
+      ]
+    },
+    {
+      "id": 21,
+      "type": "StimmaAudioOutput",
+      "pos": [
+        570,
+        260
+      ],
+      "size": [
+        480,
+        220
+      ],
+      "flags": {},
+      "order": 11,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "audio",
+          "type": "AUDIO",
+          "link": 9
+        },
+        {
+          "name": "filename_prefix",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "filename_prefix"
+          }
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "Node name for S&R": "StimmaAudioOutput"
+      },
+      "widgets_values": [
+        "Stimma/MossSoundEffect"
+      ]
+    }
+  ],
+  "links": [
+    [
+      1,
+      2,
+      0,
+      20,
+      0,
+      "STRING"
+    ],
+    [
+      2,
+      3,
+      0,
+      20,
+      1,
+      "FLOAT"
+    ],
+    [
+      3,
+      5,
+      0,
+      20,
+      2,
+      "INT"
+    ],
+    [
+      4,
+      6,
+      0,
+      20,
+      3,
+      "FLOAT"
+    ],
+    [
+      5,
+      7,
+      0,
+      20,
+      4,
+      "FLOAT"
+    ],
+    [
+      6,
+      4,
+      0,
+      20,
+      5,
+      "INT"
+    ],
+    [
+      7,
+      8,
+      0,
+      20,
+      6,
+      "STRING"
+    ],
+    [
+      8,
+      9,
+      0,
+      20,
+      7,
+      "BOOLEAN"
+    ],
+    [
+      9,
+      20,
+      0,
+      21,
+      0,
+      "AUDIO"
+    ]
+  ],
+  "groups": [],
+  "config": {},
+  "extra": {
+    "ds": {
+      "scale": 0.6,
+      "offset": [
+        40,
+        40
+      ]
+    }
+  },
+  "version": 0.4
+}

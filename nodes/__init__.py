@@ -22,7 +22,8 @@ from .params import (
 )
 from .loras import StimmaLoraLoader, StimmaPairedLoraLoader
 from .checkpoints import StimmaCheckpointLoader
-from .outputs import StimmaImageOutput, StimmaVideoOutput
+from .outputs import StimmaImageOutput, StimmaVideoOutput, StimmaAudioOutput
+from .moss_audio import StimmaMossSoundEffect
 from .layout import StimmaLayoutGroup
 from .stitch_assembler import StimmaVideoStitchAssembler
 from .outpaint import StimmaOutpaintPadding
@@ -52,6 +53,8 @@ NODE_CLASS_MAPPINGS = {
     "StimmaPairedLoraLoader": StimmaPairedLoraLoader,
     "StimmaCheckpointLoader": StimmaCheckpointLoader,
     "StimmaImageOutput": StimmaImageOutput,
+    "StimmaAudioOutput": StimmaAudioOutput,
+    "StimmaMossSoundEffect": StimmaMossSoundEffect,
     "StimmaVideoOutput": StimmaVideoOutput,
     "StimmaLayoutGroup": StimmaLayoutGroup,
     "StimmaVideoStitchAssembler": StimmaVideoStitchAssembler,
@@ -81,6 +84,8 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "StimmaPairedLoraLoader": "Stimma Paired LoRA Loader",
     "StimmaCheckpointLoader": "Stimma Checkpoint Loader",
     "StimmaImageOutput": "Stimma Image Output",
+    "StimmaAudioOutput": "Stimma Audio Output",
+    "StimmaMossSoundEffect": "Stimma MOSS SoundEffect v2",
     "StimmaVideoOutput": "Stimma Video Output",
     "StimmaLayoutGroup": "Stimma Layout Group",
     "StimmaVideoStitchAssembler": "Stimma Video Stitch Assembler",

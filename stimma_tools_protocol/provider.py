@@ -36,7 +36,7 @@ logger = logging.getLogger(__name__)
 _MEDIA_TYPE_BY_EXT = {
     "png": "image", "jpg": "image", "jpeg": "image", "gif": "image", "webp": "image",
     "mp4": "video", "webm": "video", "mov": "video",
-    "mp3": "audio", "wav": "audio", "ogg": "audio",
+    "mp3": "audio", "wav": "audio", "ogg": "audio", "flac": "audio", "opus": "audio", "m4a": "audio",
 }
 
 

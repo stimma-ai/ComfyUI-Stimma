@@ -25,6 +25,7 @@ class ComfyUITransport(Transport):
         self._ws_path = ws_path
         self._running = False
         self._clients: set = set()
+        self._awaiting_registration: set = set()
         self._message_queue: asyncio.Queue[str] = asyncio.Queue()
         self._write_lock = asyncio.Lock()
         self._first_client_connected: asyncio.Event = asyncio.Event()
@@ -58,6 +59,7 @@ class ComfyUITransport(Transport):
             except Exception:
                 pass
         self._clients.clear()
+        self._awaiting_registration.clear()
         logger.debug("ComfyUI transport stopped")
 
     async def send(self, message: str) -> None:
@@ -68,7 +70,7 @@ class ComfyUITransport(Transport):
             # when no client is connected. The common path (clients present,
             # debug off) skips the parse entirely.
             method = None
-            if not self._clients or logger.isEnabledFor(logging.DEBUG):
+            if not self._clients or self._awaiting_registration or logger.isEnabledFor(logging.DEBUG):
                 try:
                     parsed = json.loads(message)
                     method = parsed.get("method")
@@ -88,11 +90,18 @@ class ComfyUITransport(Transport):
                 return
 
             for client in list(self._clients):
+                # A watcher/progress broadcast can race the registration task
+                # when a CLI connects to an already-running provider. STP hosts
+                # require provider.register to be the first frame.
+                if client in self._awaiting_registration and method != "provider.register":
+                    continue
                 try:
                     await client.send_str(message)
+                    self._awaiting_registration.discard(client)
                 except Exception as e:
                     logger.error(f"Error sending to STP client: {e}")
                     self._clients.discard(client)
+                    self._awaiting_registration.discard(client)
 
     async def receive(self) -> AsyncIterator[str]:
         """Receive messages from connected STP clients."""
@@ -129,6 +138,7 @@ class ComfyUITransport(Transport):
         await ws.prepare(request)
 
         self._clients.add(ws)
+        self._awaiting_registration.add(ws)
         client_addr = request.remote
         logger.info(f"STP client connected: {client_addr}")
 
@@ -151,6 +161,7 @@ class ComfyUITransport(Transport):
             logger.debug(f"STP WebSocket connection closed: {e}")
         finally:
             self._clients.discard(ws)
+            self._awaiting_registration.discard(ws)
             logger.info(f"STP client disconnected: {client_addr}")
 
         return ws

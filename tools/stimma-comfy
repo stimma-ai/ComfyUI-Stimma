@@ -1,0 +1,74 @@
+#!/usr/bin/env python3
+"""Optional audio model setup without changing ComfyUI's Python packages."""
+
+import argparse
+import json
+import shutil
+import subprocess
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+from audio_runtime import (
+    MOSS_FILES, MOSS_REPO, MOSS_REVISION, MOSS_SOURCE, SA3_FILES,
+    SA3_REPO, SA3_REVISION, missing_moss_files, model_directory, runtime_python, runtime_ready,
+)
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    sub = parser.add_subparsers(dest="command")
+    for command in ("setup-audio", "audio-status"):
+        p = sub.add_parser(command)
+        p.add_argument("--comfyui", type=Path, required=True, help="ComfyUI installation directory")
+        if command == "setup-audio":
+            p.add_argument("--model", choices=("all", "stable-audio-3", "moss"), default="all")
+    args = parser.parse_args()
+    if not args.command:
+        parser.print_help()
+        return
+    models = args.comfyui.expanduser().resolve() / "models"
+    if not models.is_dir():
+        parser.error("The ComfyUI models directory does not exist")
+    python = runtime_python()
+    if args.command == "audio-status":
+        status = {
+            "stable_audio_3_missing": [name for name in SA3_FILES if not (models / name).is_file()],
+            "moss_runtime_installed": runtime_ready(),
+            "moss_missing": missing_moss_files(models),
+        }
+        print(json.dumps(status, indent=2))
+        return
+    uv = shutil.which("uv")
+    if not uv:
+        parser.error("Install uv first: https://docs.astral.sh/uv/getting-started/installation/")
+    # The isolated environment also supplies the model downloader. Do not import
+    # MOSS's pinned transformers/numpy into ComfyUI or upgrade its torch install.
+    if not python.is_file():
+        subprocess.run([uv, "venv", "--python", "3.12", str(python.parent.parent)], check=True)
+    if args.model in ("all", "moss"):
+        source = f"moss-soundeffect-v2[torch-cu128] @ git+https://github.com/OpenMOSS/MOSS-TTS.git@{MOSS_SOURCE}#subdirectory=moss_soundeffect_v2"
+        subprocess.run([uv, "pip", "install", "--python", str(python),
+                        "--extra-index-url", "https://download.pytorch.org/whl/cu128",
+                        "--index-strategy", "unsafe-best-match", source], check=True)
+        subprocess.run([str(python), "-c", "from moss_soundeffect_v2 import MossSoundEffectPipeline"], check=True)
+        (python.parent.parent / ".stimma-moss-source").write_text(MOSS_SOURCE + "\n")
+    else:
+        subprocess.run([uv, "pip", "install", "--python", str(python), "huggingface_hub"], check=True)
+    requests = []
+    if args.model in ("all", "stable-audio-3"):
+        requests.append(dict(repo=SA3_REPO, revision=SA3_REVISION, directory=str(models), files=SA3_FILES))
+    if args.model in ("all", "moss"):
+        requests.append(dict(repo=MOSS_REPO, revision=MOSS_REVISION, directory=str(model_directory(models)), files=MOSS_FILES))
+    script = """import json, sys
+from huggingface_hub import snapshot_download
+for request in json.load(sys.stdin):
+    snapshot_download(repo_id=request['repo'], revision=request['revision'],
+                      local_dir=request['directory'], allow_patterns=request['files'], max_workers=4)
+"""
+    subprocess.run([str(python), "-c", script], input=json.dumps(requests), text=True, check=True)
+    print("Audio setup complete. Restart ComfyUI to register the new nodes and workflows.")
+
+
+if __name__ == "__main__":
+    main()

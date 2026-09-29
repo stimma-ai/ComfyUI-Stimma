@@ -314,6 +314,13 @@ async def execute_workflow(
                     gen_start = time.time()
                     await _monitor_execution(ws, prompt_id, context)
                     t_gen = time.time() - gen_start
+                except asyncio.CancelledError:
+                    if prompt_id:
+                        try:
+                            await instance.cancel_prompt(prompt_id)
+                        except Exception:
+                            logger.exception("Could not cancel ComfyUI prompt %s", prompt_id)
+                    raise
                 finally:
                     # Tear the monitoring socket down in the background. A graceful
                     # ws close handshake blocks until ComfyUI acks it, and ComfyUI's
@@ -334,7 +341,7 @@ async def execute_workflow(
                 t_cap0 = time.time()
                 expected_output_node_ids = [
                     nid for nid, nd in prompt.items()
-                    if nd.get("class_type") in {"StimmaImageOutput", "StimmaVideoOutput"}
+                    if nd.get("class_type") in {"StimmaImageOutput", "StimmaVideoOutput", "StimmaAudioOutput"}
                 ]
                 result = await _capture_output(
                     output_dir,
@@ -1724,12 +1731,12 @@ async def _capture_from_history(
                             return {"asset_id": asset_id}
 
         # Check for videos
-        videos = output.get("videos", output.get("gifs", []))
+        videos = output.get("videos", output.get("gifs", [])) + output.get("audio", [])
         for vid_info in videos:
             filename = vid_info.get("filename", "")
             if filename:
                 subfolder = vid_info.get("subfolder", "")
-                params = {"filename": filename, "type": "output"}
+                params = {"filename": filename, "type": vid_info.get("type", "output")}
                 if subfolder:
                     params["subfolder"] = subfolder
 
@@ -1768,5 +1775,5 @@ async def _capture_from_history(
     raise RuntimeError(
         f"Workflow produced no output files (status={status_str}, "
         f"output nodes={n_output_nodes}, expected_stimma_output_nodes={expected_str}). "
-        f"Check that your workflow has a StimmaImageOutput or StimmaVideoOutput node."
+        f"Check that your workflow has a StimmaImageOutput, StimmaVideoOutput, or StimmaAudioOutput node."
     )

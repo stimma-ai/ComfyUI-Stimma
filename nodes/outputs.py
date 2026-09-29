@@ -1,4 +1,4 @@
-"""Stimma output nodes — capture generated images/videos."""
+"""Stimma output nodes — capture generated images, video, and audio."""
 
 import os
 import json
@@ -26,13 +26,15 @@ def _write_audio_wav(audio, wav_path):
 
     arr = waveform
     if hasattr(arr, "detach"):
-        arr = arr.detach().cpu().numpy()
+        arr = arr.detach().float().cpu().numpy()
     arr = np.asarray(arr, dtype=np.float32)
-    if arr.ndim == 3:  # [batch, channels, samples] -> first batch item
+    if arr.ndim == 3 and arr.shape[0] > 0:  # [batch, channels, samples] -> first batch item
         arr = arr[0]
     if arr.ndim == 1:  # [samples] -> [1, samples]
         arr = arr[None, :]
     # arr is now [channels, samples]; WAV wants interleaved [samples, channels]
+    if arr.ndim != 2 or not np.isfinite(arr).all():
+        return None
     channels = arr.shape[0]
     if channels == 0 or arr.shape[1] == 0:
         return None
@@ -46,6 +48,44 @@ def _write_audio_wav(audio, wav_path):
         wf.setframerate(sample_rate)
         wf.writeframes(pcm.tobytes())
     return wav_path
+
+
+class StimmaAudioOutput:
+    """Save a single audio result as PCM WAV for ComfyUI preview and STP."""
+
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "audio": ("AUDIO",),
+                "filename_prefix": ("STRING", {"default": "Stimma/audio"}),
+            },
+            "optional": {"_stimma_output_dir": ("STRING", {"default": ""})},
+        }
+
+    RETURN_TYPES = ()
+    OUTPUT_NODE = True
+    FUNCTION = "execute"
+    CATEGORY = "Stimma/Outputs"
+
+    @classmethod
+    def IS_CHANGED(cls, **kwargs):
+        return float("nan")
+
+    def execute(self, audio, filename_prefix="Stimma/audio", _stimma_output_dir=""):
+        import folder_paths
+
+        if _stimma_output_dir:
+            directory, filename, subfolder = _stimma_output_dir, "stimma_output_0000.wav", ""
+        else:
+            directory, _, counter, subfolder, prefix = folder_paths.get_save_image_path(
+                filename_prefix, folder_paths.get_output_directory(),
+            )
+            filename = f"{prefix}_{counter:05d}.wav"
+        os.makedirs(directory, exist_ok=True)
+        if _write_audio_wav(audio, os.path.join(directory, filename)) is None:
+            raise ValueError("Audio output is empty or has no valid sample rate.")
+        return {"ui": {"audio": [{"filename": filename, "subfolder": subfolder, "type": "output"}]}}
 
 
 class StimmaImageOutput:

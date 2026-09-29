@@ -31,3 +31,7 @@ config.yaml
 
 # Manager runtime state (operations, cached node map, remembered download URLs)
 .stimma-manage/
+
+# Optional model runtimes, installed by tools/stimma-comfy.
+.runtimes/
+.venv/

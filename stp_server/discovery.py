@@ -24,7 +24,7 @@ STIMMA_PARAM_TYPES = {
 }
 STIMMA_LORA_TYPES = {"StimmaLoraLoader", "StimmaPairedLoraLoader"}
 STIMMA_CHECKPOINT_TYPES = {"StimmaCheckpointLoader"}
-STIMMA_OUTPUT_TYPES = {"StimmaImageOutput", "StimmaVideoOutput"}
+STIMMA_OUTPUT_TYPES = {"StimmaImageOutput", "StimmaVideoOutput", "StimmaAudioOutput"}
 STIMMA_LAYOUT_TYPES = {"StimmaLayoutGroup"}
 ALL_STIMMA_TYPES = (
     {STIMMA_TOOL_INFO}
@@ -388,6 +388,20 @@ def _validate_workflow(
 
     for node_id, node_data in api_prompt.items():
         class_type = node_data.get("class_type", "")
+
+        if class_type == "StimmaMossSoundEffect" and class_type in object_info:
+            # MOSS runs in an optional isolated environment, not in a node pack.
+            # Report setup explicitly rather than advertising an unusable tool.
+            try:
+                import folder_paths
+                from audio_runtime import missing_moss_files, runtime_ready
+                missing = missing_moss_files(folder_paths.models_dir)
+                if missing or not runtime_ready():
+                    message = "MOSS SoundEffect: run tools/stimma-comfy setup-audio --model moss --comfyui <ComfyUI directory>"
+                    warnings.append(message)
+                    issues.append({"kind": "missing_runtime", "name": message, "class_type": class_type})
+            except ImportError:
+                pass  # Offline workflow inspection has no ComfyUI filesystem.
 
         # StimmaCheckpointLoader needs special handling — it's "present" as a
         # node (we provide it), but the user-selected ckpt_name comes from

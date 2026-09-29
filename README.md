@@ -89,6 +89,59 @@ The recipe was evaluated at 1344×768; other sizes and extra LoRAs remain availa
 for experimentation. Ref2v uses its own adapter and needs separate quality judgment
 from the i2v comparison.
 
+## Audio generation
+
+Three bundled STP tools generate downloadable WAV audio:
+
+| Tool | Output | Default sampling | Controls |
+|------|--------|------------------|----------|
+| **Stable Audio 3 Medium** (`stable-audio-3-medium`) | 44.1 kHz stereo, 1–380 seconds | 8 steps, LCM/simple, CFG 1 | Prompt, duration, seed, steps, sampler, scheduler |
+| **Stable Audio 3 Medium Base** (`stable-audio-3-medium-base`) | 44.1 kHz stereo, 1–380 seconds | 50 steps, LCM/simple, CFG 7 | Above, plus guidance and negative prompt |
+| **MOSS SoundEffect v2** (`moss-soundeffect-v2`) | 48 kHz mono, 0.1–30 seconds | 100 steps, guidance 4, shift 5 | Prompt, duration, seed, steps, guidance, negative prompt, schedule shift, duration suffix |
+
+Stable Audio follows the [official ComfyUI recipes](https://github.com/Comfy-Org/workflow_templates/blob/main/templates/audio_stable_audio_3_medium.json).
+Use Medium for quick music, instruments, ambience, and sound effects; use Base
+when you want classifier-free guidance and negative prompts. Guidance is fixed
+at 1 on the distilled Medium tool because its recommended sampling does not
+use a negative prompt. Describe instruments, style, tempo, and sound events in
+the prompt. Duration defaults to 30 seconds. No automatic prompt rewriting is
+applied. These workflows use ComfyUI's native model loading and memory manager.
+
+[MOSS SoundEffect v2](https://github.com/OpenMOSS/MOSS-TTS/tree/main/moss_soundeffect_v2)
+accepts English and Chinese descriptions of foley, sound effects, and ambient
+environments. Duration defaults to 10 seconds. Keep the duration suffix enabled
+to match its training convention. The model denoises a 30-second latent and
+crops to the requested duration, so shorter clips do not proportionally reduce
+generation time.
+
+Install [uv](https://docs.astral.sh/uv/getting-started/installation/), then run
+from the plugin checkout:
+
+```bash
+tools/stimma-comfy setup-audio --comfyui /path/to/ComfyUI
+tools/stimma-comfy audio-status --comfyui /path/to/ComfyUI
+```
+
+Use `--model stable-audio-3` or `--model moss` to install one family. The setup
+command downloads pinned model revisions (approximately 20 GB for Stable Audio
+and 11 GB for MOSS), plus MOSS's Python runtime. Stable Audio files are also
+available through the manager's model download UI. Restart ComfyUI after setup.
+
+MOSS requires an NVIDIA GPU and uses a separate Python 3.12 environment under
+the plugin's ignored `.runtimes/` directory, with upstream's pinned dependencies.
+It does not change ComfyUI's torch, transformers, or numpy packages. Each MOSS
+job unloads that worker's ComfyUI models, loads MOSS in a child process on the
+same GPU, and releases its GPU memory on completion or cancellation. This adds
+model-loading time to each generation but lets image/video jobs reclaim the
+GPU afterward. Progress and cancellation are forwarded through ComfyUI/STP.
+
+Example STP calls (replace the provider alias with yours):
+
+```bash
+stp -s comfyui run stable-audio-3-medium "Warm jazz trio with brushed drums, upright bass and piano, 85 BPM" --duration 30 -o jazz.wav
+stp -s comfyui run moss-soundeffect-v2 "Rain falling on a metal roof, distant rolling thunder, no voices" --duration 10 -o rain.wav
+```
+
 ## Nodes
 
 ### Metadata
@@ -143,6 +196,7 @@ Common STP task types include `text-to-image`, `image-to-image`, `text-to-video`
 |------|---------|
 | **StimmaImageOutput** | Captures generated images. Embeds ComfyUI metadata into PNGs. |
 | **StimmaVideoOutput** | Captures generated video (encodes frames to MP4 via ffmpeg). |
+| **StimmaAudioOutput** | Captures generated audio as 16-bit PCM WAV, preserving sample rate and channels. |
 
 ### Layout
 

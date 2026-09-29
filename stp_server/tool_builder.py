@@ -443,6 +443,7 @@ def _build_param_parameter(
                 "control": ui_control,
                 "step": inputs.get("step", 0.1),
                 "label": label,
+                **({"format": inputs["ui_format"]} if inputs.get("ui_format") else {}),
             },
         )
     elif class_type == "StimmaStringParam":
