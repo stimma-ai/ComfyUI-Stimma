@@ -8,8 +8,8 @@
           <span v-if="o.state === 'queued' || o.state === 'paused'" class="dot z"></span>
           <div class="t">
             <div class="a">{{ o.title }}</div>
-            <div v-if="o.state === 'running' && o.kind === 'download'" class="bar" :class="{ ind: o.progress == null }"><i :style="{ width: (o.progress != null ? Math.round(o.progress * 100) : 40) + '%' }"></i></div>
-            <div class="b" :style="o.state === 'running' && o.kind === 'download' ? 'margin-top:4px' : ''">{{ o.detail || labelFor(o.state) }}</div>
+            <div v-if="o.state === 'running' && (o.kind === 'download' || o.kind === 'peer_download')" class="bar" :class="{ ind: o.progress == null }"><i :style="{ width: (o.progress != null ? Math.round(o.progress * 100) : 40) + '%' }"></i></div>
+            <div class="b" :style="o.state === 'running' && (o.kind === 'download' || o.kind === 'peer_download') ? 'margin-top:4px' : ''">{{ o.detail || labelFor(o.state) }}</div>
           </div>
           <div class="r">
             <button v-if="o.kind === 'download' && o.state === 'running'" class="btn sm ghost" title="Pause" @click="act(o, 'pause')">⏸</button>

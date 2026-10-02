@@ -3,6 +3,8 @@
 import os
 from pathlib import Path
 
+MOSS_RUNTIME = "moss-soundeffect-v2"
+
 PLUGIN_ROOT = Path(__file__).resolve().parent
 MOSS_SOURCE = "934d6826b084c46a0d033402174d5f8ac4ed2519"
 MOSS_REPO = "OpenMOSS-Team/MOSS-SoundEffect-v2.0"
@@ -52,3 +54,19 @@ def model_directory(models_root):
 def missing_moss_files(models_root):
     root = model_directory(models_root)
     return [name for name in MOSS_FILES if not (root / name).is_file()]
+
+
+def moss_dependencies(models_root):
+    """File dependencies use the same names and folders as the download catalog."""
+    root = model_directory(models_root)
+    return [{"filename": f"{root.name}/{name}", "folder": "moss_soundeffect_v2",
+             "installed": (root / name).is_file()} for name in MOSS_FILES]
+
+
+def runtime_status(runtime_id):
+    if runtime_id != MOSS_RUNTIME:
+        raise KeyError(runtime_id)
+    installed = runtime_ready()
+    return {"id": runtime_id, "title": "MOSS SoundEffect runtime", "installed": installed,
+            "installable": installed or not bool(os.environ.get("STIMMA_MOSS_PYTHON")),
+            "detail": "The configured external runtime is missing." if not installed and os.environ.get("STIMMA_MOSS_PYTHON") else None}

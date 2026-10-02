@@ -50,8 +50,8 @@ def remember_user_source(filename: str, url: str, folder: Optional[str]) -> None
     USER_SOURCES_PATH.write_text(json.dumps(data, indent=2, sort_keys=True))
 
 
-def hf_url(repo: str, path: str) -> str:
-    return f"https://huggingface.co/{repo}/resolve/main/{path}"
+def hf_url(repo: str, path: str, revision: str = "main") -> str:
+    return f"https://huggingface.co/{repo}/resolve/{revision}/{path}"
 
 
 def _norm(name: str) -> str:
@@ -85,7 +85,7 @@ def resolve_source(filename: str, hints: Optional[Dict[str, Dict[str, Any]]] = N
     if entry:
         src = entry.get("source") or {}
         if src.get("type") == "huggingface" and src.get("repo") and src.get("path"):
-            url = hf_url(src["repo"], src["path"])
+            url = hf_url(src["repo"], src["path"], src.get("revision") or "main")
             repo = src["repo"]
         else:
             url = src.get("url")

@@ -1350,6 +1350,231 @@
       "size": 1187264003,
       "sha256": "1e1eba25be8872edb0d3c6335c6658fd6388e7b14b60da6e454e404cfcd8150e",
       "gated": false
+    },
+    "MOSS-SoundEffect-v2.0/model_index.json": {
+      "directory": "moss_soundeffect_v2",
+      "source": {
+        "type": "huggingface",
+        "repo": "OpenMOSS-Team/MOSS-SoundEffect-v2.0",
+        "path": "model_index.json",
+        "revision": "e35df4d82fbe87fcd5d14e5d100e349c0c3c076d"
+      },
+      "used_by": [
+        "Stimma-MOSS-SoundEffect-v2.json"
+      ],
+      "size": 504,
+      "sha256": "28ed3d19217bf774394bd5992d1a6dfd1ffab2863117423c3fe4945dadabb3be",
+      "gated": false
+    },
+    "MOSS-SoundEffect-v2.0/scheduler/scheduler_config.json": {
+      "directory": "moss_soundeffect_v2",
+      "source": {
+        "type": "huggingface",
+        "repo": "OpenMOSS-Team/MOSS-SoundEffect-v2.0",
+        "path": "scheduler/scheduler_config.json",
+        "revision": "e35df4d82fbe87fcd5d14e5d100e349c0c3c076d"
+      },
+      "used_by": [
+        "Stimma-MOSS-SoundEffect-v2.json"
+      ],
+      "size": 134,
+      "sha256": "060d9ee9ea73310ff1a47e589a5e37d3e03d99711a6277646b3f679030606977",
+      "gated": false
+    },
+    "MOSS-SoundEffect-v2.0/text_encoder/config.json": {
+      "directory": "moss_soundeffect_v2",
+      "source": {
+        "type": "huggingface",
+        "repo": "OpenMOSS-Team/MOSS-SoundEffect-v2.0",
+        "path": "text_encoder/config.json",
+        "revision": "e35df4d82fbe87fcd5d14e5d100e349c0c3c076d"
+      },
+      "used_by": [
+        "Stimma-MOSS-SoundEffect-v2.json"
+      ],
+      "size": 726,
+      "sha256": "1ddb5b89ebc90dcb417a45c213d818577e65976454d29385c8f6140771d95197",
+      "gated": false
+    },
+    "MOSS-SoundEffect-v2.0/text_encoder/generation_config.json": {
+      "directory": "moss_soundeffect_v2",
+      "source": {
+        "type": "huggingface",
+        "repo": "OpenMOSS-Team/MOSS-SoundEffect-v2.0",
+        "path": "text_encoder/generation_config.json",
+        "revision": "e35df4d82fbe87fcd5d14e5d100e349c0c3c076d"
+      },
+      "used_by": [
+        "Stimma-MOSS-SoundEffect-v2.json"
+      ],
+      "size": 239,
+      "sha256": "2325da0f15bb848e018c5ae071b7943332e9f871d6b60e2ed22ca97d4cb993d2",
+      "gated": false
+    },
+    "MOSS-SoundEffect-v2.0/text_encoder/model-00001-of-00002.safetensors": {
+      "directory": "moss_soundeffect_v2",
+      "source": {
+        "type": "huggingface",
+        "repo": "OpenMOSS-Team/MOSS-SoundEffect-v2.0",
+        "path": "text_encoder/model-00001-of-00002.safetensors",
+        "revision": "e35df4d82fbe87fcd5d14e5d100e349c0c3c076d"
+      },
+      "used_by": [
+        "Stimma-MOSS-SoundEffect-v2.json"
+      ],
+      "size": 3441185608,
+      "sha256": "169ad53ec313c3a34b06c0809216e4fc072cce444a5d4ff2b59690d064130ed5",
+      "gated": false
+    },
+    "MOSS-SoundEffect-v2.0/text_encoder/model-00002-of-00002.safetensors": {
+      "directory": "moss_soundeffect_v2",
+      "source": {
+        "type": "huggingface",
+        "repo": "OpenMOSS-Team/MOSS-SoundEffect-v2.0",
+        "path": "text_encoder/model-00002-of-00002.safetensors",
+        "revision": "e35df4d82fbe87fcd5d14e5d100e349c0c3c076d"
+      },
+      "used_by": [
+        "Stimma-MOSS-SoundEffect-v2.json"
+      ],
+      "size": 622329984,
+      "sha256": "912becff8d60672aa8628ef08c05898d9adf17c2ad4ae3caf99b065622fdeff9",
+      "gated": false
+    },
+    "MOSS-SoundEffect-v2.0/text_encoder/model.safetensors.index.json": {
+      "directory": "moss_soundeffect_v2",
+      "source": {
+        "type": "huggingface",
+        "repo": "OpenMOSS-Team/MOSS-SoundEffect-v2.0",
+        "path": "text_encoder/model.safetensors.index.json",
+        "revision": "e35df4d82fbe87fcd5d14e5d100e349c0c3c076d"
+      },
+      "used_by": [
+        "Stimma-MOSS-SoundEffect-v2.json"
+      ],
+      "size": 25605,
+      "sha256": "0d660e94b165eb912669a5249dff44b83188c4777a07ddb9611fb78d91b0578d",
+      "gated": false
+    },
+    "MOSS-SoundEffect-v2.0/tokenizer/merges.txt": {
+      "directory": "moss_soundeffect_v2",
+      "source": {
+        "type": "huggingface",
+        "repo": "OpenMOSS-Team/MOSS-SoundEffect-v2.0",
+        "path": "tokenizer/merges.txt",
+        "revision": "e35df4d82fbe87fcd5d14e5d100e349c0c3c076d"
+      },
+      "used_by": [
+        "Stimma-MOSS-SoundEffect-v2.json"
+      ],
+      "size": 1671853,
+      "sha256": "8831e4f1a044471340f7c0a83d7bd71306a5b867e95fd870f74d0c5308a904d5",
+      "gated": false
+    },
+    "MOSS-SoundEffect-v2.0/tokenizer/tokenizer.json": {
+      "directory": "moss_soundeffect_v2",
+      "source": {
+        "type": "huggingface",
+        "repo": "OpenMOSS-Team/MOSS-SoundEffect-v2.0",
+        "path": "tokenizer/tokenizer.json",
+        "revision": "e35df4d82fbe87fcd5d14e5d100e349c0c3c076d"
+      },
+      "used_by": [
+        "Stimma-MOSS-SoundEffect-v2.json"
+      ],
+      "size": 11422654,
+      "sha256": "aeb13307a71acd8fe81861d94ad54ab689df773318809eed3cbe794b4492dae4",
+      "gated": false
+    },
+    "MOSS-SoundEffect-v2.0/tokenizer/tokenizer_config.json": {
+      "directory": "moss_soundeffect_v2",
+      "source": {
+        "type": "huggingface",
+        "repo": "OpenMOSS-Team/MOSS-SoundEffect-v2.0",
+        "path": "tokenizer/tokenizer_config.json",
+        "revision": "e35df4d82fbe87fcd5d14e5d100e349c0c3c076d"
+      },
+      "used_by": [
+        "Stimma-MOSS-SoundEffect-v2.json"
+      ],
+      "size": 9732,
+      "sha256": "d5d09f07b48c3086c508b30d1c9114bd1189145b74e982a265350c923acd8101",
+      "gated": false
+    },
+    "MOSS-SoundEffect-v2.0/tokenizer/vocab.json": {
+      "directory": "moss_soundeffect_v2",
+      "source": {
+        "type": "huggingface",
+        "repo": "OpenMOSS-Team/MOSS-SoundEffect-v2.0",
+        "path": "tokenizer/vocab.json",
+        "revision": "e35df4d82fbe87fcd5d14e5d100e349c0c3c076d"
+      },
+      "used_by": [
+        "Stimma-MOSS-SoundEffect-v2.json"
+      ],
+      "size": 2776833,
+      "sha256": "ca10d7e9fb3ed18575dd1e277a2579c16d108e32f27439684afa0e10b1440910",
+      "gated": false
+    },
+    "MOSS-SoundEffect-v2.0/transformer/config.json": {
+      "directory": "moss_soundeffect_v2",
+      "source": {
+        "type": "huggingface",
+        "repo": "OpenMOSS-Team/MOSS-SoundEffect-v2.0",
+        "path": "transformer/config.json",
+        "revision": "e35df4d82fbe87fcd5d14e5d100e349c0c3c076d"
+      },
+      "used_by": [
+        "Stimma-MOSS-SoundEffect-v2.json"
+      ],
+      "size": 311,
+      "sha256": "168ed701ba50c85d15a4a052a29038b81a8dbde0590cda3c5672b3cb1a263906",
+      "gated": false
+    },
+    "MOSS-SoundEffect-v2.0/transformer/diffusion_pytorch_model.safetensors": {
+      "directory": "moss_soundeffect_v2",
+      "source": {
+        "type": "huggingface",
+        "repo": "OpenMOSS-Team/MOSS-SoundEffect-v2.0",
+        "path": "transformer/diffusion_pytorch_model.safetensors",
+        "revision": "e35df4d82fbe87fcd5d14e5d100e349c0c3c076d"
+      },
+      "used_by": [
+        "Stimma-MOSS-SoundEffect-v2.json"
+      ],
+      "size": 5664274560,
+      "sha256": "bda86e4d6730ff47cea47851d219880191e9d21d4d264b21a6ffe7cb2db9dfb0",
+      "gated": false
+    },
+    "MOSS-SoundEffect-v2.0/vae/config.json": {
+      "directory": "moss_soundeffect_v2",
+      "source": {
+        "type": "huggingface",
+        "repo": "OpenMOSS-Team/MOSS-SoundEffect-v2.0",
+        "path": "vae/config.json",
+        "revision": "e35df4d82fbe87fcd5d14e5d100e349c0c3c076d"
+      },
+      "used_by": [
+        "Stimma-MOSS-SoundEffect-v2.json"
+      ],
+      "size": 169,
+      "sha256": "92cdfc4c26b7f88efc15316e70faa6c53695f933ebaf1300c636b040d8e69d04",
+      "gated": false
+    },
+    "MOSS-SoundEffect-v2.0/vae/vae_128d_48k.pth": {
+      "directory": "moss_soundeffect_v2",
+      "source": {
+        "type": "huggingface",
+        "repo": "OpenMOSS-Team/MOSS-SoundEffect-v2.0",
+        "path": "vae/vae_128d_48k.pth",
+        "revision": "e35df4d82fbe87fcd5d14e5d100e349c0c3c076d"
+      },
+      "used_by": [
+        "Stimma-MOSS-SoundEffect-v2.json"
+      ],
+      "size": 1486465965,
+      "sha256": "07e6139ff33bd21ba8a7a7f40ed24aab13ac0d100cd686f8a9f3e03dc5251cb1",
+      "gated": false
     }
   },
   "unresolved": [

@@ -15,7 +15,7 @@ from typing import Any, Dict, List, Optional
 
 import aiohttp
 
-from . import credentials, jobs, nodes as nodepacks, resolve, update as updater
+from . import credentials, jobs, nodes as nodepacks, resolve, runtimes, update as updater
 from .downloads import DownloadManager, probe_hf
 from .instances import InstanceMonitor, disk_stats, is_local_addr, merge_comfy_gpu_memory
 from .ops import (
@@ -77,6 +77,7 @@ class Manager:
         self._dismissed_failures: set = set()
         self._op_states = {op.id: op.state for op in self.ops.all()}
         self._started = False
+        self._setup_tasks = set()
         self._session: Optional[aiohttp.ClientSession] = None
         self.ops.on_change(self._on_op_change)
         self.instances.on_change(self._on_instances_change)
@@ -91,6 +92,10 @@ class Manager:
         asyncio.create_task(self._background_update_check())
 
     async def stop(self):
+        tasks = list(self._setup_tasks)
+        for task in tasks:
+            task.cancel()
+        await asyncio.gather(*tasks, return_exceptions=True)
         await self.instances.stop()
         await self.downloads.stop()
         if self._session and not self._session.closed:
@@ -109,6 +114,13 @@ class Manager:
 
     def log(self, line: str):
         logger.info("[manage] %s", line)
+
+    def _start_setup_task(self, coroutine):
+        if not hasattr(self, "_setup_tasks"):
+            self._setup_tasks = set()
+        task = asyncio.create_task(coroutine)
+        self._setup_tasks.add(task)
+        task.add_done_callback(self._setup_tasks.discard)
 
     # ------------------------------------------------------------------ hooks
     def on_tools_rebuilt(self, workflows, tools, changed: bool):
@@ -143,10 +155,10 @@ class Manager:
     def _on_op_change(self, op: Operation):
         previous_state = self._op_states.get(op.id)
         self._op_states[op.id] = op.state
-        if op.state == STATE_FAILED and op.kind == "download":
+        if op.state == STATE_FAILED and op.kind in ("download", "peer_download", "install_runtime"):
             asyncio.ensure_future(self.provider.notify(
                 id=f"download-failed:{op.id}", level="error",
-                title=f"Download failed: {op.title}", body=op.error, action="manage", anchor="activity",
+                title=f"Setup failed: {op.title}", body=op.error, action="manage", anchor="activity",
             ))
         # Progress updates can fire many times per second. Provider state only
         # changes when the operation itself changes lifecycle state.
@@ -158,11 +170,14 @@ class Manager:
             self.log(f"downloaded {op.meta.get('filename')}")
             # Poke discovery so the tool flips to ready quickly (the file
             # watcher's fingerprint would catch it within its interval anyway).
-            try:
-                await self.provider.discover_and_register_tools()
-                await self.provider.notify_tools_changed()
-            except Exception:
-                logger.debug("post-download rescan failed", exc_info=True)
+            await self._refresh_setup()
+
+    async def _refresh_setup(self):
+        try:
+            await self.provider.discover_and_register_tools(force=True)
+            await self.provider.notify_tools_changed()
+        except Exception:
+            logger.debug("post-setup rescan failed", exc_info=True)
 
     # ------------------------------------------------------------------ provider state
     def provider_state(self):
@@ -384,6 +399,9 @@ class Manager:
                     gated = gated or bool(src.get("gated"))
             elif i["kind"] == "missing_checkpoint":
                 unresolved += 1
+            elif i["kind"] == "missing_runtime":
+                if "model runtime" not in parts:
+                    parts.append("model runtime")
         if total:
             parts.append(f"{_fmt_gb(total)} to download")
         elif any(i["kind"] == "missing_model" for i in required_issues) and not unresolved:
@@ -406,9 +424,34 @@ class Manager:
         w = self._workflow(slug)
         if w is None:
             raise KeyError(slug)
-        downloads, packs, blockers = [], [], []
+        downloads, packs, blockers, runtime_plan = [], [], [], []
+        issues = list(_required_issues(w))
+        pipeline_files = set()
+        # Runtime-backed nodes expose dependencies without loader widgets. Probe
+        # one worker per remote host so a locally ready workflow can still set up
+        # peers whose models/runtime are missing.
+        for runtime in self._workflow_runtimes(w):
+            if runtime.get("optional"):
+                continue
+            pipeline_files.update(model["filename"] for model in runtime.get("models", []))
+            if not runtime["installed"]:
+                runtime_plan.append({**runtime, "target": "local"})
+                if not runtime["installable"]:
+                    blockers.append({"kind": "runtime", "message": runtime["detail"]})
+            for addr, status in await self._peer_runtime_statuses(runtime["id"]):
+                if status.get("error"):
+                    blockers.append({"kind": "peer", "message": f"Cannot check setup on {addr}: {status['error']}"})
+                    continue
+                if not status["installed"]:
+                    runtime_plan.append({**status, "target": addr})
+                    if not status["installable"]:
+                        blockers.append({"kind": "runtime", "message": status["detail"]})
+                for model in status.get("models", []):
+                    if not model["installed"]:
+                        issues.append({"kind": "missing_model", "name": model["filename"],
+                                       "folder": model["folder"], "peer": addr})
         seen_files = set()
-        for i in _required_issues(w):
+        for i in issues:
             if i["kind"] == "missing_model":
                 fname = i["name"]
                 if fname in seen_files:
@@ -422,6 +465,9 @@ class Manager:
                          **({k: src.get(k) for k in ("url", "size", "sha256", "gated", "license_url", "repo", "via")} if src else {})}
                 if dest and os.path.exists(dest):
                     entry["already_present"] = True
+                if fname in pipeline_files:
+                    entry["peers"] = sorted({issue["peer"] for issue in issues
+                                             if issue.get("name") == fname and issue.get("peer")})
                 downloads.append(entry)
                 if not src:
                     blockers.append({"kind": "no_source", "filename": fname, "folder": folder})
@@ -439,7 +485,7 @@ class Manager:
                     blockers.append({"kind": "unknown_node", "class_type": i["name"]})
         # Probe HF for gated / token needs on the resolved HF downloads
         hf_needs_token, hf_license = False, []
-        probes = [d for d in downloads if d.get("resolved") and "huggingface.co" in (d.get("url") or "") and not d.get("already_present")]
+        probes = [d for d in downloads if d.get("resolved") and "huggingface.co" in (d.get("url") or "") and (not d.get("already_present") or d.get("peers"))]
         if probes:
             results = await asyncio.gather(*[probe_hf(d["url"]) for d in probes], return_exceptions=True)
             for d, r in zip(probes, results):
@@ -458,7 +504,7 @@ class Manager:
         for lic in hf_license:
             if not any(b.get("kind") == "hf_license" and b.get("repo") == lic["repo"] for b in blockers):
                 blockers.append({"kind": "hf_license", **lic})
-        total = sum((d.get("size") or 0) for d in downloads if not d.get("already_present"))
+        total = sum((d.get("size") or 0) for d in downloads if not d.get("already_present") or d.get("peers"))
         free = None
         for d in downloads:
             if d.get("dest_path"):
@@ -470,7 +516,7 @@ class Manager:
                     pass
         return {
             "slug": slug, "name": w.tool_info.get("display_name") or slug,
-            "downloads": downloads, "packs": packs, "blockers": blockers,
+            "downloads": downloads, "packs": packs, "runtimes": runtime_plan, "blockers": blockers,
             "total_size": total, "free_space": free,
             "targets": self._download_targets(),
             "hf_token_set": bool(credentials.hf_token()),
@@ -498,15 +544,24 @@ class Manager:
         group = f"setup:{slug}"
         queued = []
         for d in plan["downloads"]:
-            if d.get("already_present") or not d.get("resolved") or not d.get("dest_path"):
+            if not d.get("resolved") or not d.get("dest_path"):
                 continue
-            op = self.downloads.enqueue(
-                filename=d["filename"], url=d["url"], dest_path=d["dest_path"], size=d.get("size"),
-                sha256=d.get("sha256"), gated=bool(d.get("gated")), license_url=d.get("license_url"),
-                repo=d.get("repo"), group=group, workflows=[slug],
-            )
-            queued.append(op.id)
-            await self._fanout_download(d, slug)
+            if not d.get("already_present"):
+                op = self.downloads.enqueue(
+                    filename=d["filename"], url=d["url"], dest_path=d["dest_path"], size=d.get("size"),
+                    sha256=d.get("sha256"), gated=bool(d.get("gated")), license_url=d.get("license_url"),
+                    repo=d.get("repo"), group=group, workflows=[slug],
+                )
+                queued.append(op.id)
+            elif not d.get("peers"):
+                continue
+            queued.extend(await self._fanout_download(d, slug))
+        for runtime in plan["runtimes"]:
+            if not runtime["installable"]:
+                continue
+            op = self.start_runtime_install(runtime["id"], slug, runtime["target"])
+            if op:
+                queued.append(op.id)
         for p in plan["packs"]:
             if p["installed"] or not p["installable"]:
                 continue
@@ -522,21 +577,162 @@ class Manager:
 
     async def _fanout_download(self, d: dict, slug: str):
         """Ask remote-host peers (other machines running the plugin) to fetch the same file."""
+        hosts = set()
+        queued = []
         for s in self.instances.statuses:
             if s.local or not s.healthy:
                 continue
+            if "peers" in d and s.addr not in d["peers"]:
+                continue
             host = s.addr.rsplit(":", 1)[0]
+            if host in hosts:
+                continue
+            hosts.add(host)
+            existing = self.ops.find("peer_download", target=s.addr, filename=d["filename"])
+            if existing:
+                queued.append(existing.id)
+                continue
+            request = {"filename": d["filename"], "url": d["url"], "folder": d.get("folder"), "size": d.get("size"),
+                       "sha256": d.get("sha256"), "gated": d.get("gated"), "license_url": d.get("license_url"),
+                       "repo": d.get("repo"), "group": f"setup:{slug}", "workflows": [slug]}
+            op = self.ops.create("peer_download", f"{d['filename']} on {s.addr}",
+                                 meta={"target": s.addr, **request}, group=f"setup:{slug}")
+            self._start_setup_task(self._run_peer_download(op))
+            queued.append(op.id)
+        return queued
+
+    async def _run_peer_download(self, op):
+        self.ops.update(op, state=STATE_RUNNING, error=None, error_kind=None, fix=None)
+        try:
+            session = await self._get_session()
+            async with session.post(f"http://{op.meta['target']}/stp-v1/manage/api/downloads", json=op.meta,
+                                    timeout=aiohttp.ClientTimeout(total=15)) as response:
+                response.raise_for_status()
+                result = await response.json()
+            await self._wait_peer_operation(op, result["operation"])
+            self.ops.update(op, state=STATE_DONE, detail="Downloaded on worker", progress=1)
+        except Exception as error:
+            self.ops.update(op, state=STATE_FAILED, error=str(error), error_kind="other", fix={"action": "retry"})
+        finally:
+            self.ops.save()
+        if op.state == STATE_DONE:
+            await self._refresh_setup()
+
+    def _workflow_runtimes(self, workflow):
+        from audio_runtime import MOSS_RUNTIME
+        from ..discovery import _default_optional_switch_nodes
+        optional_nodes = _default_optional_switch_nodes(workflow.api_prompt)
+        matching = [str(node_id) for node_id, node in workflow.api_prompt.items()
+                    if node.get("class_type") == "StimmaMossSoundEffect"]
+        if not matching:
+            return []
+        return [{**runtimes.status(MOSS_RUNTIME), "optional": all(node_id in optional_nodes for node_id in matching)}]
+
+    async def _peer_runtime_statuses(self, runtime_id):
+        peers = {}
+        for instance in self.instances.statuses:
+            if instance.local:
+                continue
+            host = instance.addr.rsplit(":", 1)[0]
+            if host not in peers or instance.healthy:
+                peers[host] = instance.addr
+
+        async def check(addr):
             try:
-                sess = await self._get_session()
-                async with sess.post(f"http://{s.addr}/stp-v1/manage/api/downloads", json={
-                    "filename": d["filename"], "url": d["url"], "folder": d.get("folder"), "size": d.get("size"),
-                    "sha256": d.get("sha256"), "gated": d.get("gated"), "license_url": d.get("license_url"),
-                    "repo": d.get("repo"), "group": f"setup:{slug}", "workflows": [slug],
-                }) as r:
-                    if r.status != 200:
-                        self.log(f"peer {host} declined download {d['filename']}: HTTP {r.status}")
-            except Exception as e:
-                self.log(f"peer {host} unreachable for download fan-out: {e}")
+                session = await self._get_session()
+                async with session.get(f"http://{addr}/stp-v1/manage/api/runtimes/{runtime_id}",
+                                       timeout=aiohttp.ClientTimeout(total=10)) as response:
+                    if response.status != 200:
+                        raise RuntimeError(f"HTTP {response.status}; update the connector on this worker")
+                    result = await response.json()
+                    if result.get("id") != runtime_id or "installed" not in result:
+                        raise RuntimeError("Invalid runtime status")
+                    return addr, result
+            except Exception as error:
+                return addr, {"error": str(error) or "Worker is unreachable"}
+
+        return await asyncio.gather(*(check(addr) for addr in peers.values()))
+
+    def start_runtime_install(self, runtime_id, slug=None, target="local"):
+        from audio_runtime import runtime_status
+        status = runtime_status(runtime_id)  # Reject unknown IDs; never install a supplied URL.
+        if target == "local" and status["installed"]:
+            return None
+        if target == "local" and not status["installable"]:
+            raise ValueError(status["detail"])
+        existing = self.ops.find("install_runtime", runtime_id=runtime_id, target=target)
+        if existing:
+            return existing
+        op = self.ops.create("install_runtime", f"Install {status['title']}" + (f" on {target}" if target != "local" else ""),
+                             meta={"runtime_id": runtime_id, "target": target, "workflows": [slug] if slug else []},
+                             group=f"setup:{slug}" if slug else None)
+        self._start_setup_task(self._run_runtime_install(op))
+        return op
+
+    async def _run_runtime_install(self, op: Operation):
+        self.ops.update(op, state=STATE_RUNNING, error=None, error_kind=None, fix=None)
+        lines = []
+
+        def log(line):
+            lines.append(line)
+            del lines[:-10]
+            self.ops.update(op, detail=line[:160])
+
+        try:
+            target = op.meta.get("target", "local")
+            if target == "local":
+                await runtimes.install(op.meta["runtime_id"], log)
+            else:
+                await self._install_peer_runtime(op)
+            self.ops.update(op, state=STATE_DONE, detail="Runtime ready")
+        except Exception as error:
+            self.ops.update(op, state=STATE_FAILED, error=str(error) + ("\n" + "\n".join(lines[-3:]) if lines else ""),
+                            error_kind="other", fix={"action": "retry"})
+        finally:
+            self.ops.save()
+        if op.state == STATE_DONE:
+            await self._refresh_setup()
+
+    async def _install_peer_runtime(self, op):
+        session = await self._get_session()
+        base = f"http://{op.meta['target']}/stp-v1/manage/api"
+        timeout = aiohttp.ClientTimeout(total=15)
+        async with session.post(f"{base}/runtimes/{op.meta['runtime_id']}/install",
+                                json={"slug": next(iter(op.meta.get("workflows") or []), None)}, timeout=timeout) as response:
+            if response.status != 200:
+                raise RuntimeError(f"Worker declined runtime setup: HTTP {response.status}")
+            result = await response.json()
+        remote = result.get("operation")
+        if remote is None and result.get("ready"):
+            return
+        if not remote or not remote.get("id"):
+            raise RuntimeError("Worker returned no runtime setup operation")
+        await self._wait_peer_operation(op, remote)
+
+    async def _wait_peer_operation(self, op, remote):
+        session = await self._get_session()
+        base = f"http://{op.meta['target']}/stp-v1/manage/api"
+        timeout = aiohttp.ClientTimeout(total=15)
+        op.meta["peer_operation_id"] = remote["id"]
+        self.ops.save()
+        # Track the peer in our Activity too, rather than marking dispatch done.
+        deadline = time.monotonic() + 6 * 60 * 60
+        while True:
+            if remote["state"] == STATE_DONE:
+                return
+            if remote["state"] in (STATE_FAILED, "cancelled", STATE_PAUSED):
+                raise RuntimeError(remote.get("error") or f"Worker setup {remote['state']}")
+            if time.monotonic() >= deadline:
+                raise RuntimeError("Worker setup timed out")
+            self.ops.update(op, detail=remote.get("detail") or "Preparing dependencies on worker",
+                            progress=remote.get("progress"))
+            await asyncio.sleep(2)
+            async with session.get(f"{base}/activity", timeout=timeout) as response:
+                response.raise_for_status()
+                activity = await response.json()
+            remote = next((item for item in activity.get("operations", []) if item["id"] == remote["id"]), None)
+            if remote is None:
+                raise RuntimeError("Worker setup operation is no longer available; retry to check setup")
 
     async def _run_install(self, op: Operation):
         self.ops.update(op, state=STATE_RUNNING, detail=None)
@@ -709,6 +905,15 @@ class Manager:
         optional_nodes = discovery._default_optional_switch_nodes(w.api_prompt)
         models = []
         seen = set()
+        workflow_runtimes = self._workflow_runtimes(w)
+        if workflow_runtimes:
+            from audio_runtime import moss_dependencies
+            import folder_paths
+            for entry in moss_dependencies(folder_paths.models_dir):
+                src = resolve.resolve_source(entry["filename"], w.model_hints) or {}
+                models.append({**entry, "optional": workflow_runtimes[0]["optional"],
+                               "size": src.get("size"), "source": src.get("repo"), "no_source": not bool(src)})
+                seen.add(entry["filename"])
         for node_id, node_data in w.api_prompt.items():
             ct = node_data.get("class_type", "")
             if ct in discovery.ALL_STIMMA_TYPES or ct in discovery._ANNOTATION_NODE_TYPES:
@@ -767,5 +972,6 @@ class Manager:
             "state": "ready" if not w.warnings else "needs_setup",
             "models": sorted(models, key=lambda m: (m["installed"], m["filename"].lower())),
             "packs": packs,
+            "runtimes": workflow_runtimes,
             "in_progress": any(o.group == f"setup:{slug}" for o in self.ops.active()),
         }

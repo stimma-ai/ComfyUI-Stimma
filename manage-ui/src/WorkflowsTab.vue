@@ -9,9 +9,9 @@
     <div class="body">
       <div v-if="detail.loading" class="empty"><span class="spin"></span></div>
       <template v-else>
-        <div v-if="!detail.error && (requiredModels.length || requiredPacks.length)" class="dependency-intro">
+        <div v-if="!detail.error && (requiredModels.length || requiredPacks.length || requiredRuntimes.length)" class="dependency-intro">
           <div class="dependency-title">Dependencies</div>
-          <div>Get ready downloads missing models and installs the custom nodes this workflow requires.</div>
+          <div>Get ready prepares the dependencies this workflow requires.</div>
         </div>
         <div class="grp" v-if="requiredModels.length">
           <h4>Required models</h4>
@@ -30,6 +30,14 @@
             <span class="dot z"></span>
             <div class="t"><div class="a">{{ pk.title || pk.class_type }}</div><div class="b mono">{{ pk.class_type }}</div></div>
             <div class="r">missing</div>
+          </div>
+        </div>
+        <div class="grp" v-if="requiredRuntimes.length">
+          <h4>Required runtimes</h4>
+          <div v-for="r in requiredRuntimes" :key="r.id" class="li" style="min-height:32px;padding:6px 0">
+            <span class="dot" :class="r.installed ? 'g' : 'z'"></span>
+            <div class="t"><div class="a">{{ r.title }}</div><div class="b" v-if="r.detail">{{ r.detail }}</div></div>
+            <div class="r">{{ r.installed ? 'Installed' : 'missing' }}</div>
           </div>
         </div>
         <div class="grp" v-if="optionalModels.length">
@@ -106,6 +114,9 @@
         <div class="lst" v-if="packsToDo.length">
           <div v-for="p in packsToDo" :key="p.url"><span class="f">Install {{ p.title }}</span><span class="mono">{{ p.installable ? 'node pack' : 'Manager required' }}</span></div>
         </div>
+        <div class="lst" v-if="runtimesToDo.length">
+          <div v-for="r in runtimesToDo" :key="r.id + ':' + r.target"><span class="f">Install {{ r.title }}</span><span>{{ r.target === 'local' ? 'this machine' : r.target }}</span></div>
+        </div>
 
         <!-- blockers -->
         <div v-for="(b, i) in sheet.plan.blockers" :key="i" class="warn">
@@ -123,6 +134,7 @@
           <template v-else-if="b.kind === 'unknown_node'">
             <span class="mono">{{ b.class_type }}</span> — no known node pack.
           </template>
+          <template v-else-if="b.kind === 'runtime' || b.kind === 'peer'">{{ b.message }}</template>
         </div>
 
         <div class="acts">
@@ -170,12 +182,15 @@ const rows = computed(() => all.value.filter(w =>
 const requiredModels = computed(() => (detail.value?.models || []).filter(m => !m.optional))
 const optionalModels = computed(() => (detail.value?.models || []).filter(m => m.optional))
 const requiredPacks = computed(() => (detail.value?.packs || []).filter(p => !p.optional))
+const requiredRuntimes = computed(() => (detail.value?.runtimes || []).filter(r => !r.optional))
 const missingSummary = computed(() => {
   const models = requiredModels.value.filter(m => !m.installed).length
   const packs = requiredPacks.value.filter(p => !p.installed).length
   const parts = []
   if (models) parts.push(`${models} model${models === 1 ? '' : 's'}`)
   if (packs) parts.push(`${packs} node pack${packs === 1 ? '' : 's'}`)
+  const runtimes = requiredRuntimes.value.filter(r => !r.installed).length
+  if (runtimes) parts.push(`${runtimes} runtime${runtimes === 1 ? '' : 's'}`)
   return parts.length ? `${parts.join(' · ')} missing` : ''
 })
 
@@ -226,8 +241,9 @@ async function openPlan(w) {
   catch (e) { sheet.value = { w, error: e.message } }
 }
 function closeSheet() { sheet.value = null }
-const downloadsToDo = computed(() => (sheet.value?.plan?.downloads || []).filter(d => !d.already_present))
+const downloadsToDo = computed(() => (sheet.value?.plan?.downloads || []).filter(d => !d.already_present || d.peers?.length))
 const packsToDo = computed(() => (sheet.value?.plan?.packs || []).filter(p => !p.installed))
+const runtimesToDo = computed(() => (sheet.value?.plan?.runtimes || []).filter(r => !r.installed))
 const targetsLabel = computed(() => {
   const t = sheet.value?.plan?.targets || ['local']
   return t.map(x => x === 'local' ? 'this machine' : x).join(', ')
@@ -239,14 +255,14 @@ const canStart = computed(() => {
     if (b.kind === 'hf_token' && !hfToken.value.trim() && !p.hf_token_set) return false
     if (b.kind === 'no_source' && !(sources[b.filename] || '').trim()) {
       // allow starting when there is *something* else to do
-      if (downloadsToDo.value.filter(d => d.resolved).length === 0 && packsToDo.value.filter(x => x.installable).length === 0) return false
+      if (downloadsToDo.value.filter(d => d.resolved).length === 0 && packsToDo.value.filter(x => x.installable).length === 0 && !runtimesToDo.value.some(r => r.installable)) return false
     }
   }
-  return downloadsToDo.value.some(d => d.resolved || sources[d.filename]) || packsToDo.value.some(x => x.installable)
+  return downloadsToDo.value.some(d => d.resolved || sources[d.filename]) || packsToDo.value.some(x => x.installable) || runtimesToDo.value.some(r => r.installable)
 })
 const startLabel = computed(() => {
   const dl = downloadsToDo.value.some(d => d.resolved || sources[d.filename])
-  const inst = packsToDo.value.some(x => x.installable)
+  const inst = packsToDo.value.some(x => x.installable) || runtimesToDo.value.some(r => r.installable)
   return dl && inst ? 'Download & install' : dl ? 'Download' : inst ? 'Install' : 'Start'
 })
 async function start() {

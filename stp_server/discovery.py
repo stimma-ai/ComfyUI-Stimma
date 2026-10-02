@@ -390,16 +390,26 @@ def _validate_workflow(
         class_type = node_data.get("class_type", "")
 
         if class_type == "StimmaMossSoundEffect" and class_type in object_info:
-            # MOSS runs in an optional isolated environment, not in a node pack.
-            # Report setup explicitly rather than advertising an unusable tool.
+            # The runtime and pipeline files are ordinary setup dependencies,
+            # even though this node has no model-selection widget.
             try:
                 import folder_paths
-                from audio_runtime import missing_moss_files, runtime_ready
-                missing = missing_moss_files(folder_paths.models_dir)
-                if missing or not runtime_ready():
-                    message = "MOSS SoundEffect: run tools/stimma-comfy setup-audio --model moss --comfyui <ComfyUI directory>"
-                    warnings.append(message)
-                    issues.append({"kind": "missing_runtime", "name": message, "class_type": class_type})
+                from audio_runtime import MOSS_RUNTIME, moss_dependencies, runtime_ready
+                optional = str(node_id) in optional_nodes
+                if not runtime_ready():
+                    if not optional:
+                        warnings.append("missing runtime: MOSS SoundEffect")
+                    issues.append({"kind": "missing_runtime", "name": "MOSS SoundEffect runtime",
+                                   "runtime_id": MOSS_RUNTIME, "class_type": class_type, "optional": optional})
+                for dependency in moss_dependencies(folder_paths.models_dir):
+                    if dependency["installed"] or dependency["filename"] in seen_missing_models:
+                        continue
+                    seen_missing_models.add(dependency["filename"])
+                    if not optional:
+                        warnings.append(f"missing model: {dependency['filename']}")
+                    issues.append({"kind": "missing_model", "name": dependency["filename"],
+                                   "folder": dependency["folder"], "class_type": class_type,
+                                   "optional": optional})
             except ImportError:
                 pass  # Offline workflow inspection has no ComfyUI filesystem.
 

@@ -385,6 +385,10 @@ class StimmaPluginProvider(Provider):
                 except OSError:
                     pass
 
+        # Pipeline files and the isolated runtime aren't ComfyUI COMBO models.
+        # Their completion/removal must also refresh workflow readiness.
+        from audio_runtime import missing_moss_files, runtime_ready
+        parts.append(f"moss:{runtime_ready()}:{','.join(missing_moss_files(folder_paths.models_dir))}")
         h = hashlib.md5("|".join(parts).encode()).hexdigest()
         return h
 

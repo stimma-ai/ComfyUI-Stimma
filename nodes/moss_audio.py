@@ -40,7 +40,7 @@ class StimmaMossSoundEffect:
             raise ValueError("Enter a sound description.")
         python = runtime_python()
         if not runtime_ready() or missing_moss_files(folder_paths.models_dir):
-            raise RuntimeError("MOSS SoundEffect needs setup. Run tools/stimma-comfy setup-audio --model moss --comfyui <ComfyUI directory> from the plugin.")
+            raise RuntimeError("MOSS SoundEffect needs setup. Open the ComfyUI manager in Stimma and choose Get ready for this workflow.")
         device = mm.get_torch_device()
         if device.type != "cuda":
             raise RuntimeError("MOSS SoundEffect currently requires an NVIDIA GPU.")

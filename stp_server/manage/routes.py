@@ -8,7 +8,7 @@ from pathlib import Path
 
 from aiohttp import web
 
-from . import credentials, resolve, update as updater
+from . import credentials, resolve, runtimes, update as updater
 
 logger = logging.getLogger(__name__)
 
@@ -122,6 +122,24 @@ def make_routes(manager) -> list:
         manager.instances.touch()
         return _json(manager.activity())
 
+    async def runtime_status(request):
+        try:
+            return _json(runtimes.status(request.match_info["runtime_id"]))
+        except KeyError:
+            return _err("unknown runtime", 404)
+
+    async def install_runtime(request):
+        if not _mutation_allowed(request):
+            return _err("forbidden", 403)
+        body = await _body(request)
+        try:
+            op = manager.start_runtime_install(request.match_info["runtime_id"], body.get("slug"))
+            return _json({"ready": op is None, "operation": op.to_dict() if op else None})
+        except KeyError:
+            return _err("unknown runtime", 404)
+        except ValueError as error:
+            return _err(str(error))
+
     async def op_action(request):
         if not _mutation_allowed(request):
             return _err("forbidden", 403)
@@ -143,6 +161,22 @@ def make_routes(manager) -> list:
                 from .ops import STATE_QUEUED
                 manager.ops.update(op, state=STATE_QUEUED, error=None, error_kind=None, fix=None)
                 asyncio.create_task(manager._run_manager_install(op))
+            elif op.kind == "install_runtime":
+                import asyncio
+                from .ops import STATE_QUEUED
+                if op.state in ("queued", "running"):
+                    return _err("runtime installation is already in progress", 409)
+                manager.ops.update(op, state=STATE_QUEUED, error=None, error_kind=None, fix=None,
+                                   started_at=None, finished_at=None)
+                manager._start_setup_task(manager._run_runtime_install(op))
+            elif op.kind == "peer_download":
+                import asyncio
+                from .ops import STATE_QUEUED
+                if op.state in ("queued", "running"):
+                    return _err("download is already in progress", 409)
+                manager.ops.update(op, state=STATE_QUEUED, error=None, error_kind=None, fix=None,
+                                   started_at=None, finished_at=None)
+                manager._start_setup_task(manager._run_peer_download(op))
             else:
                 return _err("not retryable")
         elif action == "pause":
@@ -250,6 +284,8 @@ def make_routes(manager) -> list:
         web.get(api + "/host", host),
         web.get(api + "/workflows", workflows),
         web.post(api + "/workflows/rescan", rescan),
+        web.get(api + "/runtimes/{runtime_id}", runtime_status),
+        web.post(api + "/runtimes/{runtime_id}/install", install_runtime),
         web.get(api + "/workflows/{slug}/plan", plan),
         web.get(api + "/workflows/{slug}", workflow_detail),
         web.post(api + "/workflows/{slug}/setup", setup),
