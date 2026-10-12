@@ -8,6 +8,7 @@ provider-level state + milestone notifications back over STP.
 import asyncio
 import logging
 import os
+import shutil
 import sys
 import time
 from pathlib import Path
@@ -509,8 +510,8 @@ class Manager:
         for d in downloads:
             if d.get("dest_path"):
                 try:
-                    st = os.statvfs(os.path.dirname(d["dest_path"]) if os.path.isdir(os.path.dirname(d["dest_path"])) else resolve.model_dirs()[0])
-                    free = st.f_bavail * st.f_frsize
+                    path = os.path.dirname(d["dest_path"])
+                    free = shutil.disk_usage(path if os.path.isdir(path) else resolve.model_dirs()[0]).free
                     break
                 except Exception:
                     pass

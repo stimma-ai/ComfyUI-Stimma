@@ -154,17 +154,17 @@ def disk_stats(paths: List[str]) -> List[Dict[str, Any]]:
     result = []
     for p in paths:
         try:
-            st = os.statvfs(p)
+            usage = shutil.disk_usage(p)
+            key = os.stat(p).st_dev
         except OSError:
             continue
-        key = (st.f_fsid if hasattr(st, "f_fsid") else p)
         if key in seen:
             continue
         seen.add(key)
         result.append({
             "path": p,
-            "free": st.f_bavail * st.f_frsize,
-            "total": st.f_blocks * st.f_frsize,
+            "free": usage.free,
+            "total": usage.total,
         })
     return result
 

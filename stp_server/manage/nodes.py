@@ -1,6 +1,7 @@
 """Custom node packs: class_type → pack lookup, install via ComfyUI-Manager."""
 
 import asyncio
+from importlib import metadata
 import json
 import logging
 import os
@@ -50,6 +51,16 @@ def manager_dir() -> Optional[Path]:
         p = Path(base) / "custom_nodes" / name
         if (p / "cm-cli.py").exists():
             return p
+    # Desktop installs Manager as a Python distribution rather than a node pack.
+    # Read its metadata without importing it: importing Manager registers routes.
+    try:
+        dist = metadata.distribution("comfyui-manager")
+        package = Path(dist.locate_file("comfyui_manager"))
+        cli = Path(dist.locate_file("cm_cli/__main__.py"))
+        if package.is_dir() and cli.is_file():
+            return package
+    except metadata.PackageNotFoundError:
+        pass
     return None
 
 
@@ -62,6 +73,11 @@ def manager_version() -> Optional[str]:
     md = manager_dir()
     if md is None:
         return None
+    if not (md / "cm-cli.py").is_file():
+        try:
+            return metadata.version("comfyui-manager")
+        except metadata.PackageNotFoundError:
+            return None
     try:
         import tomllib
         data = tomllib.loads((md / "pyproject.toml").read_text())
@@ -204,7 +220,8 @@ async def install_pack(url: str, log) -> None:
     if md is None:
         raise RuntimeError("ComfyUI-Manager is not installed")
     base = comfy_base_path() or str(md.parent.parent)
-    cmd = [python_exe(), str(md / "cm-cli.py"), "install", url]
+    cli = [str(md / "cm-cli.py")] if (md / "cm-cli.py").is_file() else ["-m", "cm_cli"]
+    cmd = [python_exe(), *cli, "install", url]
     env = dict(os.environ)
     env.setdefault("COMFYUI_PATH", base)
     log(f"$ {' '.join(cmd)}")

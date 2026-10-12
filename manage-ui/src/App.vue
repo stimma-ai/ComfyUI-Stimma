@@ -32,6 +32,15 @@
       </div>
       <button v-if="!updateBusy" class="btn sm update-cta" @click="applyUpdate">Update & restart</button>
     </div>
+    <div v-if="loadError" class="banner red" role="alert">
+      <span>Could not load ComfyUI status</span>
+      <button class="lnk" @click="showLoadError = !showLoadError">{{ showLoadError ? 'Hide details' : 'Details' }}</button>
+      <button class="lnk" @click="load">Retry</button>
+    </div>
+    <div v-if="loadError && showLoadError" class="body">
+      <div class="mono cap-detail">{{ loadError }}</div>
+      <div class="cap-detail">The ComfyUI-Stimma status request failed. This does not mean ComfyUI-Manager is missing.</div>
+    </div>
     <div v-if="overview && overview.summary && !['ready', 'in_progress'].includes(overview.state)" class="banner" :class="{ red: overview.state === 'error' }">
       <span>{{ bannerText }}</span>
       <button v-if="overview.restart_needed && overview.restart_needed.length" class="lnk" :disabled="restartBusy" @click="restart">{{ restartBusy ? 'Restarting…' : 'Restart' }}</button>
@@ -52,7 +61,10 @@
       <button v-else class="lnk" @click="tab = 'activity'">Activity</button>
     </div>
 
-    <OverviewTab v-if="tab === 'overview'" :overview="overview" @refresh="load" @open="tab = $event" />
+    <div v-if="tab === 'overview' && loadError && !overview" class="body">
+      <div class="empty">Machine status could not be loaded. Use Retry to check again.</div>
+    </div>
+    <OverviewTab v-else-if="tab === 'overview'" :overview="overview" @refresh="load" @open="tab = $event" />
     <WorkflowsTab v-else-if="tab === 'workflows'" @activity="tab = 'activity'" />
     <ActivityTab v-else-if="tab === 'activity'" />
     <SettingsTab v-else :overview="overview" :restarting="restartBusy" @refresh="load" @restart="restart" @reconnecting="beginReconnect" />
@@ -83,6 +95,8 @@ const tabs = [
 const initial = (location.hash || '').replace('#', '')
 const tab = ref(tabs.some(t => t.id === initial) ? initial : 'overview')
 const overview = ref(null)
+const loadError = ref('')
+const showLoadError = ref(false)
 const managerBusy = ref(false)
 const updateBusy = ref(false)
 const restartBusy = ref(false)
@@ -93,7 +107,13 @@ let reconnectTimer = null
 let reconnectStartedAt = 0
 
 async function load() {
-  try { overview.value = await api.overview() } catch (e) { overview.value = overview.value || { state: 'error', summary: 'Manager unavailable' } }
+  try {
+    overview.value = await api.overview()
+    loadError.value = ''
+    showLoadError.value = false
+  } catch (e) {
+    loadError.value = `GET overview: ${e.message || 'Request failed'}`
+  }
 }
 const rootEl = ref(null)
 let sizeObs = null

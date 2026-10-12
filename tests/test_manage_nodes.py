@@ -33,6 +33,47 @@ class _Process:
 
 
 class TestComfyUIManager(unittest.TestCase):
+    def test_detects_packaged_manager_and_uses_its_module_cli(self):
+        async def run():
+            with tempfile.TemporaryDirectory() as td:
+                base = Path(td) / "ComfyUI"
+                base.mkdir()
+                site = Path(td) / "site-packages"
+                package = site / "comfyui_manager"
+                package.mkdir(parents=True)
+                cli = site / "cm_cli"
+                cli.mkdir()
+                (cli / "__main__.py").write_text("")
+                dist = types.SimpleNamespace(locate_file=lambda path: site / path)
+                calls = []
+
+                async def fake_exec(*args, **kwargs):
+                    calls.append((args, kwargs))
+                    return _Process()
+
+                with patch.dict(sys.modules, {"folder_paths": types.SimpleNamespace(base_path=str(base))}), \
+                     patch.object(nodes.metadata, "distribution", return_value=dist), \
+                     patch.object(nodes.metadata, "version", return_value="4.2.2"), \
+                     patch.object(nodes.asyncio, "create_subprocess_exec", fake_exec):
+                    self.assertTrue(nodes.has_manager())
+                    self.assertEqual(nodes.manager_dir(), package)
+                    self.assertEqual(nodes.manager_version(), "4.2.2")
+                    await nodes.install_pack("https://example.com/nodes", lambda _line: None)
+
+                self.assertEqual(calls[0][0], (sys.executable, "-m", "cm_cli", "install", "https://example.com/nodes"))
+                self.assertEqual(calls[0][1]["env"]["COMFYUI_PATH"], str(base))
+
+        asyncio.run(run())
+
+    def test_package_without_cli_is_not_install_capable(self):
+        with tempfile.TemporaryDirectory() as td:
+            site = Path(td)
+            (site / "comfyui_manager").mkdir()
+            dist = types.SimpleNamespace(locate_file=lambda path: site / path)
+            with patch.dict(sys.modules, {"folder_paths": types.SimpleNamespace(base_path=td)}), \
+                 patch.object(nodes.metadata, "distribution", return_value=dist):
+                self.assertFalse(nodes.has_manager())
+
     def test_bundled_pack_override_resolves_before_manager_index(self):
         async def run():
             with patch.object(nodes, "_ensure_node_map", side_effect=AssertionError("index should not be needed")):

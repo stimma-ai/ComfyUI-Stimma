@@ -1,6 +1,8 @@
 """Focused tests for host GPU telemetry."""
 
 import subprocess
+import shutil
+import tempfile
 import sys
 import types
 import unittest
@@ -11,9 +13,21 @@ ROOT = Path(__file__).resolve().parent.parent
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from stp_server.manage.instances import InstanceMonitor, InstanceStatus, gpu_stats, merge_comfy_gpu_memory
+from stp_server.manage.instances import InstanceMonitor, InstanceStatus, disk_stats, gpu_stats, merge_comfy_gpu_memory
 from stp_server.manage.manager import Manager, _running_jobs_view
 from stp_server.manage.ops import Operation, STATE_FAILED, STATE_PAUSED, STATE_RUNNING
+
+
+class TestDiskStats(unittest.TestCase):
+    def test_reports_real_disk_usage_without_statvfs(self):
+        with tempfile.TemporaryDirectory() as td:
+            expected = shutil.disk_usage(td)
+            with patch("stp_server.manage.instances.os.statvfs", None, create=True):
+                result = disk_stats([td, str(Path(td) / "."), str(Path(td) / "missing")])
+            self.assertEqual(len(result), 1)
+            self.assertEqual(result[0]["total"], expected.total)
+            self.assertGreater(result[0]["free"], 0)
+            self.assertEqual(result[0]["path"], td)
 
 
 class TestGpuStats(unittest.TestCase):
