@@ -1287,7 +1287,8 @@
       },
       "used_by": [
         "Stimma-Qwen-Image-2.1.json",
-        "Stimma-Qwen-Image-2.1-Edit.json"
+        "Stimma-Qwen-Image-2.1-Edit.json",
+        "Stimma-Qwen-Image-2.1-Turbo.json"
       ],
       "size": 9350798360,
       "sha256": "8bfd0f6e12abf2d2d697ecc888e5e90b0d6741d6708f05799f53afa560452e8f",
@@ -1302,7 +1303,8 @@
       },
       "used_by": [
         "Stimma-Qwen-Image-2.1.json",
-        "Stimma-Qwen-Image-2.1-Edit.json"
+        "Stimma-Qwen-Image-2.1-Edit.json",
+        "Stimma-Qwen-Image-2.1-Turbo.json"
       ],
       "size": 675509688,
       "sha256": "bb21f7473051e1ac368515dd3f2e15cd44d7a11748ee8823e1ddca3e4876b7c9",
@@ -1574,6 +1576,20 @@
       ],
       "size": 1486465965,
       "sha256": "07e6139ff33bd21ba8a7a7f40ed24aab13ac0d100cd686f8a9f3e03dc5251cb1",
+      "gated": false
+    },
+    "qwen_image_2.1_turbo_int8_convrot.safetensors": {
+      "directory": "diffusion_models",
+      "source": {
+        "type": "huggingface",
+        "repo": "Comfy-Org/Qwen-Image-2.1",
+        "path": "diffusion_models/qwen_image_2.1_turbo_int8_convrot.safetensors"
+      },
+      "used_by": [
+        "Stimma-Qwen-Image-2.1-Turbo.json"
+      ],
+      "size": 7256787829,
+      "sha256": "8144a0182964aa8403ad6dbc011db837304167d235161b9aabaa8532e967314c",
       "gated": false
     }
   },

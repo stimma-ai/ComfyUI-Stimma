@@ -63,6 +63,12 @@ download the three required files from
 For transparent output, request an RGBA image with an alpha channel and a
 transparent background; the output PNG preserves alpha.
 
+`Qwen Image 2.1 Turbo` (`qwen-image-2.1-turbo`) offers the same generation,
+editing, reference images, and RGBA controls using the official Turbo INT8
+checkpoint. It defaults to 8 Euler/simple steps at CFG 1 and shares the base
+model's text encoder and VAE. Install its separate diffusion checkpoint through
+the manager; the Turbo tool is bundled alongside the base tool.
+
 ## MiniMax H3 workflows
 
 All H3 tools use conservative native Sol attention. I2V retains optional last-frame
