@@ -11,6 +11,7 @@ import asyncio
 import hashlib
 import logging
 import os
+import shutil
 import time
 from pathlib import Path
 from typing import Callable, Dict, Optional, Any
@@ -282,8 +283,7 @@ class DownloadManager:
 
             # Disk preflight
             try:
-                st = os.statvfs(str(dest.parent))
-                free = st.f_bavail * st.f_frsize
+                free = shutil.disk_usage(dest.parent).free
                 need = (size or 0) - have
                 if need > 0 and free < need + 512 * 1024 * 1024:
                     raise DownloadError(
