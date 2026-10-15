@@ -69,6 +69,33 @@ checkpoint. It defaults to 8 Euler/simple steps at CFG 1 and shares the base
 model's text encoder and VAE. Install its separate diffusion checkpoint through
 the manager; the Turbo tool is bundled alongside the base tool.
 
+## FLUX.3 Klein
+
+`FLUX.3 Klein` (`flux3-klein`) is one unified generation/editing tool built on
+the official distilled checkpoint. With no images it generates using
+width/height (default 1024 × 1024). With 1–10 images it edits the first image
+using the others as references; the output follows the first image's aspect
+ratio at `reference_megapixels` (default 1). Refer to references as
+`<ref_image_1>`, `<ref_image_2>`, and so on. The model follows full scene
+captions much better than short instructions, so describe the whole result,
+including for edits.
+
+It defaults to 16 Euler/simple steps without guidance, matching the model card;
+4–8 steps work for drafts. Steps, sampler, scheduler, reference size, optional
+LoRAs from `flux3-klein/`, and seed are exposed under Advanced. Edit noise is
+derived from the seed and first reference, as for Qwen Image 2.1.
+
+`FLUX.3 Klein Base` (`flux3-klein-base`) uses the undistilled checkpoint with
+the same graph, defaulting to 50 steps at CFG 3.5 with an optional negative
+prompt. It is slower and intended for LoRAs and research.
+
+Update ComfyUI to v0.41.0 or later (`Flux3` model support and
+`ReferenceMultiLatent`). Both tools use the official INT8 files from
+[black-forest-labs/flux-3-image-klein-comfy](https://huggingface.co/black-forest-labs/flux-3-image-klein-comfy),
+which is gated: accept the FLUX Kommunity License on Hugging Face and give the
+manager a token before downloading. The VAE is shared with FLUX.2. The prompt
+upsampler from the official templates is not included.
+
 ## MiniMax H3 workflows
 
 All H3 tools use conservative native Sol attention. I2V retains optional last-frame

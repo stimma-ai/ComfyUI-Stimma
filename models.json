@@ -245,6 +245,8 @@
         "Stimma-Flux2-Klein-9B-Inpaint.json",
         "Stimma-Flux2-Klein-9B-Outpaint.json",
         "Stimma-Flux2-Klein-9B.json",
+        "Stimma-Flux3-Klein-Base.json",
+        "Stimma-Flux3-Klein.json",
         "Stimma-Ideogram4-T2I.json"
       ],
       "size": 336213556,
@@ -1591,6 +1593,52 @@
       "size": 7256787829,
       "sha256": "8144a0182964aa8403ad6dbc011db837304167d235161b9aabaa8532e967314c",
       "gated": false
+    },
+    "flux3_image_klein_sd_int8_convrot.safetensors": {
+      "directory": "diffusion_models",
+      "source": {
+        "type": "huggingface",
+        "repo": "black-forest-labs/flux-3-image-klein-comfy",
+        "path": "diffusion_models/flux3_image_klein_sd_int8_convrot.safetensors"
+      },
+      "used_by": [
+        "Stimma-Flux3-Klein.json"
+      ],
+      "size": 5827874779,
+      "sha256": "847d8933548afd93df4af2cac2498e70891bf28d9dae06d695f536992e168fe2",
+      "gated": true,
+      "license_url": "https://huggingface.co/black-forest-labs/flux-3-image-klein-comfy"
+    },
+    "flux3_image_klein_int8_convrot.safetensors": {
+      "directory": "diffusion_models",
+      "source": {
+        "type": "huggingface",
+        "repo": "black-forest-labs/flux-3-image-klein-comfy",
+        "path": "diffusion_models/flux3_image_klein_int8_convrot.safetensors"
+      },
+      "used_by": [
+        "Stimma-Flux3-Klein-Base.json"
+      ],
+      "size": 5807427339,
+      "sha256": "8949ecfc1bf3871b08be02cf43ec7276a4914e1a86eade6b5eb8f4204426bc92",
+      "gated": true,
+      "license_url": "https://huggingface.co/black-forest-labs/flux-3-image-klein-comfy"
+    },
+    "qwen3vl_4b_int8_convrot.safetensors": {
+      "directory": "text_encoders",
+      "source": {
+        "type": "huggingface",
+        "repo": "black-forest-labs/flux-3-image-klein-comfy",
+        "path": "text_encoders/qwen3vl_4b_int8_convrot.safetensors"
+      },
+      "used_by": [
+        "Stimma-Flux3-Klein.json",
+        "Stimma-Flux3-Klein-Base.json"
+      ],
+      "size": 4858559240,
+      "sha256": "32de113cbf8282b02cbff0794b637b9d6676da09314a1db5a30bcea9bf4ee01c",
+      "gated": true,
+      "license_url": "https://huggingface.co/black-forest-labs/flux-3-image-klein-comfy"
     }
   },
   "unresolved": [

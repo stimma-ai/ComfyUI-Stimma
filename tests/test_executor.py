@@ -132,6 +132,15 @@ class TestIsInputRequired(unittest.TestCase):
         info["TextEncodeQwenImage21"]["input"]["required"]["images"][1]["template"]["min"] = 1
         self.assertTrue(_is_input_required("TextEncodeQwenImage21", "images.image_1", info))
 
+    def test_optional_autogrow_group_members_are_optional(self):
+        # FLUX.3 ReferenceMultiLatent: prefix template with min 1, but the
+        # whole group is optional, so text-only runs keep the node.
+        info = {"ReferenceMultiLatent": {"input": {"required": {}, "optional": {
+            "images": ["COMFY_AUTOGROW_V3", {"template": {"prefix": "image", "min": 1, "max": 100}}],
+        }}}}
+        self.assertFalse(_is_input_required("ReferenceMultiLatent", "images.image0", info))
+        self.assertFalse(_is_input_required("ReferenceMultiLatent", "images.image9", info))
+
     def test_required_input(self):
         self.assertTrue(
             _is_input_required("ImageScaleToTotalPixels", "image", MOCK_OBJECT_INFO)

@@ -1261,6 +1261,11 @@ def _is_input_required(
     # the encoder and its downstream sampler.
     group, separator, member = input_name.partition(".")
     if separator:
+        # A member of an optional Autogrow group (FLUX.3's ReferenceMultiLatent
+        # images.imageN) is optional whatever the template's minimum.
+        spec = input_def.get("optional", {}).get(group, [])
+        if spec and spec[0] == "COMFY_AUTOGROW_V3":
+            return False
         for category in ("required", "optional"):
             spec = input_def.get(category, {}).get(group, [])
             if len(spec) < 2 or spec[0] != "COMFY_AUTOGROW_V3":
