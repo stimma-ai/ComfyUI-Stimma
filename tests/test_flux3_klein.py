@@ -26,8 +26,13 @@ class Flux3KleinTests(unittest.TestCase):
         self.assertEqual(nodes[1]['widgets_values'][2], 'text-to-image,image-to-image')
         self.assertEqual(nodes[3]['widgets_values'][1], 'flux3')
         self.assertEqual(nodes[6]['widgets_values'][2:6], [16, 1.0, 'euler', 'simple'])
-        refs = [i['name'] for i in nodes[51]['inputs'] if i['name'].startswith('images.')]
-        self.assertEqual(refs, [f'images.image{i}' for i in range(10)])
+        self.assertEqual(nodes[51]['type'], 'StimmaFlux3References')
+        refs = [i['name'] for i in nodes[51]['inputs'] if i['name'].startswith('image_')]
+        self.assertEqual(refs, [f'image_{i}' for i in range(1, 11)])
+        # Decode -> crop padding -> restore unchanged pixels -> output.
+        self.assertIn((7, 0, 52, 0), edges(distilled))
+        self.assertIn((52, 0, 53, 0), edges(distilled))
+        self.assertIn((53, 0, 8, 0), edges(distilled))
         base_nodes = {n['id']: n for n in base['nodes']}
         self.assertEqual(base_nodes[1]['widgets_values'][0], 'flux3-klein-base')
         self.assertEqual(base_nodes[46]['widgets_values'][1], 3.5)

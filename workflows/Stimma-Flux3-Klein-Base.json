@@ -1,8 +1,8 @@
 {
   "id": "6f1d3c52-8a0e-4c1b-9d7e-3b2f1a4c9e02",
   "revision": 1,
-  "last_node_id": 51,
-  "last_link_id": 39,
+  "last_node_id": 53,
+  "last_link_id": 43,
   "groups": [],
   "config": {},
   "extra": {
@@ -99,7 +99,7 @@
         "FLUX.3 Klein Base",
         "text-to-image,image-to-image",
         "Open Weights",
-        "Undistilled FLUX.3 Klein for LoRAs and research: 50 steps with CFG. Generate images or edit with up to ten references; with images, the first is the edit target and output follows its aspect ratio at the reference size. Write full scene captions.",
+        "Undistilled FLUX.3 Klein for LoRAs and research: 50 steps with CFG. Generate images or edit with up to ten references; with images, the first is the edit target and a single-image edit keeps its exact size and framing. Write detailed captions.",
         "black-forest-labs",
         "flux3-klein-base"
       ]
@@ -258,7 +258,7 @@
           "type": "VAE",
           "links": [
             9,
-            38
+            37
           ],
           "slot_index": 0
         }
@@ -341,12 +341,12 @@
         {
           "name": "model",
           "type": "MODEL",
-          "link": 21
+          "link": 20
         },
         {
           "name": "seed",
           "type": "INT",
-          "link": 22,
+          "link": 21,
           "widget": {
             "name": "seed"
           }
@@ -354,7 +354,7 @@
         {
           "name": "steps",
           "type": "INT",
-          "link": 23,
+          "link": 22,
           "widget": {
             "name": "steps"
           }
@@ -362,7 +362,7 @@
         {
           "name": "cfg",
           "type": "FLOAT",
-          "link": 24,
+          "link": 23,
           "widget": {
             "name": "cfg"
           }
@@ -370,7 +370,7 @@
         {
           "name": "sampler_name",
           "type": "COMBO",
-          "link": 25,
+          "link": 24,
           "widget": {
             "name": "sampler_name"
           }
@@ -378,7 +378,7 @@
         {
           "name": "scheduler",
           "type": "COMBO",
-          "link": 26,
+          "link": 25,
           "widget": {
             "name": "scheduler"
           }
@@ -386,17 +386,17 @@
         {
           "name": "positive",
           "type": "CONDITIONING",
-          "link": 27
+          "link": 26
         },
         {
           "name": "negative",
           "type": "CONDITIONING",
-          "link": 28
+          "link": 27
         },
         {
           "name": "latent_image",
           "type": "LATENT",
-          "link": 29
+          "link": 28
         },
         {
           "name": "denoise",
@@ -412,7 +412,7 @@
           "name": "LATENT",
           "type": "LATENT",
           "links": [
-            37
+            36
           ],
           "slot_index": 0
         }
@@ -448,12 +448,12 @@
         {
           "name": "samples",
           "type": "LATENT",
-          "link": 37
+          "link": 36
         },
         {
           "name": "vae",
           "type": "VAE",
-          "link": 38
+          "link": 37
         }
       ],
       "outputs": [
@@ -461,7 +461,7 @@
           "name": "IMAGE",
           "type": "IMAGE",
           "links": [
-            39
+            38
           ],
           "slot_index": 0
         }
@@ -489,7 +489,7 @@
         {
           "name": "images",
           "type": "IMAGE",
-          "link": 39
+          "link": 43
         },
         {
           "name": "filename_prefix",
@@ -638,7 +638,7 @@
         "",
         true,
         0,
-        "Full scene caption: subject, framing, background, lighting. Refer to images as <ref_image_1>, <ref_image_2>, etc."
+        "Describe the image in detail, or the edit as an instruction; refer to inputs as the first image, the second image, etc."
       ]
     },
     {
@@ -734,7 +734,7 @@
           "name": "value",
           "type": "INT",
           "links": [
-            23
+            22
           ],
           "slot_index": 0
         }
@@ -799,7 +799,7 @@
           "name": "seed",
           "type": "INT",
           "links": [
-            30
+            29
           ],
           "slot_index": 0
         }
@@ -867,7 +867,7 @@
       },
       "widgets_values": [
         "Advanced",
-        "steps\ncfg\nnegative_prompt !full_width\nsampler\nscheduler\nreference_megapixels\nloras\nseed",
+        "steps\ncfg\nnegative_prompt !full_width\nsampler\nscheduler\npreserve_unchanged\nloras\nseed",
         true,
         90
       ]
@@ -1099,7 +1099,7 @@
           "name": "model",
           "type": "MODEL",
           "links": [
-            21
+            20
           ],
           "slot_index": 0
         },
@@ -1142,15 +1142,15 @@
       ]
     },
     {
-      "id": 17,
-      "type": "StimmaFloatParam",
+      "id": 18,
+      "type": "StimmaBoolParam",
       "pos": [
         -800,
         2100
       ],
       "size": [
-        384,
-        355
+        360,
+        200
       ],
       "flags": {},
       "order": 0,
@@ -1159,90 +1159,54 @@
         {
           "name": "name",
           "type": "STRING",
+          "link": null,
           "widget": {
             "name": "name"
-          },
-          "link": null
+          }
         },
         {
           "name": "value",
-          "type": "FLOAT",
+          "type": "BOOLEAN",
+          "link": null,
           "widget": {
             "name": "value"
-          },
-          "link": null
-        },
-        {
-          "name": "minimum",
-          "type": "FLOAT",
-          "widget": {
-            "name": "minimum"
-          },
-          "link": null
-        },
-        {
-          "name": "maximum",
-          "type": "FLOAT",
-          "widget": {
-            "name": "maximum"
-          },
-          "link": null
-        },
-        {
-          "name": "step",
-          "type": "FLOAT",
-          "widget": {
-            "name": "step"
-          },
-          "link": null
-        },
-        {
-          "name": "ui_control",
-          "type": "COMBO",
-          "widget": {
-            "name": "ui_control"
-          },
-          "link": null
+          }
         },
         {
           "name": "ui_order",
           "type": "INT",
+          "link": null,
           "widget": {
             "name": "ui_order"
-          },
-          "link": null
+          }
         },
         {
           "name": "ui_description",
           "type": "STRING",
+          "link": null,
           "widget": {
             "name": "ui_description"
-          },
-          "link": null
+          }
         }
       ],
       "outputs": [
         {
           "name": "value",
-          "type": "FLOAT",
+          "type": "BOOLEAN",
           "links": [
-            10
+            41
           ],
           "slot_index": 0
         }
       ],
       "properties": {
-        "Node name for S&R": "StimmaFloatParam"
+        "Node name for S&R": "StimmaBoolParam"
       },
       "widgets_values": [
-        "reference_megapixels",
-        1.0,
-        0.25,
-        4.0,
-        0.05,
-        "slider",
-        15,
-        "Size of each reference image in megapixels; edits come out at the first reference's size."
+        "preserve_unchanged",
+        true,
+        16,
+        "Keep the input's exact pixels outside the edited area; turn off to let the model re-render the whole image."
       ]
     },
     {
@@ -1315,9 +1279,10 @@
           "name": "image",
           "type": "IMAGE",
           "links": [
-            11,
-            31,
-            36
+            10,
+            30,
+            35,
+            42
           ],
           "slot_index": 0
         },
@@ -1411,7 +1376,7 @@
           "name": "image",
           "type": "IMAGE",
           "links": [
-            12
+            11
           ],
           "slot_index": 0
         },
@@ -1505,7 +1470,7 @@
           "name": "image",
           "type": "IMAGE",
           "links": [
-            13
+            12
           ],
           "slot_index": 0
         },
@@ -1599,7 +1564,7 @@
           "name": "image",
           "type": "IMAGE",
           "links": [
-            14
+            13
           ],
           "slot_index": 0
         },
@@ -1693,7 +1658,7 @@
           "name": "image",
           "type": "IMAGE",
           "links": [
-            15
+            14
           ],
           "slot_index": 0
         },
@@ -1787,7 +1752,7 @@
           "name": "image",
           "type": "IMAGE",
           "links": [
-            16
+            15
           ],
           "slot_index": 0
         },
@@ -1881,7 +1846,7 @@
           "name": "image",
           "type": "IMAGE",
           "links": [
-            17
+            16
           ],
           "slot_index": 0
         },
@@ -1975,7 +1940,7 @@
           "name": "image",
           "type": "IMAGE",
           "links": [
-            18
+            17
           ],
           "slot_index": 0
         },
@@ -2069,7 +2034,7 @@
           "name": "image",
           "type": "IMAGE",
           "links": [
-            19
+            18
           ],
           "slot_index": 0
         },
@@ -2163,7 +2128,7 @@
           "name": "image",
           "type": "IMAGE",
           "links": [
-            20
+            19
           ],
           "slot_index": 0
         },
@@ -2205,12 +2170,12 @@
         {
           "name": "seed",
           "type": "INT",
-          "link": 30
+          "link": 29
         },
         {
           "name": "image",
           "type": "IMAGE",
-          "link": 31,
+          "link": 30,
           "shape": 7
         }
       ],
@@ -2219,7 +2184,7 @@
           "name": "seed",
           "type": "INT",
           "links": [
-            22
+            21
           ],
           "slot_index": 0
         }
@@ -2314,7 +2279,7 @@
           "name": "width",
           "type": "INT",
           "links": [
-            32
+            31
           ],
           "slot_index": 0
         },
@@ -2322,7 +2287,7 @@
           "name": "height",
           "type": "INT",
           "links": [
-            33
+            32
           ],
           "slot_index": 1
         }
@@ -2359,7 +2324,7 @@
         {
           "name": "width",
           "type": "INT",
-          "link": 32,
+          "link": 31,
           "widget": {
             "name": "width"
           }
@@ -2367,7 +2332,7 @@
         {
           "name": "height",
           "type": "INT",
-          "link": 33,
+          "link": 32,
           "widget": {
             "name": "height"
           }
@@ -2386,7 +2351,7 @@
           "name": "LATENT",
           "type": "LATENT",
           "links": [
-            34
+            33
           ],
           "slot_index": 0
         }
@@ -2418,17 +2383,17 @@
         {
           "name": "generation",
           "type": "LATENT",
-          "link": 34
+          "link": 33
         },
         {
           "name": "edit",
           "type": "LATENT",
-          "link": 35
+          "link": 34
         },
         {
           "name": "image",
           "type": "IMAGE",
-          "link": 36,
+          "link": 35,
           "shape": 7
         }
       ],
@@ -2437,7 +2402,7 @@
           "name": "latent",
           "type": "LATENT",
           "links": [
-            29
+            28
           ],
           "slot_index": 0
         }
@@ -2500,7 +2465,7 @@
           "name": "value",
           "type": "*",
           "links": [
-            25
+            24
           ],
           "slot_index": 0
         }
@@ -2568,7 +2533,7 @@
           "name": "value",
           "type": "*",
           "links": [
-            26
+            25
           ],
           "slot_index": 0
         }
@@ -2668,7 +2633,7 @@
           "name": "value",
           "type": "FLOAT",
           "links": [
-            24
+            23
           ],
           "slot_index": 0
         }
@@ -2775,17 +2740,17 @@
     },
     {
       "id": 51,
-      "type": "ReferenceMultiLatent",
+      "type": "StimmaFlux3References",
       "pos": [
         900,
         -300
       ],
       "size": [
         360,
-        420
+        340
       ],
       "flags": {},
-      "order": 13,
+      "order": 0,
       "mode": 0,
       "inputs": [
         {
@@ -2794,84 +2759,75 @@
           "link": 7
         },
         {
+          "name": "vae",
+          "type": "VAE",
+          "link": 9
+        },
+        {
           "name": "negative",
           "shape": 7,
           "type": "CONDITIONING",
           "link": 8
         },
         {
-          "name": "vae",
+          "name": "image_1",
           "shape": 7,
-          "type": "VAE",
-          "link": 9
+          "type": "IMAGE",
+          "link": 10
         },
         {
-          "name": "resolution.megapixels",
-          "type": "FLOAT",
-          "link": 10,
-          "widget": {
-            "name": "resolution.megapixels"
-          }
-        },
-        {
-          "name": "images.image0",
+          "name": "image_2",
           "shape": 7,
           "type": "IMAGE",
           "link": 11
         },
         {
-          "name": "images.image1",
+          "name": "image_3",
           "shape": 7,
           "type": "IMAGE",
           "link": 12
         },
         {
-          "name": "images.image2",
+          "name": "image_4",
           "shape": 7,
           "type": "IMAGE",
           "link": 13
         },
         {
-          "name": "images.image3",
+          "name": "image_5",
           "shape": 7,
           "type": "IMAGE",
           "link": 14
         },
         {
-          "name": "images.image4",
+          "name": "image_6",
           "shape": 7,
           "type": "IMAGE",
           "link": 15
         },
         {
-          "name": "images.image5",
+          "name": "image_7",
           "shape": 7,
           "type": "IMAGE",
           "link": 16
         },
         {
-          "name": "images.image6",
+          "name": "image_8",
           "shape": 7,
           "type": "IMAGE",
           "link": 17
         },
         {
-          "name": "images.image7",
+          "name": "image_9",
           "shape": 7,
           "type": "IMAGE",
           "link": 18
         },
         {
-          "name": "images.image8",
+          "name": "image_10",
           "shape": 7,
           "type": "IMAGE",
           "link": 19
-        },
-        {
-          "name": "images.image9",
-          "shape": 7,
-          "type": "IMAGE",
-          "link": 20
         }
       ],
       "outputs": [
@@ -2879,37 +2835,133 @@
           "name": "positive",
           "type": "CONDITIONING",
           "links": [
-            27
-          ]
+            26
+          ],
+          "slot_index": 0
         },
         {
           "name": "negative",
           "type": "CONDITIONING",
           "links": [
-            28
-          ]
+            27
+          ],
+          "slot_index": 1
         },
         {
-          "name": "empty_latent",
+          "name": "edit_latent",
           "type": "LATENT",
           "links": [
-            35
-          ]
+            34
+          ],
+          "slot_index": 2
+        },
+        {
+          "name": "crop",
+          "type": "STIMMA_CROP",
+          "links": [
+            39
+          ],
+          "slot_index": 3
         }
       ],
       "properties": {
-        "Node name for S&R": "ReferenceMultiLatent"
+        "Node name for S&R": "StimmaFlux3References"
+      },
+      "widgets_values": []
+    },
+    {
+      "id": 52,
+      "type": "StimmaCropToReference",
+      "pos": [
+        1500,
+        0
+      ],
+      "size": [
+        300,
+        80
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "link": 38
+        },
+        {
+          "name": "crop",
+          "shape": 7,
+          "type": "STIMMA_CROP",
+          "link": 39
+        }
+      ],
+      "outputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "links": [
+            40
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "StimmaCropToReference"
+      },
+      "widgets_values": []
+    },
+    {
+      "id": 53,
+      "type": "StimmaPreserveUnchanged",
+      "pos": [
+        1500,
+        200
+      ],
+      "size": [
+        300,
+        100
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "edited",
+          "type": "IMAGE",
+          "link": 40
+        },
+        {
+          "name": "enabled",
+          "type": "BOOLEAN",
+          "link": 41,
+          "widget": {
+            "name": "enabled"
+          }
+        },
+        {
+          "name": "source",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": 42
+        }
+      ],
+      "outputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "links": [
+            43
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "StimmaPreserveUnchanged"
       },
       "widgets_values": [
-        "resize",
-        1.0
-      ],
-      "widgets_values_named": {
-        "resolution": "resize",
-        "resolution.megapixels": 1
-      },
-      "color": "#322",
-      "bgcolor": "#533"
+        true
+      ]
     }
   ],
   "links": [
@@ -2974,7 +3026,7 @@
       9,
       0,
       51,
-      1,
+      2,
       "CONDITIONING"
     ],
     [
@@ -2982,20 +3034,20 @@
       4,
       0,
       51,
-      2,
+      1,
       "VAE"
     ],
     [
       10,
-      17,
+      30,
       0,
       51,
       3,
-      "FLOAT"
+      "IMAGE"
     ],
     [
       11,
-      30,
+      31,
       0,
       51,
       4,
@@ -3003,7 +3055,7 @@
     ],
     [
       12,
-      31,
+      32,
       0,
       51,
       5,
@@ -3011,7 +3063,7 @@
     ],
     [
       13,
-      32,
+      33,
       0,
       51,
       6,
@@ -3019,7 +3071,7 @@
     ],
     [
       14,
-      33,
+      34,
       0,
       51,
       7,
@@ -3027,7 +3079,7 @@
     ],
     [
       15,
-      34,
+      35,
       0,
       51,
       8,
@@ -3035,7 +3087,7 @@
     ],
     [
       16,
-      35,
+      36,
       0,
       51,
       9,
@@ -3043,7 +3095,7 @@
     ],
     [
       17,
-      36,
+      37,
       0,
       51,
       10,
@@ -3051,7 +3103,7 @@
     ],
     [
       18,
-      37,
+      38,
       0,
       51,
       11,
@@ -3059,7 +3111,7 @@
     ],
     [
       19,
-      38,
+      39,
       0,
       51,
       12,
@@ -3067,14 +3119,6 @@
     ],
     [
       20,
-      39,
-      0,
-      51,
-      13,
-      "IMAGE"
-    ],
-    [
-      21,
       16,
       0,
       6,
@@ -3082,7 +3126,7 @@
       "MODEL"
     ],
     [
-      22,
+      21,
       40,
       0,
       6,
@@ -3090,7 +3134,7 @@
       "INT"
     ],
     [
-      23,
+      22,
       12,
       0,
       6,
@@ -3098,7 +3142,7 @@
       "INT"
     ],
     [
-      24,
+      23,
       46,
       0,
       6,
@@ -3106,7 +3150,7 @@
       "FLOAT"
     ],
     [
-      25,
+      24,
       44,
       0,
       6,
@@ -3114,7 +3158,7 @@
       "COMBO"
     ],
     [
-      26,
+      25,
       45,
       0,
       6,
@@ -3122,7 +3166,7 @@
       "COMBO"
     ],
     [
-      27,
+      26,
       51,
       0,
       6,
@@ -3130,7 +3174,7 @@
       "CONDITIONING"
     ],
     [
-      28,
+      27,
       51,
       1,
       6,
@@ -3138,7 +3182,7 @@
       "CONDITIONING"
     ],
     [
-      29,
+      28,
       43,
       0,
       6,
@@ -3146,7 +3190,7 @@
       "LATENT"
     ],
     [
-      30,
+      29,
       14,
       0,
       40,
@@ -3154,7 +3198,7 @@
       "INT"
     ],
     [
-      31,
+      30,
       30,
       0,
       40,
@@ -3162,23 +3206,23 @@
       "IMAGE"
     ],
     [
-      32,
+      31,
       41,
       0,
       42,
       0,
+      "INT"
+    ],
+    [
+      32,
+      41,
+      1,
+      42,
+      1,
       "INT"
     ],
     [
       33,
-      41,
-      1,
-      42,
-      1,
-      "INT"
-    ],
-    [
-      34,
       42,
       0,
       43,
@@ -3186,7 +3230,7 @@
       "LATENT"
     ],
     [
-      35,
+      34,
       51,
       2,
       43,
@@ -3194,7 +3238,7 @@
       "LATENT"
     ],
     [
-      36,
+      35,
       30,
       0,
       43,
@@ -3202,7 +3246,7 @@
       "IMAGE"
     ],
     [
-      37,
+      36,
       6,
       0,
       7,
@@ -3210,7 +3254,7 @@
       "LATENT"
     ],
     [
-      38,
+      37,
       4,
       0,
       7,
@@ -3218,8 +3262,48 @@
       "VAE"
     ],
     [
-      39,
+      38,
       7,
+      0,
+      52,
+      0,
+      "IMAGE"
+    ],
+    [
+      39,
+      51,
+      3,
+      52,
+      1,
+      "STIMMA_CROP"
+    ],
+    [
+      40,
+      52,
+      0,
+      53,
+      0,
+      "IMAGE"
+    ],
+    [
+      41,
+      18,
+      0,
+      53,
+      1,
+      "BOOLEAN"
+    ],
+    [
+      42,
+      30,
+      0,
+      53,
+      2,
+      "IMAGE"
+    ],
+    [
+      43,
+      53,
       0,
       8,
       0,

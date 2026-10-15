@@ -29,6 +29,7 @@ from .stitch_assembler import StimmaVideoStitchAssembler
 from .outpaint import StimmaOutpaintPadding
 from .image_seed import StimmaImageSeed
 from .image_latent import StimmaImageModeLatent
+from .flux3_edit import StimmaFlux3References, StimmaCropToReference, StimmaPreserveUnchanged
 
 NODE_CLASS_MAPPINGS = {
     "StimmaToolInfo": StimmaToolInfo,
@@ -42,6 +43,9 @@ NODE_CLASS_MAPPINGS = {
     "StimmaSeedParam": StimmaSeedParam,
     "StimmaImageSeed": StimmaImageSeed,
     "StimmaImageModeLatent": StimmaImageModeLatent,
+    "StimmaFlux3References": StimmaFlux3References,
+    "StimmaCropToReference": StimmaCropToReference,
+    "StimmaPreserveUnchanged": StimmaPreserveUnchanged,
     "StimmaIntParam": StimmaIntParam,
     "StimmaFloatParam": StimmaFloatParam,
     "StimmaStringParam": StimmaStringParam,
@@ -73,6 +77,9 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "StimmaSeedParam": "Stimma Seed",
     "StimmaImageSeed": "Stimma Image Edit Seed",
     "StimmaImageModeLatent": "Stimma Generation / Edit Canvas",
+    "StimmaFlux3References": "Stimma FLUX.3 References",
+    "StimmaCropToReference": "Stimma Crop To Reference",
+    "StimmaPreserveUnchanged": "Stimma Preserve Unchanged Pixels",
     "StimmaIntParam": "Stimma Int",
     "StimmaFloatParam": "Stimma Float",
     "StimmaStringParam": "Stimma String",

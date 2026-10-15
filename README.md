@@ -74,27 +74,41 @@ the manager; the Turbo tool is bundled alongside the base tool.
 `FLUX.3 Klein` (`flux3-klein`) is one unified generation/editing tool built on
 the official distilled checkpoint. With no images it generates using
 width/height (default 1024 × 1024). With 1–10 images it edits the first image
-using the others as references; the output follows the first image's aspect
-ratio at `reference_megapixels` (default 1). Refer to references as
-`<ref_image_1>`, `<ref_image_2>`, and so on. The model follows full scene
-captions much better than short instructions, so describe the whole result,
-including for edits.
+using the others as references. Write generation prompts as detailed captions
+and edits as instructions, naming inputs by ordinal ("the first image", "the
+second image"); Stimma's prompt enhancement rewrites short requests into both
+forms, following Black Forest Labs' official prompt upsampler.
+
+References are prepared the way Black Forest Labs' reference pipeline does it.
+A single image keeps its own size (fitted to 4 MP only when larger) and is
+reflect-padded to the 16 px latent grid; the padding is cropped off the result,
+so the edit lines up with the input pixel for pixel. With several images, each
+is fitted under 1 MP and the output follows the first. ComfyUI's generic
+`ReferenceMultiLatent` path is not used because it resamples to a megapixel
+budget and crops to the grid, shifting scale and framing.
+
+`preserve_unchanged` (on by default, under Advanced) then copies the input's
+exact pixels back wherever the edit left the image alone. Every output pixel
+passes through the autoencoder and sampler, so untouched areas otherwise come
+back slightly re-rendered. Changed regions are detected from the difference,
+cleared of isolated specks, grown and feathered; whole-image edits such as a
+restyle, and multi-reference edits whose size differs from the first image, are
+returned as generated.
 
 It defaults to 16 Euler/simple steps without guidance, matching the model card;
-4–8 steps work for drafts. Steps, sampler, scheduler, reference size, optional
-LoRAs from `flux3-klein/`, and seed are exposed under Advanced. Edit noise is
-derived from the seed and first reference, as for Qwen Image 2.1.
+4–8 steps work for drafts. Steps, sampler, scheduler, `preserve_unchanged`,
+optional LoRAs from `flux3-klein/`, and seed are exposed under Advanced. Edit
+noise is derived from the seed and first reference, as for Qwen Image 2.1.
 
 `FLUX.3 Klein Base` (`flux3-klein-base`) uses the undistilled checkpoint with
 the same graph, defaulting to 50 steps at CFG 3.5 with an optional negative
 prompt. It is slower and intended for LoRAs and research.
 
-Update ComfyUI to v0.41.0 or later (`Flux3` model support and
-`ReferenceMultiLatent`). Both tools use the official INT8 files from
+Update ComfyUI to v0.41.0 or later (`Flux3` model support). Both tools use the
+official INT8 files from
 [black-forest-labs/flux-3-image-klein-comfy](https://huggingface.co/black-forest-labs/flux-3-image-klein-comfy),
 which is gated: accept the FLUX Kommunity License on Hugging Face and give the
-manager a token before downloading. The VAE is shared with FLUX.2. The prompt
-upsampler from the official templates is not included.
+manager a token before downloading. The VAE is shared with FLUX.2.
 
 ## MiniMax H3 workflows
 
