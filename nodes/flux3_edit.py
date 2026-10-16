@@ -87,6 +87,8 @@ class StimmaFlux3References:
     def INPUT_TYPES(cls):
         optional = {"negative": ("CONDITIONING",)}
         optional.update({f"image_{i}": ("IMAGE",) for i in range(1, MAX_REFERENCES + 1)})
+        # A batch of further references (StimmaImagesParam), appended after image_N.
+        optional["reference_batch"] = ("IMAGE",)
         return {"required": {"positive": ("CONDITIONING",), "vae": ("VAE",)}, "optional": optional}
 
     RETURN_TYPES = ("CONDITIONING", "CONDITIONING", "LATENT", "STIMMA_CROP")
@@ -99,10 +101,13 @@ class StimmaFlux3References:
         "an output aligned with the input. Several images are each fitted under 1 MP."
     )
 
-    def execute(self, positive, vae, negative=None, **images):
+    def execute(self, positive, vae, negative=None, reference_batch=None, **images):
         import node_helpers
 
         refs = [images[f"image_{i}"] for i in range(1, MAX_REFERENCES + 1) if images.get(f"image_{i}") is not None]
+        if reference_batch is not None:
+            refs += [reference_batch[i:i + 1] for i in range(reference_batch.shape[0])]
+        refs = refs[:MAX_REFERENCES]
         crop = None
         if len(refs) == 1:
             prepared, crop = prepare_single(refs[0])

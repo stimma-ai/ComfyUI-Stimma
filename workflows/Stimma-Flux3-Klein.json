@@ -1299,7 +1299,7 @@
       "widgets_values": [
         "example.png",
         false,
-        "",
+        "canny,depth,lineart,pose,pose_hands",
         "image_picker",
         1,
         true
@@ -1393,7 +1393,7 @@
       "widgets_values": [
         "example.png",
         false,
-        "",
+        "canny,depth,lineart,pose,pose_hands",
         "image_picker",
         2,
         true
@@ -1487,7 +1487,7 @@
       "widgets_values": [
         "example.png",
         false,
-        "",
+        "canny,depth,lineart,pose,pose_hands",
         "image_picker",
         3,
         true
@@ -1581,7 +1581,7 @@
       "widgets_values": [
         "example.png",
         false,
-        "",
+        "canny,depth,lineart,pose,pose_hands",
         "image_picker",
         4,
         true
@@ -1675,7 +1675,7 @@
       "widgets_values": [
         "example.png",
         false,
-        "",
+        "canny,depth,lineart,pose,pose_hands",
         "image_picker",
         5,
         true
@@ -1769,7 +1769,7 @@
       "widgets_values": [
         "example.png",
         false,
-        "",
+        "canny,depth,lineart,pose,pose_hands",
         "image_picker",
         6,
         true
@@ -1863,7 +1863,7 @@
       "widgets_values": [
         "example.png",
         false,
-        "",
+        "canny,depth,lineart,pose,pose_hands",
         "image_picker",
         7,
         true
@@ -1957,7 +1957,7 @@
       "widgets_values": [
         "example.png",
         false,
-        "",
+        "canny,depth,lineart,pose,pose_hands",
         "image_picker",
         8,
         true
@@ -2051,7 +2051,7 @@
       "widgets_values": [
         "example.png",
         false,
-        "",
+        "canny,depth,lineart,pose,pose_hands",
         "image_picker",
         9,
         true
@@ -2145,7 +2145,7 @@
       "widgets_values": [
         "example.png",
         false,
-        "",
+        "canny,depth,lineart,pose,pose_hands",
         "image_picker",
         10,
         true

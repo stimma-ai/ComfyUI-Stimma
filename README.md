@@ -104,7 +104,18 @@ noise is derived from the seed and first reference, as for Qwen Image 2.1.
 the same graph, defaulting to 50 steps at CFG 3.5 with an optional negative
 prompt. It is slower and intended for LoRAs and research.
 
-Update ComfyUI to v0.41.0 or later (`Flux3` model support). Both tools use the
+`FLUX.3 Klein Inpaint` (`flux3-klein-inpaint`) and `FLUX.3 Klein Outpaint`
+(`flux3-klein-outpaint`) match the Flux.2 Klein 9B inpaint and outpaint tools
+parameter for parameter, so the image editor's Remove, Repaint and Expand use
+them. Inpaint crops around the mask to 1024 × 1024, paints the masked area green
+in the reference and asks for it to be repainted (FLUX.3 otherwise reproduces an
+unmarked reference faithfully), locks everything outside the mask with a latent
+noise mask, and stitches the result back. Outpaint marks the new canvas green,
+asks for it to be filled, and composites the original back over it. In both,
+pixels outside the mask or new canvas are kept exactly. Reference images on all
+FLUX.3 tools accept canny, depth, lineart and pose preprocessing.
+
+Update ComfyUI to v0.41.0 or later (`Flux3` model support). All four tools use the
 official INT8 files from
 [black-forest-labs/flux-3-image-klein-comfy](https://huggingface.co/black-forest-labs/flux-3-image-klein-comfy),
 which is gated: accept the FLUX Kommunity License on Hugging Face and give the

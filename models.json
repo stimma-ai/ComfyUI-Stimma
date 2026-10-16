@@ -246,6 +246,8 @@
         "Stimma-Flux2-Klein-9B-Outpaint.json",
         "Stimma-Flux2-Klein-9B.json",
         "Stimma-Flux3-Klein-Base.json",
+        "Stimma-Flux3-Klein-Inpaint.json",
+        "Stimma-Flux3-Klein-Outpaint.json",
         "Stimma-Flux3-Klein.json",
         "Stimma-Ideogram4-T2I.json"
       ],
@@ -1602,6 +1604,8 @@
         "path": "diffusion_models/flux3_image_klein_sd_int8_convrot.safetensors"
       },
       "used_by": [
+        "Stimma-Flux3-Klein-Inpaint.json",
+        "Stimma-Flux3-Klein-Outpaint.json",
         "Stimma-Flux3-Klein.json"
       ],
       "size": 5827874779,
@@ -1632,8 +1636,10 @@
         "path": "text_encoders/qwen3vl_4b_int8_convrot.safetensors"
       },
       "used_by": [
-        "Stimma-Flux3-Klein.json",
-        "Stimma-Flux3-Klein-Base.json"
+        "Stimma-Flux3-Klein-Base.json",
+        "Stimma-Flux3-Klein-Inpaint.json",
+        "Stimma-Flux3-Klein-Outpaint.json",
+        "Stimma-Flux3-Klein.json"
       ],
       "size": 4858559240,
       "sha256": "32de113cbf8282b02cbff0794b637b9d6676da09314a1db5a30bcea9bf4ee01c",

@@ -5,6 +5,7 @@ import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
 NAMES = ('Stimma-Flux3-Klein.json', 'Stimma-Flux3-Klein-Base.json')
+ALL = NAMES + ('Stimma-Flux3-Klein-Inpaint.json', 'Stimma-Flux3-Klein-Outpaint.json')
 
 
 def load(name):
@@ -40,7 +41,7 @@ class Flux3KleinTests(unittest.TestCase):
 
     def test_required_models_are_downloadable(self):
         manifest = json.loads((ROOT / 'models.json').read_text())['models']
-        for name in NAMES:
+        for name in ALL:
             for node in load(name)['nodes']:
                 for model in node.get('properties', {}).get('models', []):
                     entry = manifest[model['name']]
