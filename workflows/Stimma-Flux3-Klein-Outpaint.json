@@ -53,8 +53,7 @@
           "name": "IMAGE",
           "type": "IMAGE",
           "links": [
-            3,
-            56
+            3
           ],
           "slot_index": 0
         }
@@ -746,7 +745,8 @@
           "name": "images",
           "type": "IMAGE",
           "links": [
-            37
+            37,
+            56
           ],
           "slot_index": 0
         }
@@ -2332,7 +2332,7 @@
     ],
     [
       56,
-      3,
+      24,
       0,
       113,
       4,

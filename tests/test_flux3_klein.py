@@ -54,6 +54,8 @@ class Flux3KleinTests(unittest.TestCase):
             self.assertTrue(switch['widgets_values'][1])
             self.assertIn((switch['id'], 0, pup['id'], 1), edges(workflow))
             self.assertTrue(any(l[1] == pup['id'] and l[5] == 'STRING' for l in workflow['links']))
+            if 'Outpaint' in name:
+                self.assertIn((24, 0, pup['id'], 4), edges(workflow))
             for n in nodes.values():
                 if n['type'] == 'StimmaResolutionParam':
                     self.assertEqual(n['widgets_values'][:2], [2048, 2048])
