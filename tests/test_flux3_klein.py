@@ -49,13 +49,11 @@ class Flux3KleinTests(unittest.TestCase):
             alpha = next(n for n in nodes.values() if n['type'] == 'StimmaFloatParam' and n['widgets_values'][0] == 'timestep_alpha')
             self.assertEqual(alpha['widgets_values'][1], 16.0)
             self.assertIn((alpha['id'], 0, patch['id'], 1), edges(workflow))
-            pup = next(n for n in nodes.values() if n['type'] == 'StimmaFlux3PromptUpsample')
-            switch = next(n for n in nodes.values() if n['type'] == 'StimmaBoolParam' and n['widgets_values'][0] == 'prompt_upsampling')
-            self.assertTrue(switch['widgets_values'][1])
-            self.assertIn((switch['id'], 0, pup['id'], 1), edges(workflow))
-            self.assertTrue(any(l[1] == pup['id'] and l[5] == 'STRING' for l in workflow['links']))
-            if 'Outpaint' in name:
-                self.assertIn((24, 0, pup['id'], 4), edges(workflow))
+            self.assertFalse(any(n['type'] == 'StimmaFlux3PromptUpsample' for n in nodes.values()))
+            self.assertFalse(any(n['type'] == 'StimmaBoolParam' and n['widgets_values'][0] == 'prompt_upsampling' for n in nodes.values()))
+            if 'Outpaint' not in name:
+                prompt_node = next(n for n in nodes.values() if n['type'] == 'StimmaPromptParam')
+                self.assertTrue(any(l[1] == prompt_node['id'] and l[5] == 'STRING' for l in workflow['links']))
             for n in nodes.values():
                 if n['type'] == 'StimmaResolutionParam':
                     self.assertEqual(n['widgets_values'][:2], [2048, 2048])

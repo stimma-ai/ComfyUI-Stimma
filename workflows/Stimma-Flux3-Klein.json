@@ -1,8 +1,8 @@
 {
   "id": "6f1d3c52-8a0e-4c1b-9d7e-3b2f1a4c9e01",
   "revision": 1,
-  "last_node_id": 57,
-  "last_link_id": 56,
+  "last_node_id": 55,
+  "last_link_id": 43,
   "groups": [],
   "config": {},
   "extra": {
@@ -99,7 +99,7 @@
         "FLUX.3 Klein",
         "text-to-image,image-to-image",
         "Open Weights\nFast",
-        "Generate images or edit with up to ten references. With images, the first is the edit target and a single-image edit keeps its exact size and framing. Without images, width and height set the canvas. Write detailed captions; for edits, give an instruction and name references by ordinal (the first image, the second image).",
+        "Generate images or edit with up to ten references. With images, the first is the edit target and a single-image edit keeps its exact size and framing. Without images, width and height set the canvas. Write detailed captions; for edits, give an instruction and name references by ordinal (the first image, the second image). Use Stimma's Enhance Prompt for short requests; this workflow does not rewrite prompts.",
         "black-forest-labs",
         "flux3-klein"
       ]
@@ -625,7 +625,7 @@
           "name": "text",
           "type": "STRING",
           "links": [
-            44
+            4
           ],
           "slot_index": 0
         }
@@ -799,8 +799,7 @@
           "name": "seed",
           "type": "INT",
           "links": [
-            27,
-            46
+            27
           ],
           "slot_index": 0
         }
@@ -868,7 +867,7 @@
       },
       "widgets_values": [
         "Advanced",
-        "steps\nsampler\nscheduler\npreserve_unchanged\nloras\nseed\nprompt_upsampling\ntimestep_alpha",
+        "steps\nsampler\nscheduler\npreserve_unchanged\nloras\nseed\ntimestep_alpha",
         true,
         90
       ]
@@ -1283,8 +1282,7 @@
             9,
             28,
             33,
-            40,
-            47
+            40
           ],
           "slot_index": 0
         },
@@ -1378,8 +1376,7 @@
           "name": "image",
           "type": "IMAGE",
           "links": [
-            10,
-            48
+            10
           ],
           "slot_index": 0
         },
@@ -1473,8 +1470,7 @@
           "name": "image",
           "type": "IMAGE",
           "links": [
-            11,
-            49
+            11
           ],
           "slot_index": 0
         },
@@ -1568,8 +1564,7 @@
           "name": "image",
           "type": "IMAGE",
           "links": [
-            12,
-            50
+            12
           ],
           "slot_index": 0
         },
@@ -1663,8 +1658,7 @@
           "name": "image",
           "type": "IMAGE",
           "links": [
-            13,
-            51
+            13
           ],
           "slot_index": 0
         },
@@ -1758,8 +1752,7 @@
           "name": "image",
           "type": "IMAGE",
           "links": [
-            14,
-            52
+            14
           ],
           "slot_index": 0
         },
@@ -1853,8 +1846,7 @@
           "name": "image",
           "type": "IMAGE",
           "links": [
-            15,
-            53
+            15
           ],
           "slot_index": 0
         },
@@ -1948,8 +1940,7 @@
           "name": "image",
           "type": "IMAGE",
           "links": [
-            16,
-            54
+            16
           ],
           "slot_index": 0
         },
@@ -2043,8 +2034,7 @@
           "name": "image",
           "type": "IMAGE",
           "links": [
-            17,
-            55
+            17
           ],
           "slot_index": 0
         },
@@ -2138,8 +2128,7 @@
           "name": "image",
           "type": "IMAGE",
           "links": [
-            18,
-            56
+            18
           ],
           "slot_index": 0
         },
@@ -2867,164 +2856,6 @@
         "Timestep shift alpha; 16 matches the updated BFL workflows",
         ""
       ]
-    },
-    {
-      "id": 56,
-      "type": "StimmaFlux3PromptUpsample",
-      "pos": [
-        1800,
-        1080
-      ],
-      "size": [
-        330,
-        160
-      ],
-      "flags": {},
-      "order": 36,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "prompt",
-          "type": "STRING",
-          "link": 44,
-          "widget": {
-            "name": "prompt"
-          }
-        },
-        {
-          "name": "enabled",
-          "type": "BOOLEAN",
-          "link": 45,
-          "widget": {
-            "name": "enabled"
-          }
-        },
-        {
-          "name": "seed",
-          "type": "INT",
-          "link": 46,
-          "widget": {
-            "name": "seed"
-          }
-        },
-        {
-          "name": "model_name",
-          "type": "COMBO",
-          "link": null,
-          "widget": {
-            "name": "model_name"
-          }
-        },
-        {
-          "name": "image_1",
-          "type": "IMAGE",
-          "link": 47
-        },
-        {
-          "name": "image_2",
-          "type": "IMAGE",
-          "link": 48
-        },
-        {
-          "name": "image_3",
-          "type": "IMAGE",
-          "link": 49
-        },
-        {
-          "name": "image_4",
-          "type": "IMAGE",
-          "link": 50
-        },
-        {
-          "name": "image_5",
-          "type": "IMAGE",
-          "link": 51
-        },
-        {
-          "name": "image_6",
-          "type": "IMAGE",
-          "link": 52
-        },
-        {
-          "name": "image_7",
-          "type": "IMAGE",
-          "link": 53
-        },
-        {
-          "name": "image_8",
-          "type": "IMAGE",
-          "link": 54
-        },
-        {
-          "name": "image_9",
-          "type": "IMAGE",
-          "link": 55
-        },
-        {
-          "name": "image_10",
-          "type": "IMAGE",
-          "link": 56
-        }
-      ],
-      "outputs": [
-        {
-          "name": "text",
-          "type": "STRING",
-          "links": [
-            4
-          ]
-        }
-      ],
-      "properties": {
-        "Node name for S&R": "StimmaFlux3PromptUpsample",
-        "models": [
-          {
-            "name": "qwen3.5_9b_flux3_prompt_upsampler_w4a8.safetensors",
-            "url": "https://huggingface.co/black-forest-labs/flux-3-image-klein-comfy/resolve/main/text_encoders/qwen3.5_9b_flux3_prompt_upsampler_w4a8.safetensors",
-            "directory": "text_encoders"
-          }
-        ]
-      },
-      "widgets_values": [
-        "",
-        true,
-        0,
-        "qwen3.5_9b_flux3_prompt_upsampler_w4a8.safetensors"
-      ]
-    },
-    {
-      "id": 57,
-      "type": "StimmaBoolParam",
-      "pos": [
-        1800,
-        1260
-      ],
-      "size": [
-        330,
-        160
-      ],
-      "flags": {},
-      "order": 37,
-      "mode": 0,
-      "inputs": [],
-      "outputs": [
-        {
-          "name": "value",
-          "type": "BOOLEAN",
-          "links": [
-            45
-          ]
-        }
-      ],
-      "properties": {
-        "Node name for S&R": "StimmaBoolParam"
-      },
-      "widgets_values": [
-        "prompt_upsampling",
-        true,
-        54,
-        "Use BFL local prompt upsampling; disable for an already enhanced prompt"
-      ]
     }
   ],
   "links": [
@@ -3054,7 +2885,7 @@
     ],
     [
       4,
-      56,
+      10,
       0,
       5,
       1,
@@ -3371,110 +3202,6 @@
       54,
       1,
       "FLOAT"
-    ],
-    [
-      44,
-      10,
-      0,
-      56,
-      0,
-      "STRING"
-    ],
-    [
-      45,
-      57,
-      0,
-      56,
-      1,
-      "BOOLEAN"
-    ],
-    [
-      46,
-      14,
-      0,
-      56,
-      2,
-      "INT"
-    ],
-    [
-      47,
-      30,
-      0,
-      56,
-      4,
-      "IMAGE"
-    ],
-    [
-      48,
-      31,
-      0,
-      56,
-      5,
-      "IMAGE"
-    ],
-    [
-      49,
-      32,
-      0,
-      56,
-      6,
-      "IMAGE"
-    ],
-    [
-      50,
-      33,
-      0,
-      56,
-      7,
-      "IMAGE"
-    ],
-    [
-      51,
-      34,
-      0,
-      56,
-      8,
-      "IMAGE"
-    ],
-    [
-      52,
-      35,
-      0,
-      56,
-      9,
-      "IMAGE"
-    ],
-    [
-      53,
-      36,
-      0,
-      56,
-      10,
-      "IMAGE"
-    ],
-    [
-      54,
-      37,
-      0,
-      56,
-      11,
-      "IMAGE"
-    ],
-    [
-      55,
-      38,
-      0,
-      56,
-      12,
-      "IMAGE"
-    ],
-    [
-      56,
-      39,
-      0,
-      56,
-      13,
-      "IMAGE"
     ]
   ]
 }

@@ -77,10 +77,10 @@ width/height (default 2048 × 2048). With 1–10 images it edits the first image
 using the others as references. Write generation prompts as detailed captions
 and edits as instructions, naming inputs by ordinal ("the first image", "the
 second image"); Stimma's prompt enhancement rewrites short requests into both
-forms, following Black Forest Labs' official prompt upsampler. The workflows also
-run BFL's local prompt upsampler by default, using the supplied references for
-editing. Disable `prompt_upsampling` under Advanced when the prompt is already
-enhanced. This requires the additional 6.7 GB upsampler checkpoint.
+forms, following Black Forest Labs' guidance for external language models.
+Enable **Enhance Prompt** in Stimma for short requests, or supply a detailed
+caption yourself. The bundled workflows pass the resulting prompt through
+without a second rewrite and do not require BFL's local upsampler checkpoint.
 
 References are prepared the way Black Forest Labs' reference pipeline does it.
 A single image keeps its own size (fitted to 4 MP only when larger) and is
@@ -98,11 +98,10 @@ cleared of isolated specks, grown and feathered; whole-image edits such as a
 restyle, and multi-reference edits whose size differs from the first image, are
 returned as generated.
 
-It defaults to 16 Euler/simple steps without guidance, matching the model card;
+It defaults to 16 Euler/simple steps without guidance, matching the model card.
 The timestep shift defaults to alpha 16, matching BFL's updated workflows.
 4–8 steps work for drafts. Steps, sampler, scheduler, `timestep_alpha`,
-`prompt_upsampling`, `preserve_unchanged`,
-optional LoRAs from `flux3-klein/`, and seed are exposed under Advanced. Edit
+`preserve_unchanged`, optional LoRAs from `flux3-klein/`, and seed are exposed under Advanced. Edit
 noise is derived from the seed and first reference, as for Qwen Image 2.1.
 
 `FLUX.3 Klein Base` (`flux3-klein-base`) uses the undistilled checkpoint with

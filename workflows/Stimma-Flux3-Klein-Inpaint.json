@@ -1,8 +1,8 @@
 {
   "id": "6f1d3c52-8a0e-4c1b-9d7e-3b2f1a4c9e03",
   "revision": 0,
-  "last_node_id": 76,
-  "last_link_id": 50,
+  "last_node_id": 74,
+  "last_link_id": 45,
   "nodes": [
     {
       "id": 1,
@@ -28,7 +28,7 @@
         "FLUX.3 Klein Inpaint",
         "inpaint-image",
         "Open Weights\nFast",
-        "Inpaint masked regions with FLUX.3 Klein. Pixels outside the mask are kept exactly.",
+        "Inpaint masked regions with FLUX.3 Klein. Pixels outside the mask are kept exactly. Use Stimma's Enhance Prompt for short requests; this workflow does not rewrite prompts.",
         "black-forest-labs",
         "flux3-klein"
       ]
@@ -53,7 +53,7 @@
           "name": "text",
           "type": "STRING",
           "links": [
-            46
+            24
           ],
           "slot_index": 0
         }
@@ -89,8 +89,7 @@
           "name": "images",
           "type": "IMAGE",
           "links": [
-            3,
-            49
+            3
           ],
           "slot_index": 0
         }
@@ -170,8 +169,7 @@
           "name": "images",
           "type": "IMAGE",
           "links": [
-            33,
-            50
+            33
           ],
           "slot_index": 0
         }
@@ -210,8 +208,7 @@
           "name": "seed",
           "type": "INT",
           "links": [
-            34,
-            48
+            34
           ],
           "slot_index": 0
         }
@@ -464,7 +461,7 @@
       },
       "widgets_values": [
         "Advanced",
-        "steps\nsampler\nloras\nseed\nprompt_upsampling\ntimestep_alpha",
+        "steps\nsampler\nloras\nseed\ntimestep_alpha",
         true,
         10
       ]
@@ -1813,164 +1810,6 @@
         "Timestep shift alpha; 16 matches the updated BFL workflows",
         ""
       ]
-    },
-    {
-      "id": 75,
-      "type": "StimmaFlux3PromptUpsample",
-      "pos": [
-        1800,
-        900
-      ],
-      "size": [
-        330,
-        160
-      ],
-      "flags": {},
-      "order": 37,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "prompt",
-          "type": "STRING",
-          "link": 46,
-          "widget": {
-            "name": "prompt"
-          }
-        },
-        {
-          "name": "enabled",
-          "type": "BOOLEAN",
-          "link": 47,
-          "widget": {
-            "name": "enabled"
-          }
-        },
-        {
-          "name": "seed",
-          "type": "INT",
-          "link": 48,
-          "widget": {
-            "name": "seed"
-          }
-        },
-        {
-          "name": "model_name",
-          "type": "COMBO",
-          "link": null,
-          "widget": {
-            "name": "model_name"
-          }
-        },
-        {
-          "name": "image_1",
-          "type": "IMAGE",
-          "link": 49
-        },
-        {
-          "name": "image_2",
-          "type": "IMAGE",
-          "link": 50
-        },
-        {
-          "name": "image_3",
-          "type": "IMAGE",
-          "link": null
-        },
-        {
-          "name": "image_4",
-          "type": "IMAGE",
-          "link": null
-        },
-        {
-          "name": "image_5",
-          "type": "IMAGE",
-          "link": null
-        },
-        {
-          "name": "image_6",
-          "type": "IMAGE",
-          "link": null
-        },
-        {
-          "name": "image_7",
-          "type": "IMAGE",
-          "link": null
-        },
-        {
-          "name": "image_8",
-          "type": "IMAGE",
-          "link": null
-        },
-        {
-          "name": "image_9",
-          "type": "IMAGE",
-          "link": null
-        },
-        {
-          "name": "image_10",
-          "type": "IMAGE",
-          "link": null
-        }
-      ],
-      "outputs": [
-        {
-          "name": "text",
-          "type": "STRING",
-          "links": [
-            24
-          ]
-        }
-      ],
-      "properties": {
-        "Node name for S&R": "StimmaFlux3PromptUpsample",
-        "models": [
-          {
-            "name": "qwen3.5_9b_flux3_prompt_upsampler_w4a8.safetensors",
-            "url": "https://huggingface.co/black-forest-labs/flux-3-image-klein-comfy/resolve/main/text_encoders/qwen3.5_9b_flux3_prompt_upsampler_w4a8.safetensors",
-            "directory": "text_encoders"
-          }
-        ]
-      },
-      "widgets_values": [
-        "",
-        true,
-        0,
-        "qwen3.5_9b_flux3_prompt_upsampler_w4a8.safetensors"
-      ]
-    },
-    {
-      "id": 76,
-      "type": "StimmaBoolParam",
-      "pos": [
-        1800,
-        1080
-      ],
-      "size": [
-        330,
-        160
-      ],
-      "flags": {},
-      "order": 38,
-      "mode": 0,
-      "inputs": [],
-      "outputs": [
-        {
-          "name": "value",
-          "type": "BOOLEAN",
-          "links": [
-            47
-          ]
-        }
-      ],
-      "properties": {
-        "Node name for S&R": "StimmaBoolParam"
-      },
-      "widgets_values": [
-        "prompt_upsampling",
-        true,
-        54,
-        "Use BFL local prompt upsampling; disable for an already enhanced prompt"
-      ]
     }
   ],
   "links": [
@@ -2160,7 +1999,7 @@
     ],
     [
       24,
-      75,
+      2,
       0,
       71,
       1,
@@ -2333,46 +2172,6 @@
       73,
       1,
       "FLOAT"
-    ],
-    [
-      46,
-      2,
-      0,
-      75,
-      0,
-      "STRING"
-    ],
-    [
-      47,
-      76,
-      0,
-      75,
-      1,
-      "BOOLEAN"
-    ],
-    [
-      48,
-      6,
-      0,
-      75,
-      2,
-      "INT"
-    ],
-    [
-      49,
-      3,
-      0,
-      75,
-      4,
-      "IMAGE"
-    ],
-    [
-      50,
-      5,
-      0,
-      75,
-      5,
-      "IMAGE"
     ]
   ],
   "groups": [],
