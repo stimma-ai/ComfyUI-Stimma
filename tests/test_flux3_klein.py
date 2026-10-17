@@ -36,8 +36,31 @@ class Flux3KleinTests(unittest.TestCase):
         self.assertIn((53, 0, 8, 0), edges(distilled))
         base_nodes = {n['id']: n for n in base['nodes']}
         self.assertEqual(base_nodes[1]['widgets_values'][0], 'flux3-klein-base')
-        self.assertEqual(base_nodes[46]['widgets_values'][1], 3.5)
+        self.assertEqual(base_nodes[46]['widgets_values'][1], 4.0)
         self.assertEqual(base_nodes[12]['widgets_values'][1], 50)
+
+    def test_updated_bfl_sampling_and_prompt_route(self):
+        for name in ALL:
+            workflow = load(name)
+            nodes = {n['id']: n for n in workflow['nodes']}
+            patch = next(n for n in nodes.values() if n['type'] == 'StimmaFlux3Sampling')
+            sampler = next(n for n in nodes.values() if n['type'] == 'KSampler')
+            self.assertIn((patch['id'], 0, sampler['id'], 0), edges(workflow))
+            alpha = next(n for n in nodes.values() if n['type'] == 'StimmaFloatParam' and n['widgets_values'][0] == 'timestep_alpha')
+            self.assertEqual(alpha['widgets_values'][1], 16.0)
+            self.assertIn((alpha['id'], 0, patch['id'], 1), edges(workflow))
+            pup = next(n for n in nodes.values() if n['type'] == 'StimmaFlux3PromptUpsample')
+            switch = next(n for n in nodes.values() if n['type'] == 'StimmaBoolParam' and n['widgets_values'][0] == 'prompt_upsampling')
+            self.assertTrue(switch['widgets_values'][1])
+            self.assertIn((switch['id'], 0, pup['id'], 1), edges(workflow))
+            self.assertTrue(any(l[1] == pup['id'] and l[5] == 'STRING' for l in workflow['links']))
+            for n in nodes.values():
+                if n['type'] == 'StimmaResolutionParam':
+                    self.assertEqual(n['widgets_values'][:2], [2048, 2048])
+            # Every link must agree with both endpoint socket records.
+            for lid, src, slot, dst, inp, typ in workflow['links']:
+                self.assertIn(lid, nodes[src]['outputs'][slot]['links'])
+                self.assertEqual(nodes[dst]['inputs'][inp]['link'], lid)
 
     def test_required_models_are_downloadable(self):
         manifest = json.loads((ROOT / 'models.json').read_text())['models']

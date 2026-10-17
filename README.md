@@ -73,11 +73,14 @@ the manager; the Turbo tool is bundled alongside the base tool.
 
 `FLUX.3 Klein` (`flux3-klein`) is one unified generation/editing tool built on
 the official distilled checkpoint. With no images it generates using
-width/height (default 1024 × 1024). With 1–10 images it edits the first image
+width/height (default 2048 × 2048). With 1–10 images it edits the first image
 using the others as references. Write generation prompts as detailed captions
 and edits as instructions, naming inputs by ordinal ("the first image", "the
 second image"); Stimma's prompt enhancement rewrites short requests into both
-forms, following Black Forest Labs' official prompt upsampler.
+forms, following Black Forest Labs' official prompt upsampler. The workflows also
+run BFL's local prompt upsampler by default, using the supplied references for
+editing. Disable `prompt_upsampling` under Advanced when the prompt is already
+enhanced. This requires the additional 6.7 GB upsampler checkpoint.
 
 References are prepared the way Black Forest Labs' reference pipeline does it.
 A single image keeps its own size (fitted to 4 MP only when larger) and is
@@ -96,12 +99,14 @@ restyle, and multi-reference edits whose size differs from the first image, are
 returned as generated.
 
 It defaults to 16 Euler/simple steps without guidance, matching the model card;
-4–8 steps work for drafts. Steps, sampler, scheduler, `preserve_unchanged`,
+The timestep shift defaults to alpha 16, matching BFL's updated workflows.
+4–8 steps work for drafts. Steps, sampler, scheduler, `timestep_alpha`,
+`prompt_upsampling`, `preserve_unchanged`,
 optional LoRAs from `flux3-klein/`, and seed are exposed under Advanced. Edit
 noise is derived from the seed and first reference, as for Qwen Image 2.1.
 
 `FLUX.3 Klein Base` (`flux3-klein-base`) uses the undistilled checkpoint with
-the same graph, defaulting to 50 steps at CFG 3.5 with an optional negative
+the same graph, defaulting to 50 steps at CFG 4 with an optional negative
 prompt. It is slower and intended for LoRAs and research.
 
 `FLUX.3 Klein Inpaint` (`flux3-klein-inpaint`) and `FLUX.3 Klein Outpaint`
@@ -115,7 +120,7 @@ asks for it to be filled, and composites the original back over it. In both,
 pixels outside the mask or new canvas are kept exactly. Reference images on all
 FLUX.3 tools accept canny, depth, lineart and pose preprocessing.
 
-Update ComfyUI to v0.41.0 or later (`Flux3` model support). All four tools use the
+Update ComfyUI to v0.41.3 or later for the corrected FLUX.3 workflows. All four tools use the
 official INT8 files from
 [black-forest-labs/flux-3-image-klein-comfy](https://huggingface.co/black-forest-labs/flux-3-image-klein-comfy),
 which is gated: accept the FLUX Kommunity License on Hugging Face and give the

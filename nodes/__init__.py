@@ -29,6 +29,7 @@ from .stitch_assembler import StimmaVideoStitchAssembler
 from .outpaint import StimmaOutpaintPadding
 from .image_seed import StimmaImageSeed
 from .image_latent import StimmaImageModeLatent
+from .flux3_prompt import StimmaFlux3PromptUpsample, StimmaFlux3Sampling
 from .flux3_edit import StimmaFlux3References, StimmaCropToReference, StimmaPreserveUnchanged
 
 NODE_CLASS_MAPPINGS = {
@@ -43,6 +44,8 @@ NODE_CLASS_MAPPINGS = {
     "StimmaSeedParam": StimmaSeedParam,
     "StimmaImageSeed": StimmaImageSeed,
     "StimmaImageModeLatent": StimmaImageModeLatent,
+    "StimmaFlux3Sampling": StimmaFlux3Sampling,
+    "StimmaFlux3PromptUpsample": StimmaFlux3PromptUpsample,
     "StimmaFlux3References": StimmaFlux3References,
     "StimmaCropToReference": StimmaCropToReference,
     "StimmaPreserveUnchanged": StimmaPreserveUnchanged,
@@ -77,6 +80,8 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "StimmaSeedParam": "Stimma Seed",
     "StimmaImageSeed": "Stimma Image Edit Seed",
     "StimmaImageModeLatent": "Stimma Generation / Edit Canvas",
+    "StimmaFlux3Sampling": "Stimma FLUX.3 Sampling",
+    "StimmaFlux3PromptUpsample": "Stimma FLUX.3 Prompt Upsampler",
     "StimmaFlux3References": "Stimma FLUX.3 References",
     "StimmaCropToReference": "Stimma Crop To Reference",
     "StimmaPreserveUnchanged": "Stimma Preserve Unchanged Pixels",

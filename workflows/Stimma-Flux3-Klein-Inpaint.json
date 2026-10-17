@@ -1,8 +1,8 @@
 {
   "id": "6f1d3c52-8a0e-4c1b-9d7e-3b2f1a4c9e03",
   "revision": 0,
-  "last_node_id": 72,
-  "last_link_id": 43,
+  "last_node_id": 76,
+  "last_link_id": 50,
   "nodes": [
     {
       "id": 1,
@@ -53,7 +53,7 @@
           "name": "text",
           "type": "STRING",
           "links": [
-            24
+            46
           ],
           "slot_index": 0
         }
@@ -89,7 +89,8 @@
           "name": "images",
           "type": "IMAGE",
           "links": [
-            3
+            3,
+            49
           ],
           "slot_index": 0
         }
@@ -169,7 +170,8 @@
           "name": "images",
           "type": "IMAGE",
           "links": [
-            33
+            33,
+            50
           ],
           "slot_index": 0
         }
@@ -208,7 +210,8 @@
           "name": "seed",
           "type": "INT",
           "links": [
-            34
+            34,
+            48
           ],
           "slot_index": 0
         }
@@ -461,7 +464,7 @@
       },
       "widgets_values": [
         "Advanced",
-        "steps\nsampler\nloras\nseed",
+        "steps\nsampler\nloras\nseed\nprompt_upsampling\ntimestep_alpha",
         true,
         10
       ]
@@ -495,14 +498,14 @@
         "Node name for S&R": "UNETLoader",
         "models": [
           {
-            "name": "flux3_image_klein_sd_int8_convrot.safetensors",
-            "url": "https://huggingface.co/black-forest-labs/flux-3-image-klein-comfy/resolve/main/diffusion_models/flux3_image_klein_sd_int8_convrot.safetensors",
+            "name": "flux3-image-klein-int8-convrot.safetensors",
+            "url": "https://huggingface.co/black-forest-labs/flux-3-image-klein-comfy/resolve/main/diffusion_models/flux3-image-klein-int8-convrot.safetensors",
             "directory": "diffusion_models"
           }
         ]
       },
       "widgets_values": [
-        "flux3_image_klein_sd_int8_convrot.safetensors",
+        "flux3-image-klein-int8-convrot.safetensors",
         "default"
       ]
     },
@@ -619,7 +622,7 @@
           "name": "model",
           "type": "MODEL",
           "links": [
-            36
+            44
           ],
           "slot_index": 0
         },
@@ -1726,6 +1729,248 @@
         "Blend it seamlessly with its surroundings, leave no green, and keep everything outside the green area exactly the same.",
         " "
       ]
+    },
+    {
+      "id": 73,
+      "type": "StimmaFlux3Sampling",
+      "pos": [
+        1800,
+        540
+      ],
+      "size": [
+        330,
+        160
+      ],
+      "flags": {},
+      "order": 35,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "model",
+          "type": "MODEL",
+          "link": 44
+        },
+        {
+          "name": "alpha",
+          "type": "FLOAT",
+          "link": 45,
+          "widget": {
+            "name": "alpha"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "MODEL",
+          "type": "MODEL",
+          "links": [
+            36
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "StimmaFlux3Sampling"
+      },
+      "widgets_values": [
+        16.0
+      ]
+    },
+    {
+      "id": 74,
+      "type": "StimmaFloatParam",
+      "pos": [
+        1800,
+        720
+      ],
+      "size": [
+        330,
+        160
+      ],
+      "flags": {},
+      "order": 36,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "value",
+          "type": "FLOAT",
+          "links": [
+            45
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "StimmaFloatParam"
+      },
+      "widgets_values": [
+        "timestep_alpha",
+        16.0,
+        1.0,
+        100.0,
+        0.1,
+        "slider",
+        55,
+        "Timestep shift alpha; 16 matches the updated BFL workflows",
+        ""
+      ]
+    },
+    {
+      "id": 75,
+      "type": "StimmaFlux3PromptUpsample",
+      "pos": [
+        1800,
+        900
+      ],
+      "size": [
+        330,
+        160
+      ],
+      "flags": {},
+      "order": 37,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "prompt",
+          "type": "STRING",
+          "link": 46,
+          "widget": {
+            "name": "prompt"
+          }
+        },
+        {
+          "name": "enabled",
+          "type": "BOOLEAN",
+          "link": 47,
+          "widget": {
+            "name": "enabled"
+          }
+        },
+        {
+          "name": "seed",
+          "type": "INT",
+          "link": 48,
+          "widget": {
+            "name": "seed"
+          }
+        },
+        {
+          "name": "model_name",
+          "type": "COMBO",
+          "link": null,
+          "widget": {
+            "name": "model_name"
+          }
+        },
+        {
+          "name": "image_1",
+          "type": "IMAGE",
+          "link": 49
+        },
+        {
+          "name": "image_2",
+          "type": "IMAGE",
+          "link": 50
+        },
+        {
+          "name": "image_3",
+          "type": "IMAGE",
+          "link": null
+        },
+        {
+          "name": "image_4",
+          "type": "IMAGE",
+          "link": null
+        },
+        {
+          "name": "image_5",
+          "type": "IMAGE",
+          "link": null
+        },
+        {
+          "name": "image_6",
+          "type": "IMAGE",
+          "link": null
+        },
+        {
+          "name": "image_7",
+          "type": "IMAGE",
+          "link": null
+        },
+        {
+          "name": "image_8",
+          "type": "IMAGE",
+          "link": null
+        },
+        {
+          "name": "image_9",
+          "type": "IMAGE",
+          "link": null
+        },
+        {
+          "name": "image_10",
+          "type": "IMAGE",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "text",
+          "type": "STRING",
+          "links": [
+            24
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "StimmaFlux3PromptUpsample",
+        "models": [
+          {
+            "name": "qwen3.5_9b_flux3_prompt_upsampler_w4a8.safetensors",
+            "url": "https://huggingface.co/black-forest-labs/flux-3-image-klein-comfy/resolve/main/text_encoders/qwen3.5_9b_flux3_prompt_upsampler_w4a8.safetensors",
+            "directory": "text_encoders"
+          }
+        ]
+      },
+      "widgets_values": [
+        "",
+        true,
+        0,
+        "qwen3.5_9b_flux3_prompt_upsampler_w4a8.safetensors"
+      ]
+    },
+    {
+      "id": 76,
+      "type": "StimmaBoolParam",
+      "pos": [
+        1800,
+        1080
+      ],
+      "size": [
+        330,
+        160
+      ],
+      "flags": {},
+      "order": 38,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "value",
+          "type": "BOOLEAN",
+          "links": [
+            47
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "StimmaBoolParam"
+      },
+      "widgets_values": [
+        "prompt_upsampling",
+        true,
+        54,
+        "Use BFL local prompt upsampling; disable for an already enhanced prompt"
+      ]
     }
   ],
   "links": [
@@ -1915,7 +2160,7 @@
     ],
     [
       24,
-      2,
+      75,
       0,
       71,
       1,
@@ -2011,7 +2256,7 @@
     ],
     [
       36,
-      18,
+      73,
       0,
       60,
       0,
@@ -2072,6 +2317,62 @@
       38,
       0,
       "LATENT"
+    ],
+    [
+      44,
+      18,
+      0,
+      73,
+      0,
+      "MODEL"
+    ],
+    [
+      45,
+      74,
+      0,
+      73,
+      1,
+      "FLOAT"
+    ],
+    [
+      46,
+      2,
+      0,
+      75,
+      0,
+      "STRING"
+    ],
+    [
+      47,
+      76,
+      0,
+      75,
+      1,
+      "BOOLEAN"
+    ],
+    [
+      48,
+      6,
+      0,
+      75,
+      2,
+      "INT"
+    ],
+    [
+      49,
+      3,
+      0,
+      75,
+      4,
+      "IMAGE"
+    ],
+    [
+      50,
+      5,
+      0,
+      75,
+      5,
+      "IMAGE"
     ]
   ],
   "groups": [],
