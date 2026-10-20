@@ -659,6 +659,42 @@ class TestMiniMaxH3TurboWorkflows(unittest.TestCase):
 
 
 class TestLTXLoraWorkflows(unittest.TestCase):
+    def test_ltx_25_prompt_enhancement_defaults_to_passthrough_after_expansion(self):
+        object_info = {
+            "PrimitiveBoolean": {"input": {"required": {"value": ["BOOLEAN"]}}},
+            "StimmaBoolParam": {"input": {"required": {
+                "name": ["STRING"], "value": ["BOOLEAN"],
+                "ui_order": ["INT"], "ui_description": ["STRING"],
+            }}},
+        }
+        paths = sorted((Path(ROOT) / "workflows").glob("Stimma-LTX2.5-*.json"))
+        self.assertEqual(len(paths), 5)
+        for path in paths:
+            with self.subTest(workflow=path.name):
+                workflow = json.loads(path.read_text())
+                api_prompt = _convert_ui_to_api(workflow, object_info)
+                enhancers = {
+                    node_id for node_id, node in api_prompt.items()
+                    if node["class_type"] == "TextGenerateLTX2Prompt"
+                }
+                self.assertEqual(len(enhancers), 1)
+
+                def default_value(value):
+                    if not isinstance(value, list):
+                        return value
+                    node = api_prompt[value[0]]
+                    self.assertIn(node["class_type"], {"PrimitiveBoolean", "StimmaBoolParam"})
+                    return default_value(node["inputs"]["value"])
+
+                switches = [
+                    node for node in api_prompt.values()
+                    if node["class_type"] == "ComfySwitchNode"
+                    and node["inputs"].get("on_true", [None])[0] in enhancers
+                ]
+                self.assertEqual(len(switches), 1)
+                self.assertIs(default_value(switches[0]["inputs"]["switch"]), False)
+                self.assertNotIn(switches[0]["inputs"]["on_false"][0], enhancers)
+
     def test_every_ltx_family_workflow_exposes_the_generation_lora_path(self):
         workflow_dir = Path(ROOT) / "workflows"
         paths = sorted(workflow_dir.glob("Stimma-LTX*.json"))

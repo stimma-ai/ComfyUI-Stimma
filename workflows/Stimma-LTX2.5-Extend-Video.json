@@ -1604,9 +1604,9 @@
       },
       "widgets_values": [
         "prompt_enhance",
-        true,
+        false,
         21,
-        "Expand short prompts into detailed cinematic instructions"
+        "Optional ComfyUI rewrite; leave off when using Stimma prompt enhancement"
       ]
     }
   ],

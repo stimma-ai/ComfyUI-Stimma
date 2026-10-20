@@ -161,7 +161,7 @@
       },
       "widgets_values": [
         "Use the provided start image as the first frame. The cybernetic figure slowly turns his head to the right, his glowing blue eyes scanning the horizon, mechanical joints in his neck whirring faintly. The camera follows his gaze, panning across the rooftop to reveal the city beyond: a river of light winding between dark towers, a flying vehicle gliding past between the buildings, its lights streaking. He watches it pass, then his eyes narrow slightly. The camera settles on his profile against the city glow, distant hover traffic humming, wind gusting across the rooftop. No text, no black frames.",
-        true,
+        false,
         5,
         1280,
         720,
@@ -774,9 +774,9 @@
       },
       "widgets_values": [
         "prompt_enhance",
-        true,
+        false,
         22,
-        "Expand short prompts into detailed cinematic instructions"
+        "Optional ComfyUI rewrite; leave off when using Stimma prompt enhancement"
       ]
     },
     {
@@ -1792,7 +1792,7 @@
               "secondTabWidth": 65
             },
             "widgets_values": [
-              true
+              false
             ]
           },
           {
