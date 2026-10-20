@@ -24,7 +24,7 @@ def object_info():
         'EmptyFlux2LatentImage': dict(width=('INT',), height=('INT',), batch_size=('INT',)),
         'CLIPTextEncode': dict(clip=('CLIP',), text=('STRING',)),
         'KSampler': dict(model=('MODEL',), seed=('INT', {'control_after_generate': True}), steps=('INT',), cfg=('FLOAT',), sampler_name=(['euler'],), scheduler=(['sgm_uniform'],), positive=('CONDITIONING',), negative=('CONDITIONING',), latent_image=('LATENT',), denoise=('FLOAT',)),
-        'ModelSamplingSD3': dict(model=('MODEL',), shift=('FLOAT',)),
+        'ModelSamplingAuraFlow': dict(model=('MODEL',), shift=('FLOAT',)),
         'SkipLayerGuidanceDiTSimple': dict(model=('MODEL',), double_layers=('STRING',), single_layers=('STRING',), start_percent=('FLOAT',), end_percent=('FLOAT',)),
         'VAEDecode': dict(samples=('LATENT',), vae=('VAE',)),
         'StimmaToolInfo': dict.fromkeys(['slug', 'display_name', 'task_types', 'badges', 'description', 'model_vendor', 'model'], ('STRING',)),
@@ -76,6 +76,9 @@ class MossImageTests(unittest.TestCase):
                 api['101']['inputs']['default_text'] = layout
                 _resolve_stimma_links(api)
                 self.assertEqual(api['11']['inputs']['text'], layout)
+                # MOSS uses timesteps in [0, 1]. SD3's shift patch changes the
+                # multiplier to 1000 and produces noise despite a successful job.
+                self.assertEqual(api['112']['class_type'], 'ModelSamplingAuraFlow')
                 self.assertEqual(api['112']['inputs']['shift'], 5.0)
                 self.assertEqual(api['113']['inputs']['single_layers'], '22')
                 self.assertEqual(api['19']['inputs']['model'], ['113', 0])

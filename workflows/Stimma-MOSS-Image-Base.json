@@ -1560,7 +1560,7 @@
     },
     {
       "id": 112,
-      "type": "ModelSamplingSD3",
+      "type": "ModelSamplingAuraFlow",
       "pos": [
         0,
         400
@@ -1594,7 +1594,7 @@
         }
       ],
       "properties": {
-        "Node name for S&R": "ModelSamplingSD3"
+        "Node name for S&R": "ModelSamplingAuraFlow"
       },
       "widgets_values": [
         5.0
