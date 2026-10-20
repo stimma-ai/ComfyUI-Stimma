@@ -8,10 +8,13 @@ missing file, disk full).
 """
 
 import asyncio
+from contextlib import asynccontextmanager
+import errno
 import hashlib
 import logging
 import os
 import shutil
+import sys
 import time
 from pathlib import Path
 from typing import Callable, Dict, Optional, Any
@@ -25,6 +28,46 @@ logger = logging.getLogger(__name__)
 
 _CHUNK = 1024 * 1024
 _MAX_PARALLEL = 2
+
+
+def _try_destination_lock(handle):
+    """OS locks also coordinate workers sharing the same model directory."""
+    try:
+        if sys.platform == "win32":
+            import msvcrt
+            handle.seek(0)
+            msvcrt.locking(handle.fileno(), msvcrt.LK_NBLCK, 1)
+        else:
+            import fcntl
+            fcntl.flock(handle.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
+        return True
+    except OSError as error:
+        if error.errno not in (errno.EACCES, errno.EAGAIN, errno.EDEADLK):
+            raise
+        return False
+
+
+def _open_destination_lock(dest):
+    # Resolve symlinks so diffusion_models/unet aliases share one lock. Keep
+    # the lock file: unlinking it can let a third process bypass a waiter.
+    path = Path(str(Path(dest).resolve()) + ".download.lock")
+    path.parent.mkdir(parents=True, exist_ok=True)
+    return path.open("a+b")
+
+
+@asynccontextmanager
+async def _destination_lock(dest):
+    with _open_destination_lock(dest) as handle:
+        while not _try_destination_lock(handle):
+            await asyncio.sleep(0.25)
+        try:
+            yield
+        finally:
+            if sys.platform == "win32":
+                import msvcrt
+                handle.seek(0)
+                msvcrt.locking(handle.fileno(), msvcrt.LK_UNLCK, 1)
+            # Closing the handle releases flock on Unix, including on errors.
 
 
 def _fmt_bytes(n: Optional[float]) -> str:
@@ -150,8 +193,10 @@ class DownloadManager:
     def _finish_cancel(self, op: Operation):
         part = op.meta.get("dest_path", "") + ".part"
         try:
-            if os.path.exists(part):
-                os.remove(part)
+            # A cancelled waiter must not delete another worker's partial file.
+            with _open_destination_lock(op.meta["dest_path"]) as handle:
+                if _try_destination_lock(handle) and os.path.exists(part):
+                    os.remove(part)
         except OSError:
             pass
         self._ops.update(op, state=STATE_CANCELLED, detail="Cancelled", progress=None)
@@ -218,6 +263,10 @@ class DownloadManager:
         return h
 
     async def _download(self, op: Operation):
+        async with _destination_lock(op.meta["dest_path"]):
+            await self._download_locked(op)
+
+    async def _download_locked(self, op: Operation):
         meta = op.meta
         url = meta["url"]
         dest = Path(meta["dest_path"])

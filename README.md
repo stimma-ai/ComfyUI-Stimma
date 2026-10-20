@@ -25,6 +25,38 @@ pip install -r ComfyUI-Stimma/requirements.txt
 
 Restart ComfyUI. The plugin registers its nodes and starts the STP server automatically.
 
+## MOSS-Image
+
+`MOSS-Image SFT` (`moss-image-sft`) is the recommended everyday generation
+checkpoint. `MOSS-Image Base` (`moss-image-base`) preserves the pretraining
+checkpoint for compatible LoRAs and fine-tuning. Both support natural-language
+prompts, tag sequences, English/Chinese text rendering, and MOSS Layout JSON
+in the prompt field (up to 4096 tokens).
+
+Update ComfyUI to a build with native `moss_image` support in `CLIPLoader`
+and `SkipLayerGuidanceDiTSimple`. The manager downloads the pinned Comfy-Org
+INT8 ConvRot diffusion/text-encoder weights and the FLUX.2 small VAE with
+SHA-256 verification. No extra custom nodes or isolated runtime are needed.
+
+Defaults follow the [upstream guide](https://github.com/OpenMOSS/MOSS-Image/blob/main/USERGUIDE.md):
+50 steps, CFG 3, shift 5, Euler / sgm_uniform, and negative-branch skipping
+at layer 22. These checkpoints are not step-distilled. Advanced exposes the
+negative prompt, steps, CFG, shift, sampler, scheduler, seed, and compatible
+LoRAs under `moss-image/`.
+
+Start at 1024×1024; 1–2 megapixels are recommended and 0.25–4 megapixels
+are supported by the model. Dimensions use a 16-pixel grid. For layout control,
+paste the model's JSON directly into Prompt and use the same canvas dimensions
+used to calculate its boxes. For example, at 1024×1024:
+
+```json
+{"summary":{"caption":"A minimalist cream poster with green typography"},"items":[{"label":"text","caption":"Large green headline near the top","text":"OPEN STORIES","bbox":[-400,-400,-200,400]}],"bbox_coord_space":"abs_centralized","bbox_format":"yxyx"}
+```
+
+The released Base/SFT checkpoints are text-to-image models. They do not provide
+reference-image instruction editing, dedicated inpainting, or outpainting;
+separately trained community adapters have different requirements.
+
 ## Qwen Image 2.1
 
 `Qwen Image 2.1` (`qwen-image-2.1`) is one unified generation/editing tool.

@@ -1,5 +1,6 @@
 """Exercise model downloads and disk preflight through a real HTTP server."""
 
+import asyncio
 import hashlib
 import os
 import sys
@@ -51,6 +52,32 @@ class TestModelDownloads(unittest.IsolatedAsyncioTestCase):
                 headers={"Content-Range": f"bytes {start}-{len(self.payload) - 1}/{len(self.payload)}"},
             )
         return web.Response(body=self.payload)
+
+    async def test_workers_share_one_verified_download(self):
+        other = downloads.DownloadManager(OperationRegistry(self.root / 'other-operations.json'))
+        self.addAsyncCleanup(other.stop)
+        args = dict(filename=self.dest.name, url=str(self.server.make_url('/model')),
+                    dest_path=str(self.dest), sha256=self.sha256, size=len(self.payload))
+        first = self.manager.enqueue(**args)
+        second = other.enqueue(**args)
+        await asyncio.gather(self.manager._tasks[first.id], other._tasks[second.id])
+        self.assert_downloaded(first)
+        self.assert_downloaded(second)
+        self.assertEqual(self.ranges, [None], 'the second worker must reuse the verified file')
+
+    async def test_cancelled_waiter_preserves_active_workers_partial_file(self):
+        self.seed_partial_download()
+        original = self.part.read_bytes()
+        async with downloads._destination_lock(self.dest):
+            operation = self.manager.enqueue(
+                filename=self.dest.name, url=str(self.server.make_url('/model')),
+                dest_path=str(self.dest), sha256=self.sha256,
+            )
+            task = self.manager._tasks[operation.id]
+            await asyncio.sleep(0)
+            self.manager.cancel(operation.id)
+            await task
+            self.assertEqual(self.part.read_bytes(), original)
 
     def seed_partial_download(self):
         self.dest.parent.mkdir(parents=True)

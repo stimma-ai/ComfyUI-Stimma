@@ -1645,6 +1645,76 @@
       "sha256": "8949ecfc1bf3871b08be02cf43ec7276a4914e1a86eade6b5eb8f4204426bc92",
       "gated": true,
       "license_url": "https://huggingface.co/black-forest-labs/flux-3-image-klein-comfy"
+    },
+    "moss_image_sft_int8_convrot.safetensors": {
+      "directory": "diffusion_models",
+      "source": {
+        "type": "huggingface",
+        "repo": "Comfy-Org/MOSS-Image",
+        "revision": "3284a1dbb351e3396d70f39f2a71cbf6ed2ef1bb",
+        "path": "diffusion_models/moss_image_sft_int8_convrot.safetensors"
+      },
+      "used_by": [
+        "Stimma-MOSS-Image-SFT.json"
+      ],
+      "size": 5413698958,
+      "sha256": "b4d1475bc7eeffd7b809e82ea13a1fba1fb85c4e18365af3813722faa5c0fe4f",
+      "gated": false,
+      "license": "Apache-2.0",
+      "license_url": "https://huggingface.co/OpenMOSS-Team/MOSS-Image-SFT"
+    },
+    "qwen3.5_9b_int8_convrot.safetensors": {
+      "directory": "text_encoders",
+      "source": {
+        "type": "huggingface",
+        "repo": "Comfy-Org/MOSS-Image",
+        "revision": "3284a1dbb351e3396d70f39f2a71cbf6ed2ef1bb",
+        "path": "text_encoders/qwen3.5_9b_int8_convrot.safetensors"
+      },
+      "used_by": [
+        "Stimma-MOSS-Image-SFT.json",
+        "Stimma-MOSS-Image-Base.json"
+      ],
+      "size": 9748121532,
+      "sha256": "32e3787472f708fa5f83624acbf5ef23f7fc89c439e05065ea57cfe5a97f025a",
+      "gated": false,
+      "license": "Apache-2.0",
+      "license_url": "https://huggingface.co/OpenMOSS-Team/MOSS-Image-SFT"
+    },
+    "flux2-vae_small.safetensors": {
+      "directory": "vae",
+      "source": {
+        "type": "huggingface",
+        "repo": "Comfy-Org/MOSS-Image",
+        "revision": "3284a1dbb351e3396d70f39f2a71cbf6ed2ef1bb",
+        "path": "vae/flux2-vae_small.safetensors"
+      },
+      "used_by": [
+        "Stimma-MOSS-Image-SFT.json",
+        "Stimma-MOSS-Image-Base.json"
+      ],
+      "size": 249521340,
+      "sha256": "d8d52ba036475f5fb07c8b435e176d3d97ebfa82f0d1a1c317f9cc1e25bd013b",
+      "gated": false,
+      "license": "Apache-2.0",
+      "license_url": "https://huggingface.co/OpenMOSS-Team/MOSS-Image-SFT"
+    },
+    "moss_image_base_int8_convrot.safetensors": {
+      "directory": "diffusion_models",
+      "source": {
+        "type": "huggingface",
+        "repo": "Comfy-Org/MOSS-Image",
+        "revision": "3284a1dbb351e3396d70f39f2a71cbf6ed2ef1bb",
+        "path": "diffusion_models/moss_image_base_int8_convrot.safetensors"
+      },
+      "used_by": [
+        "Stimma-MOSS-Image-Base.json"
+      ],
+      "size": 5413698958,
+      "sha256": "f601c1e1161915fb3fea003da0c1782e374dd960fbb3978bc0e4e3fa1f2d8e6f",
+      "gated": false,
+      "license": "Apache-2.0",
+      "license_url": "https://huggingface.co/OpenMOSS-Team/MOSS-Image-Base"
     }
   },
   "unresolved": [
