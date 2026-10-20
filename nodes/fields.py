@@ -65,6 +65,9 @@ class StimmaImageParam:
                 # on this input. Independent of controlnet support. Optional so
                 # workflows saved before this widget existed still validate.
                 "allow_prep": ("BOOLEAN", {"default": True}),
+                # Agent-facing guidance for this input (role, order). Becomes the
+                # parameter's schema description. Keep LAST: widgets are positional.
+                "instructions": ("STRING", {"default": "", "multiline": True}),
             },
         }
 
@@ -74,7 +77,7 @@ class StimmaImageParam:
     CATEGORY = "Stimma/Params"
 
     def execute(self, image, required=True, controlnet_types="", ui_control="image_picker", ui_order=0,
-                allow_prep=True):
+                allow_prep=True, instructions=""):
         image_path = folder_paths.get_annotated_filepath(image)
         img = Image.open(image_path)
         img = ImageOps.exif_transpose(img)
@@ -200,6 +203,9 @@ class StimmaImagesParam:
                 # Optional so pre-existing workflows still validate.
                 "allow_prep": ("BOOLEAN", {"default": True}),
                 "_stimma_images": ("STRING", {"default": "", "multiline": False}),
+                # Agent-facing guidance for this input (role, order). Becomes the
+                # parameter's schema description. Keep LAST: widgets are positional.
+                "instructions": ("STRING", {"default": "", "multiline": True}),
             },
         }
 
@@ -218,6 +224,7 @@ class StimmaImagesParam:
         ui_order=0,
         allow_prep=True,
         _stimma_images="",
+        instructions="",
     ):
         filenames = [image]
         if _stimma_images:
@@ -335,6 +342,11 @@ class StimmaVideoParam:
                 "ui_order": ("INT", {"default": 0, "min": 0, "max": 100}),
                 "target_fps": ("INT", {"default": 0, "min": 0, "max": 240}),
             },
+            "optional": {
+                # Agent-facing guidance for this input (role, order). Becomes the
+                # parameter's schema description. Keep LAST: widgets are positional.
+                "instructions": ("STRING", {"default": "", "multiline": True}),
+            },
         }
 
     RETURN_TYPES = ("IMAGE", "INT", "AUDIO")
@@ -343,7 +355,7 @@ class StimmaVideoParam:
     CATEGORY = "Stimma/Params"
 
     def execute(self, video, required=True, ui_control="video_picker", ui_order=0,
-                target_fps=0):
+                target_fps=0, instructions=""):
         import torch
 
         video_path = folder_paths.get_annotated_filepath(video)
@@ -427,6 +439,11 @@ class StimmaVideosParam:
                 "ui_control": (["video_picker"],),
                 "ui_order": ("INT", {"default": 0, "min": 0, "max": 100}),
             },
+            "optional": {
+                # Agent-facing guidance for this input (role, order). Becomes the
+                # parameter's schema description. Keep LAST: widgets are positional.
+                "instructions": ("STRING", {"default": "", "multiline": True}),
+            },
         }
 
     RETURN_TYPES = ("IMAGE", "INT")
@@ -434,7 +451,7 @@ class StimmaVideosParam:
     FUNCTION = "execute"
     CATEGORY = "Stimma/Params"
 
-    def execute(self, video, min_videos, max_videos, ui_control, ui_order):
+    def execute(self, video, min_videos, max_videos, ui_control, ui_order, instructions=""):
         # Same placeholder behavior as StimmaVideoParam.
         return StimmaVideoParam().execute(video, ui_control=ui_control, ui_order=ui_order)
 
@@ -474,6 +491,11 @@ class StimmaAudioParam:
                 # reference = the clip only steers generated audio (voice identity)
                 "audio_role": (["driving", "reference"],),
             },
+            "optional": {
+                # Agent-facing guidance for this input (role, order). Becomes the
+                # parameter's schema description. Keep LAST: widgets are positional.
+                "instructions": ("STRING", {"default": "", "multiline": True}),
+            },
         }
 
     RETURN_TYPES = ("AUDIO", "FLOAT")
@@ -482,7 +504,7 @@ class StimmaAudioParam:
     CATEGORY = "Stimma/Params"
 
     def execute(self, audio, required=True, ui_control="audio_picker", ui_order=0,
-                ui_label="Audio", audio_role="driving"):
+                ui_label="Audio", audio_role="driving", instructions=""):
         audio_path = folder_paths.get_annotated_filepath(audio)
 
         # ComfyUI's own av-based loader — the same one LoadAudio uses, so we

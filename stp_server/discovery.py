@@ -1845,6 +1845,7 @@ def _extract_stimma_nodes(api_prompt: Dict[str, Any]) -> Optional[Dict[str, Any]
                 "badges": badges,
                 "model_vendor": model_vendor,
                 "model": model,
+                "instructions": inputs.get("instructions") or "",
             }
         elif class_type in STIMMA_FIELD_TYPES:
             node_entry["order"] = inputs.get("ui_order", 0)

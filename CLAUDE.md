@@ -68,11 +68,11 @@ Protocol reference: https://github.com/stimma-ai/stimma-tools-protocol
 
 | Node | Purpose | Key Inputs |
 |------|---------|------------|
-| `StimmaToolInfo` | Workflow metadata | `slug`, `display_name`, `task_type`, `task_types` |
+| `StimmaToolInfo` | Workflow metadata | `slug`, `display_name`, `task_type`, `task_types`, `instructions` (agent guidance → STP `metadata.instructions`) |
 | `StimmaPromptParam` | Text prompt | `name`, `default_text`, `required` |
-| `StimmaImageParam` | Image upload | `name`, `required` |
-| `StimmaVideoParam` | Video upload | `name`, `required` |
-| `StimmaAudioParam` | Audio upload (audio-conditioned tools) | `required`, `ui_label`, `audio_role` (`driving`/`reference`) |
+| `StimmaImageParam` | Image upload | `name`, `required`, `instructions` (agent guidance for this slot → schema `description`) |
+| `StimmaVideoParam` | Video upload | `name`, `required`, `instructions` |
+| `StimmaAudioParam` | Audio upload (audio-conditioned tools) | `required`, `ui_label`, `audio_role` (`driving`/`reference`), `instructions` |
 | `StimmaMaskParam` | Mask editor | `name`, `source_image_field` |
 | `StimmaResolutionParam` | Width/height | `width`, `height`, `step`, `supported_resolutions` |
 | `StimmaSeedParam` | Random seed | `name` |
@@ -91,6 +91,15 @@ Standard STP task types include `text-to-image`, `image-to-image`, `text-to-vide
 `image-to-video`, `video-to-video`, `upscale-image`, and `upscale-video`.
 
 ## Important Patterns
+
+### Tell the agent how to call the tool: `instructions`
+An agent only sees the tool's name, description, and parameter schema. Media
+inputs from several nodes merge into one `input_images` / `input_videos` /
+`input_audios` list, so role and order are invisible unless written down. Use
+`StimmaToolInfo.instructions` for tool-level guidance (sent as STP
+`metadata.instructions`) and each media node's `instructions` for its slot (the
+builder merges them as "Item 1: ... Item 2: ..." into the list's schema
+`description`). Agent-facing text: no internal names or ComfyUI jargon.
 
 ### Node widgets are POSITIONAL — only ever append (workflow-breaking)
 

@@ -766,5 +766,93 @@ class TestLTXLoraWorkflows(unittest.TestCase):
                 self.assertEqual(clip_targets, {"CLIPTextEncode"})
 
 
+class TestAgentInstructions(unittest.TestCase):
+    INSTRUCTION_NODES = {
+        "nodes/tool_info.py": ["StimmaToolInfo"],
+        "nodes/fields.py": [
+            "StimmaImageParam", "StimmaImagesParam", "StimmaVideoParam",
+            "StimmaVideosParam", "StimmaAudioParam",
+        ],
+    }
+
+    @staticmethod
+    def _widget_order(path, class_name):
+        import ast
+        tree = ast.parse((Path(ROOT) / path).read_text())
+        cls = next(n for n in tree.body if isinstance(n, ast.ClassDef) and n.name == class_name)
+        fn = next(n for n in cls.body if isinstance(n, ast.FunctionDef) and n.name == "INPUT_TYPES")
+        ret = next(n for n in ast.walk(fn) if isinstance(n, ast.Return))
+        order = []
+        for section, body in zip(ret.value.keys, ret.value.values):
+            if section.value in ("required", "optional"):
+                order.extend(k.value for k in body.keys)
+        return order
+
+    def test_instructions_is_the_last_widget(self):
+        # Widgets are positional in saved workflows; appending is the only safe change.
+        for path, classes in self.INSTRUCTION_NODES.items():
+            for class_name in classes:
+                order = self._widget_order(path, class_name)
+                self.assertEqual(order[-1], "instructions", class_name)
+                self.assertEqual(order.count("instructions"), 1, class_name)
+
+    def test_instructions_reach_the_descriptor(self):
+        fields = [
+            field("first", "StimmaImageParam", {
+                "required": True, "ui_control": "video_frame_picker", "ui_order": 1,
+                "instructions": "First frame.",
+            }),
+            field("last", "StimmaImageParam", {
+                "required": False, "ui_control": "video_frame_picker", "ui_order": 2,
+                "instructions": " Last frame. ",
+            }),
+        ]
+        workflow = DiscoveredWorkflow(
+            file_path="flf.json",
+            api_prompt={},
+            tool_info={
+                "slug": "flf", "display_name": "FLF", "task_types": ["image-to-video"],
+                "description": "Start and end frames.",
+                "instructions": "Pass input_images=[first, last].",
+            },
+            field_nodes=fields,
+        )
+        descriptor = _build_single_tool(
+            workflow, object_info=None, config=object(), provider=object()
+        ).to_descriptor().to_dict()
+
+        self.assertEqual(descriptor["metadata"]["description"], "Start and end frames.")
+        self.assertEqual(descriptor["metadata"]["instructions"], "Pass input_images=[first, last].")
+        self.assertEqual(
+            descriptor["parameter_schema"]["properties"]["input_images"]["description"],
+            "Item 1: First frame. Item 2: Last frame.",
+        )
+
+    def test_flf_workflows_describe_their_frames(self):
+        for name in (
+            "Stimma-MiniMax-H3-I2V.json", "Stimma-MiniMax-H3-I2V-Turbo.json",
+            "Stimma-Wan22-FLF2V.json", "Stimma-Wan22-FLF2V-Lightning.json",
+        ):
+            nodes = json.loads((Path(ROOT) / "workflows" / name).read_text())["nodes"]
+            tool = next(n for n in nodes if n["type"] == "StimmaToolInfo")
+            self.assertEqual(len(tool["widgets_values"]), 8, name)
+            self.assertIn("input_images=[first_frame, last_frame]", tool["widgets_values"][7], name)
+            frames = sorted(
+                (n for n in nodes if n["type"] == "StimmaImageParam"),
+                key=lambda n: n["widgets_values"][4],
+            )
+            # Current layout: image, required, controlnet_types, ui_control,
+            # ui_order, allow_prep, instructions.
+            self.assertEqual([n["widgets_values"][1] for n in frames], [True, False], name)
+            self.assertEqual({n["widgets_values"][3] for n in frames}, {"video_frame_picker"}, name)
+            self.assertTrue(all(n["widgets_values"][6] for n in frames), name)
+            for node in frames:
+                saved = [i["name"] for i in node["inputs"] if i.get("widget")]
+                self.assertEqual(saved, [
+                    "image", "required", "controlnet_types", "ui_control",
+                    "ui_order", "allow_prep", "instructions",
+                ], name)
+
+
 if __name__ == "__main__":
     unittest.main()

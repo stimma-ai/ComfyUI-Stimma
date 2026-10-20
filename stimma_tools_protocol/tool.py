@@ -198,6 +198,10 @@ class Tool:
             if isinstance(v, (str, int, float, bool, list, dict, type(None)))
         }
 
+        # Inject first-class fields into metadata (top-level fields win over metadata)
+        if self.description and "description" not in serializable_metadata:
+            serializable_metadata["description"] = self.description
+
         # Add layout to metadata if present
         if self.layout:
             serializable_metadata["layout"] = [g.to_dict() for g in self.layout]

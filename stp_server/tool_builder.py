@@ -199,6 +199,12 @@ def _build_checkpoint_parameter(
     )
 
 
+def _instructions(inputs: Dict[str, Any]) -> str:
+    """Agent-facing guidance from a node's `instructions` widget."""
+    value = inputs.get("instructions")
+    return value.strip() if isinstance(value, str) else ""
+
+
 def _build_field_parameter(node: Dict[str, Any]) -> Optional[ToolParameter]:
     """Build a ToolParameter from a Stimma field node."""
     class_type = node["class_type"]
@@ -232,7 +238,7 @@ def _build_field_parameter(node: Dict[str, Any]) -> Optional[ToolParameter]:
         return ToolParameter(
             name="input_images",
             type="array",
-            description="",
+            description=_instructions(inputs),
             required=required,
             items={"type": "string"},
             ui_hints=ui_hints,
@@ -266,7 +272,7 @@ def _build_field_parameter(node: Dict[str, Any]) -> Optional[ToolParameter]:
         return ToolParameter(
             name="input_images",
             type="array",
-            description="",
+            description=_instructions(inputs),
             required=int(min_images) > 0,
             items={"type": "string"},
             ui_hints=ui_hints,
@@ -277,7 +283,7 @@ def _build_field_parameter(node: Dict[str, Any]) -> Optional[ToolParameter]:
         return ToolParameter(
             name="input_videos",
             type="array",
-            description="",
+            description=_instructions(inputs),
             required=required,
             items={"type": "string"},
             ui_hints={
@@ -293,7 +299,7 @@ def _build_field_parameter(node: Dict[str, Any]) -> Optional[ToolParameter]:
         return ToolParameter(
             name="input_videos",
             type="array",
-            description="",
+            description=_instructions(inputs),
             required=int(min_videos) > 0,
             items={"type": "string"},
             ui_hints={
@@ -308,7 +314,7 @@ def _build_field_parameter(node: Dict[str, Any]) -> Optional[ToolParameter]:
         return ToolParameter(
             name="input_audios",
             type="array",
-            description="",
+            description=_instructions(inputs),
             required=required,
             items={"type": "string"},
             ui_hints={
@@ -731,8 +737,18 @@ def _merge_media_parameters(params: List[ToolParameter]) -> List[ToolParameter]:
         accept_media = None
         label = None
         audio_role = None
+        # Nodes fill the merged list in order, so each node's instructions
+        # describe a fixed slot range: "Item 1: first frame. Item 2: ..."
+        slot_notes = []
+        next_slot = 1
         for p in items:
             hints = p.ui_hints or {}
+            slots = max(int(hints.get("max-items", 1)), 1)
+            if p.description:
+                last_slot = next_slot + slots - 1
+                where = f"Item {next_slot}" if slots == 1 else f"Items {next_slot}-{last_slot}"
+                slot_notes.append(f"{where}: {p.description}")
+            next_slot += slots
             audio_role = audio_role or hints.get("audio-role")
             mins.append(int(hints.get("min-items", 1)))
             maxs.append(int(hints.get("max-items", 1)))
@@ -766,7 +782,7 @@ def _merge_media_parameters(params: List[ToolParameter]) -> List[ToolParameter]:
             ToolParameter(
                 name=name,
                 type="array",
-                description="",
+                description=" ".join(slot_notes),
                 required=min_items > 0,
                 items={"type": "string"},
                 ui_hints={
@@ -892,6 +908,9 @@ def _build_single_tool(
     badges = info.get("badges", []) or []
     if badges:
         metadata["badges"] = badges
+    instructions = (info.get("instructions") or "").strip()
+    if instructions:
+        metadata["instructions"] = instructions
 
     task_types = info.get("task_types", []) or []
     tool = Tool(

@@ -21,6 +21,10 @@ class StimmaToolInfo:
             "optional": {
                 "model_vendor": ("STRING", {"default": ""}),
                 "model": ("STRING", {"default": ""}),
+                # Guidance for the agent calling this tool (input roles, order,
+                # constraints). Not shown in the UI. Keep LAST: widgets are
+                # positional, see CLAUDE.md.
+                "instructions": ("STRING", {"default": "", "multiline": True}),
             },
         }
 
@@ -38,5 +42,6 @@ class StimmaToolInfo:
         description,
         model_vendor="",
         model="",
+        instructions="",
     ):
         return {}

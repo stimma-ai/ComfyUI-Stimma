@@ -469,6 +469,15 @@
           },
           "link": null,
           "shape": 7
+        },
+        {
+          "name": "instructions",
+          "type": "STRING",
+          "widget": {
+            "name": "instructions"
+          },
+          "link": null,
+          "shape": 7
         }
       ],
       "outputs": [],
@@ -482,7 +491,8 @@
         "Open Weights\nNative Audio\nFirst + Last Frame\nINT8 Default\nLightX2V 8-Step\nSol Attention",
         "Animate a first frame with MiniMax H3, optionally adding a last frame for endpoint control, with synchronized stereo audio. LightX2V 768p eight-step adapter with conservative Sol attention.",
         "MiniMax",
-        "MiniMax H3"
+        "MiniMax H3",
+        "For a shot that moves from one image to another, pass input_images=[first_frame, last_frame]; the video opens on the first image and ends on the last. With one image it animates forward from that frame. To build a longer sequence, chain clips: use the final frame of one clip as the first frame of the next. Describe the motion and sound that carry the first frame to the last."
       ]
     },
     {
@@ -586,6 +596,14 @@
           "link": null
         },
         {
+          "name": "required",
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "required"
+          },
+          "link": null
+        },
+        {
           "name": "controlnet_types",
           "type": "STRING",
           "widget": {
@@ -615,7 +633,17 @@
           "widget": {
             "name": "allow_prep"
           },
-          "link": null
+          "link": null,
+          "shape": 7
+        },
+        {
+          "name": "instructions",
+          "type": "STRING",
+          "widget": {
+            "name": "instructions"
+          },
+          "link": null,
+          "shape": 7
         }
       ],
       "outputs": [
@@ -639,11 +667,14 @@
       },
       "widgets_values": [
         "example.png",
+        true,
         "",
         "video_frame_picker",
         5,
-        true
-      ]
+        true,
+        "First frame. The video opens on this image."
+      ],
+      "title": "Start Frame"
     },
     {
       "id": 124,
@@ -669,6 +700,14 @@
           "link": null
         },
         {
+          "name": "required",
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "required"
+          },
+          "link": null
+        },
+        {
           "name": "controlnet_types",
           "type": "STRING",
           "widget": {
@@ -698,7 +737,17 @@
           "widget": {
             "name": "allow_prep"
           },
-          "link": null
+          "link": null,
+          "shape": 7
+        },
+        {
+          "name": "instructions",
+          "type": "STRING",
+          "widget": {
+            "name": "instructions"
+          },
+          "link": null,
+          "shape": 7
         }
       ],
       "outputs": [
@@ -722,11 +771,14 @@
       },
       "widgets_values": [
         "example.png",
+        false,
         "",
         "video_frame_picker",
         6,
-        true
-      ]
+        true,
+        "Optional last frame. The video ends on this image."
+      ],
+      "title": "End Frame (Optional)"
     },
     {
       "id": 125,
