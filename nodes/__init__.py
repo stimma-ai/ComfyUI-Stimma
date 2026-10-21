@@ -31,7 +31,7 @@ from .image_seed import StimmaImageSeed
 from .image_latent import StimmaImageModeLatent
 from .flux3_prompt import StimmaFlux3PromptUpsample, StimmaFlux3Sampling
 from .flux3_edit import StimmaFlux3References, StimmaCropToReference, StimmaPreserveUnchanged
-from .keyframes import StimmaKeyframesParam, StimmaApplyKeyframesH3
+from .keyframes import StimmaKeyframesParam, StimmaApplyKeyframesH3, StimmaApplyKeyframesLTX
 
 NODE_CLASS_MAPPINGS = {
     "StimmaToolInfo": StimmaToolInfo,
@@ -50,6 +50,7 @@ NODE_CLASS_MAPPINGS = {
     "StimmaFlux3References": StimmaFlux3References,
     "StimmaKeyframesParam": StimmaKeyframesParam,
     "StimmaApplyKeyframesH3": StimmaApplyKeyframesH3,
+    "StimmaApplyKeyframesLTX": StimmaApplyKeyframesLTX,
     "StimmaCropToReference": StimmaCropToReference,
     "StimmaPreserveUnchanged": StimmaPreserveUnchanged,
     "StimmaIntParam": StimmaIntParam,
@@ -88,6 +89,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "StimmaFlux3References": "Stimma FLUX.3 References",
     "StimmaKeyframesParam": "Stimma Keyframes",
     "StimmaApplyKeyframesH3": "Stimma Apply Keyframes (MiniMax H3)",
+    "StimmaApplyKeyframesLTX": "Stimma Apply Keyframes (LTX-2)",
     "StimmaCropToReference": "Stimma Crop To Reference",
     "StimmaPreserveUnchanged": "Stimma Preserve Unchanged Pixels",
     "StimmaIntParam": "Stimma Int",

@@ -492,7 +492,7 @@
         "Animate a first frame with MiniMax H3, optionally adding a last frame for endpoint control, with synchronized stereo audio. LightX2V 768p eight-step adapter with conservative Sol attention.",
         "MiniMax",
         "MiniMax H3",
-        "For a shot that moves from one image to another, pass input_images=[first_frame, last_frame]; the video opens on the first image and ends on the last. With one image it animates forward from that frame. To build a longer sequence, chain clips: use the final frame of one clip as the first frame of the next. Describe the motion and sound that carry the first frame to the last."
+        "For a shot that moves from one image to another, pass input_images=[first_frame, last_frame]; the video opens on the first image and ends on the last. With one image it animates forward from that frame. To continue an existing video, use minimax-h3-r2v-turbo instead: starting from its last frame here carries neither its motion nor its voice. Describe the motion and sound that carry the first frame to the last."
       ]
     },
     {

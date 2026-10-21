@@ -1,4 +1,4 @@
-"""Keyframe loading and the H3 adapter's frame placement.
+"""Keyframe loading and the H3 and LTX adapters' frame placement.
 
 Needs ComfyUI's Python (torch, numpy, cv2, PIL): run with ComfyUI's venv,
 `python tests/test_keyframes.py`.
@@ -129,6 +129,66 @@ class TestKeyframes(unittest.TestCase):
         calls = calls[:calls_no_duration]
         self.assertEqual([c[3] for c in calls], [None, None, None, None, "avae"])
         self.assertEqual(self.kf.StimmaApplyKeyframesH3().execute("pos", latent, "v", "a", None), ("pos",))
+
+    def test_ltx_clip_start(self):
+        # 5 s at 24 fps -> 121 frames. Starts are 0 or 8j + 1; a 17-frame clip
+        # mid-video keeps 16 frames, so the last start is 105.
+        start = self.kf._ltx_clip_start
+        self.assertEqual(start(0, 17, 121), 0)
+        self.assertEqual(start(48, 17, 121), 49)
+        self.assertEqual(start(120 - 17, 17, 121), 105)
+        self.assertEqual(start(500, 17, 121), 105)
+        self.assertEqual([self.kf._ltx_clip_frames(n) for n in (1, 8, 9, 22, 25)], [1, 1, 9, 17, 25])
+
+    def test_ltx_adapter_places_resamples_and_clamps(self):
+        calls = []
+
+        class FakeAddGuide:
+            @staticmethod
+            def execute(**kw):
+                calls.append((kw["frame_idx"], kw["image"].shape[0], tuple(kw["image"].shape[1:3]), kw["strength"]))
+                samples = torch.cat([kw["latent"]["samples"], torch.zeros(1, 4, 1, 3, 5)], dim=2)
+                return types.SimpleNamespace(result=(kw["positive"] + [kw["frame_idx"]], kw["negative"], {"samples": samples}))
+
+        def get_keyframe_idxs(cond, shape=None):
+            return None, len(cond)
+
+        nodes_lt = types.ModuleType("comfy_extras.nodes_lt")
+        nodes_lt.LTXVAddGuide = FakeAddGuide
+        nodes_lt.get_keyframe_idxs = get_keyframe_idxs
+        nodes_lt.preprocess = lambda frame, crf: frame
+        comfy_utils = types.ModuleType("comfy.utils")
+        comfy_utils.common_upscale = lambda s, w, h, method, crop: torch.nn.functional.interpolate(s, size=(h, w))
+        comfy = types.ModuleType("comfy")
+        comfy.utils = comfy_utils
+        vae = types.SimpleNamespace(downscale_index_formula=(8, 32, 32))
+        # 16 latent frames -> 121 pixel frames (5 s at 24 fps), 96x160 pixels.
+        latent = {"samples": torch.zeros(1, 4, 16, 3, 5)}
+        still = torch.zeros(1, 40, 40, 3)
+        clip = torch.zeros(22, 40, 40, 3)  # 22 frames loaded at 24 fps
+        frames = [
+            {"at": 0.0, "image": still, "audio": None, "length": 0.0},
+            {"at": 2.0, "image": clip, "audio": None, "length": 22 / 24},
+            {"at": -1.0, "image": still, "audio": None, "length": 0.0},
+            {"at": 5.0, "image": still, "audio": None, "length": 0.0},
+            {"at": 9.0, "image": clip, "audio": None, "length": 22 / 24},
+        ]
+        with patch.dict(sys.modules, {"comfy": comfy, "comfy.utils": comfy_utils,
+                                      "comfy_extras": types.ModuleType("comfy_extras"),
+                                      "comfy_extras.nodes_lt": nodes_lt}):
+            positive, negative, out = self.kf.StimmaApplyKeyframesLTX().execute(
+                [], "neg", vae, latent, 24.0, 0.9, 18, frames)
+            self.kf.StimmaApplyKeyframesLTX().execute([], "neg", vae, latent, 48.0, 1.0, 0, frames[1:2])
+        # Appended guide frames don't shift later placements: each keeps 121 frames.
+        self.assertEqual([c[0] for c in calls[:5]], [0, 49, 97, 120, 105])
+        self.assertEqual([c[1] for c in calls[:5]], [1, 17, 1, 1, 17])
+        self.assertEqual(calls[0][2], (96, 160))
+        self.assertEqual(calls[0][3], 0.9)
+        self.assertEqual(out["samples"].shape[2], 21)
+        # At 48 fps a 22/24 s clip is 44 frames, kept as 41 (8k + 1).
+        self.assertEqual(calls[5][1], 41)
+        self.assertEqual(self.kf.StimmaApplyKeyframesLTX().execute("p", "n", vae, latent, 24.0, 1.0, 18, None),
+                         ("p", "n", latent))
 
 
 if __name__ == "__main__":

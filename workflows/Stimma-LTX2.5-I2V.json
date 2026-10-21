@@ -1,8 +1,8 @@
 {
   "id": "07824bbb-6672-4bb0-ac36-4313a519e35b",
   "revision": 0,
-  "last_node_id": 1012,
-  "last_link_id": 13,
+  "last_node_id": 9010,
+  "last_link_id": 835,
   "nodes": [
     {
       "id": 398,
@@ -129,6 +129,11 @@
             "name": "noise_seed"
           },
           "link": 7
+        },
+        {
+          "name": "keyframes",
+          "type": "STIMMA_KEYFRAMES",
+          "link": 835
         }
       ],
       "outputs": [
@@ -1221,6 +1226,140 @@
         true
       ],
       "title": "End Frame (Optional)"
+    },
+    {
+      "id": 9010,
+      "type": "StimmaKeyframesParam",
+      "title": "Keyframes",
+      "pos": [
+        1200,
+        7300
+      ],
+      "size": [
+        400,
+        420
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "name",
+          "type": "STRING",
+          "widget": {
+            "name": "name"
+          },
+          "link": null
+        },
+        {
+          "name": "max_items",
+          "type": "INT",
+          "widget": {
+            "name": "max_items"
+          },
+          "link": null
+        },
+        {
+          "name": "positions",
+          "type": "COMBO",
+          "widget": {
+            "name": "positions"
+          },
+          "link": null
+        },
+        {
+          "name": "fps",
+          "type": "INT",
+          "widget": {
+            "name": "fps"
+          },
+          "link": null
+        },
+        {
+          "name": "clip_min_frames",
+          "type": "INT",
+          "widget": {
+            "name": "clip_min_frames"
+          },
+          "link": null
+        },
+        {
+          "name": "clip_step_frames",
+          "type": "INT",
+          "widget": {
+            "name": "clip_step_frames"
+          },
+          "link": null
+        },
+        {
+          "name": "allow_sound",
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "allow_sound"
+          },
+          "link": null
+        },
+        {
+          "name": "timeline_param",
+          "type": "STRING",
+          "widget": {
+            "name": "timeline_param"
+          },
+          "link": null
+        },
+        {
+          "name": "ui_order",
+          "type": "INT",
+          "widget": {
+            "name": "ui_order"
+          },
+          "link": null
+        },
+        {
+          "name": "_stimma_keyframes",
+          "type": "STRING",
+          "widget": {
+            "name": "_stimma_keyframes"
+          },
+          "link": null,
+          "shape": 7
+        },
+        {
+          "name": "instructions",
+          "type": "STRING",
+          "widget": {
+            "name": "instructions"
+          },
+          "link": null,
+          "shape": 7
+        }
+      ],
+      "outputs": [
+        {
+          "name": "keyframes",
+          "type": "STIMMA_KEYFRAMES",
+          "links": [
+            835
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "StimmaKeyframesParam"
+      },
+      "widgets_values": [
+        "keyframes",
+        6,
+        "any",
+        24,
+        9,
+        8,
+        false,
+        "duration",
+        7,
+        "",
+        "Pin stills or short clips at exact times in the output. A still at 0 is the first frame (it overrides the start image there); a still with `at` equal to the duration is the last frame. A clip pins its motion from where it lands: to continue an earlier take, pass the frame where its last second begins as the start image and pin that last second at 0. Clips carry picture only, not sound. Pinned images are not shown to the prompt, so describe what happens between them."
+      ]
     }
   ],
   "links": [
@@ -1327,6 +1466,14 @@
       1008,
       4,
       "BOOLEAN"
+    ],
+    [
+      835,
+      9010,
+      0,
+      398,
+      13,
+      "STIMMA_KEYFRAMES"
     ]
   ],
   "groups": [],
@@ -1337,8 +1484,8 @@
         "version": 1,
         "state": {
           "lastGroupId": 27,
-          "lastNodeId": 404,
-          "lastLinkId": 784,
+          "lastNodeId": 9009,
+          "lastLinkId": 834,
           "lastRerouteId": 0
         },
         "revision": 0,
@@ -1550,6 +1697,20 @@
               783
             ],
             "label": "last_frame",
+            "pos": [
+              -520,
+              6614
+            ]
+          },
+          {
+            "id": "e0cef325-1f2e-4efb-b5a5-897d4f78f3d8",
+            "name": "keyframes",
+            "type": "STIMMA_KEYFRAMES",
+            "linkIds": [
+              815,
+              830
+            ],
+            "label": "keyframes",
             "pos": [
               -520,
               6614
@@ -2226,8 +2387,7 @@
                 "name": "positive",
                 "type": "CONDITIONING",
                 "links": [
-                  787,
-                  795
+                  787
                 ]
               },
               {
@@ -2235,8 +2395,7 @@
                 "name": "negative",
                 "type": "CONDITIONING",
                 "links": [
-                  788,
-                  796
+                  788
                 ]
               }
             ],
@@ -2297,7 +2456,9 @@
                   774,
                   775,
                   789,
-                  797
+                  797,
+                  813,
+                  828
                 ]
               }
             ],
@@ -2879,13 +3040,13 @@
                 "localized_name": "positive",
                 "name": "positive",
                 "type": "CONDITIONING",
-                "link": 792
+                "link": 807
               },
               {
                 "localized_name": "negative",
                 "name": "negative",
                 "type": "CONDITIONING",
-                "link": 793
+                "link": 808
               }
             ],
             "outputs": [
@@ -3172,7 +3333,7 @@
                 "name": "video_latent",
                 "type": "LATENT",
                 "links": [
-                  677
+                  819
                 ]
               },
               {
@@ -3222,7 +3383,7 @@
                 "localized_name": "video_latent",
                 "name": "video_latent",
                 "type": "LATENT",
-                "link": 794
+                "link": 809
               },
               {
                 "localized_name": "audio_latent",
@@ -3618,7 +3779,7 @@
                 "localized_name": "samples",
                 "name": "samples",
                 "type": "LATENT",
-                "link": 677
+                "link": 816
               },
               {
                 "localized_name": "upscale_model",
@@ -3777,7 +3938,9 @@
                 "type": "FLOAT",
                 "links": [
                   698,
-                  713
+                  713,
+                  814,
+                  829
                 ]
               },
               {
@@ -3969,7 +4132,7 @@
                 "localized_name": "video_latent",
                 "name": "video_latent",
                 "type": "LATENT",
-                "link": 802
+                "link": 824
               },
               {
                 "localized_name": "audio_latent",
@@ -4078,13 +4241,13 @@
                 "localized_name": "positive",
                 "name": "positive",
                 "type": "CONDITIONING",
-                "link": 800
+                "link": 822
               },
               {
                 "localized_name": "negative",
                 "name": "negative",
                 "type": "CONDITIONING",
-                "link": 801
+                "link": 823
               }
             ],
             "outputs": [
@@ -4269,7 +4432,7 @@
                 "name": "video_latent",
                 "type": "LATENT",
                 "links": [
-                  709
+                  834
                 ]
               },
               {
@@ -4319,7 +4482,7 @@
                 "localized_name": "samples",
                 "name": "samples",
                 "type": "LATENT",
-                "link": 709
+                "link": 831
               },
               {
                 "localized_name": "vae",
@@ -4694,7 +4857,7 @@
                 "name": "positive",
                 "type": "CONDITIONING",
                 "links": [
-                  792
+                  810
                 ]
               },
               {
@@ -4702,7 +4865,7 @@
                 "name": "negative",
                 "type": "CONDITIONING",
                 "links": [
-                  793
+                  811
                 ]
               },
               {
@@ -4710,7 +4873,7 @@
                 "name": "latent",
                 "type": "LATENT",
                 "links": [
-                  794
+                  812
                 ]
               }
             ],
@@ -4756,13 +4919,13 @@
                 "localized_name": "positive",
                 "name": "positive",
                 "type": "CONDITIONING",
-                "link": 795
+                "link": 820
               },
               {
                 "localized_name": "negative",
                 "name": "negative",
                 "type": "CONDITIONING",
-                "link": 796
+                "link": 821
               },
               {
                 "localized_name": "vae",
@@ -4803,7 +4966,7 @@
                 "name": "positive",
                 "type": "CONDITIONING",
                 "links": [
-                  800
+                  825
                 ]
               },
               {
@@ -4811,7 +4974,7 @@
                 "name": "negative",
                 "type": "CONDITIONING",
                 "links": [
-                  801
+                  826
                 ]
               },
               {
@@ -4819,7 +4982,7 @@
                 "name": "latent",
                 "type": "LATENT",
                 "links": [
-                  802
+                  827
                 ]
               }
             ],
@@ -5144,6 +5307,322 @@
               "None",
               1
             ]
+          },
+          {
+            "id": 9006,
+            "type": "StimmaApplyKeyframesLTX",
+            "pos": [
+              3160,
+              6900
+            ],
+            "size": [
+              320,
+              160
+            ],
+            "flags": {},
+            "order": 0,
+            "mode": 0,
+            "inputs": [
+              {
+                "name": "positive",
+                "type": "CONDITIONING",
+                "link": 810
+              },
+              {
+                "name": "negative",
+                "type": "CONDITIONING",
+                "link": 811
+              },
+              {
+                "name": "vae",
+                "type": "VAE",
+                "link": 813
+              },
+              {
+                "name": "latent",
+                "type": "LATENT",
+                "link": 812
+              },
+              {
+                "name": "fps",
+                "type": "FLOAT",
+                "link": 814,
+                "widget": {
+                  "name": "fps"
+                }
+              },
+              {
+                "name": "strength",
+                "type": "FLOAT",
+                "link": null,
+                "widget": {
+                  "name": "strength"
+                }
+              },
+              {
+                "name": "img_compression",
+                "type": "INT",
+                "link": null,
+                "widget": {
+                  "name": "img_compression"
+                }
+              },
+              {
+                "name": "keyframes",
+                "type": "STIMMA_KEYFRAMES",
+                "link": 815,
+                "shape": 7
+              }
+            ],
+            "outputs": [
+              {
+                "name": "positive",
+                "type": "CONDITIONING",
+                "links": [
+                  807,
+                  817
+                ]
+              },
+              {
+                "name": "negative",
+                "type": "CONDITIONING",
+                "links": [
+                  808,
+                  818
+                ]
+              },
+              {
+                "name": "latent",
+                "type": "LATENT",
+                "links": [
+                  809
+                ]
+              }
+            ],
+            "properties": {
+              "Node name for S&R": "StimmaApplyKeyframesLTX"
+            },
+            "widgets_values": [
+              24.0,
+              1.0,
+              18
+            ],
+            "title": "Stage 1 Keyframes"
+          },
+          {
+            "id": 9007,
+            "type": "LTXVCropGuides",
+            "pos": [
+              3250,
+              6720
+            ],
+            "size": [
+              320,
+              160
+            ],
+            "flags": {},
+            "order": 0,
+            "mode": 0,
+            "inputs": [
+              {
+                "name": "positive",
+                "type": "CONDITIONING",
+                "link": 817
+              },
+              {
+                "name": "negative",
+                "type": "CONDITIONING",
+                "link": 818
+              },
+              {
+                "name": "latent",
+                "type": "LATENT",
+                "link": 819
+              }
+            ],
+            "outputs": [
+              {
+                "name": "positive",
+                "type": "CONDITIONING",
+                "links": [
+                  820
+                ]
+              },
+              {
+                "name": "negative",
+                "type": "CONDITIONING",
+                "links": [
+                  821
+                ]
+              },
+              {
+                "name": "latent",
+                "type": "LATENT",
+                "links": [
+                  816
+                ]
+              }
+            ],
+            "properties": {
+              "Node name for S&R": "LTXVCropGuides"
+            },
+            "widgets_values": []
+          },
+          {
+            "id": 9008,
+            "type": "StimmaApplyKeyframesLTX",
+            "pos": [
+              4260,
+              7200
+            ],
+            "size": [
+              320,
+              160
+            ],
+            "flags": {},
+            "order": 0,
+            "mode": 0,
+            "inputs": [
+              {
+                "name": "positive",
+                "type": "CONDITIONING",
+                "link": 825
+              },
+              {
+                "name": "negative",
+                "type": "CONDITIONING",
+                "link": 826
+              },
+              {
+                "name": "vae",
+                "type": "VAE",
+                "link": 828
+              },
+              {
+                "name": "latent",
+                "type": "LATENT",
+                "link": 827
+              },
+              {
+                "name": "fps",
+                "type": "FLOAT",
+                "link": 829,
+                "widget": {
+                  "name": "fps"
+                }
+              },
+              {
+                "name": "strength",
+                "type": "FLOAT",
+                "link": null,
+                "widget": {
+                  "name": "strength"
+                }
+              },
+              {
+                "name": "img_compression",
+                "type": "INT",
+                "link": null,
+                "widget": {
+                  "name": "img_compression"
+                }
+              },
+              {
+                "name": "keyframes",
+                "type": "STIMMA_KEYFRAMES",
+                "link": 830,
+                "shape": 7
+              }
+            ],
+            "outputs": [
+              {
+                "name": "positive",
+                "type": "CONDITIONING",
+                "links": [
+                  822,
+                  832
+                ]
+              },
+              {
+                "name": "negative",
+                "type": "CONDITIONING",
+                "links": [
+                  823,
+                  833
+                ]
+              },
+              {
+                "name": "latent",
+                "type": "LATENT",
+                "links": [
+                  824
+                ]
+              }
+            ],
+            "properties": {
+              "Node name for S&R": "StimmaApplyKeyframesLTX"
+            },
+            "widgets_values": [
+              24.0,
+              1.0,
+              18
+            ],
+            "title": "Stage 2 Keyframes"
+          },
+          {
+            "id": 9009,
+            "type": "LTXVCropGuides",
+            "pos": [
+              4730,
+              6700
+            ],
+            "size": [
+              320,
+              160
+            ],
+            "flags": {},
+            "order": 0,
+            "mode": 0,
+            "inputs": [
+              {
+                "name": "positive",
+                "type": "CONDITIONING",
+                "link": 832
+              },
+              {
+                "name": "negative",
+                "type": "CONDITIONING",
+                "link": 833
+              },
+              {
+                "name": "latent",
+                "type": "LATENT",
+                "link": 834
+              }
+            ],
+            "outputs": [
+              {
+                "name": "positive",
+                "type": "CONDITIONING",
+                "links": []
+              },
+              {
+                "name": "negative",
+                "type": "CONDITIONING",
+                "links": []
+              },
+              {
+                "name": "latent",
+                "type": "LATENT",
+                "links": [
+                  831
+                ]
+              }
+            ],
+            "properties": {
+              "Node name for S&R": "LTXVCropGuides"
+            },
+            "widgets_values": []
           }
         ],
         "groups": [
@@ -5534,14 +6013,6 @@
             "type": "INT"
           },
           {
-            "id": 677,
-            "origin_id": 367,
-            "origin_slot": 0,
-            "target_id": 348,
-            "target_slot": 0,
-            "type": "LATENT"
-          },
-          {
             "id": 678,
             "origin_id": 371,
             "origin_slot": 0,
@@ -5650,14 +6121,6 @@
             "origin_id": 368,
             "origin_slot": 0,
             "target_id": 369,
-            "target_slot": 0,
-            "type": "LATENT"
-          },
-          {
-            "id": 709,
-            "origin_id": 369,
-            "origin_slot": 0,
-            "target_id": 374,
             "target_slot": 0,
             "type": "LATENT"
           },
@@ -5934,46 +6397,6 @@
             "type": "IMAGE"
           },
           {
-            "id": 792,
-            "origin_id": 9003,
-            "origin_slot": 0,
-            "target_id": 388,
-            "target_slot": 1,
-            "type": "CONDITIONING"
-          },
-          {
-            "id": 793,
-            "origin_id": 9003,
-            "origin_slot": 1,
-            "target_id": 388,
-            "target_slot": 2,
-            "type": "CONDITIONING"
-          },
-          {
-            "id": 794,
-            "origin_id": 9003,
-            "origin_slot": 2,
-            "target_id": 377,
-            "target_slot": 0,
-            "type": "LATENT"
-          },
-          {
-            "id": 795,
-            "origin_id": 365,
-            "origin_slot": 0,
-            "target_id": 9004,
-            "target_slot": 0,
-            "type": "CONDITIONING"
-          },
-          {
-            "id": 796,
-            "origin_id": 365,
-            "origin_slot": 1,
-            "target_id": 9004,
-            "target_slot": 1,
-            "type": "CONDITIONING"
-          },
-          {
             "id": 797,
             "origin_id": 385,
             "origin_slot": 0,
@@ -5996,30 +6419,6 @@
             "target_id": 9004,
             "target_slot": 4,
             "type": "IMAGE"
-          },
-          {
-            "id": 800,
-            "origin_id": 9004,
-            "origin_slot": 0,
-            "target_id": 391,
-            "target_slot": 1,
-            "type": "CONDITIONING"
-          },
-          {
-            "id": 801,
-            "origin_id": 9004,
-            "origin_slot": 1,
-            "target_id": 391,
-            "target_slot": 2,
-            "type": "CONDITIONING"
-          },
-          {
-            "id": 802,
-            "origin_id": 9004,
-            "origin_slot": 2,
-            "target_id": 340,
-            "target_slot": 0,
-            "type": "LATENT"
           },
           {
             "id": 803,
@@ -6052,6 +6451,230 @@
             "target_id": 9005,
             "target_slot": 1,
             "type": "CLIP"
+          },
+          {
+            "id": 807,
+            "origin_id": 9006,
+            "origin_slot": 0,
+            "target_id": 388,
+            "target_slot": 1,
+            "type": "CONDITIONING"
+          },
+          {
+            "id": 808,
+            "origin_id": 9006,
+            "origin_slot": 1,
+            "target_id": 388,
+            "target_slot": 2,
+            "type": "CONDITIONING"
+          },
+          {
+            "id": 809,
+            "origin_id": 9006,
+            "origin_slot": 2,
+            "target_id": 377,
+            "target_slot": 0,
+            "type": "LATENT"
+          },
+          {
+            "id": 810,
+            "origin_id": 9003,
+            "origin_slot": 0,
+            "target_id": 9006,
+            "target_slot": 0,
+            "type": "CONDITIONING"
+          },
+          {
+            "id": 811,
+            "origin_id": 9003,
+            "origin_slot": 1,
+            "target_id": 9006,
+            "target_slot": 1,
+            "type": "CONDITIONING"
+          },
+          {
+            "id": 812,
+            "origin_id": 9003,
+            "origin_slot": 2,
+            "target_id": 9006,
+            "target_slot": 3,
+            "type": "LATENT"
+          },
+          {
+            "id": 813,
+            "origin_id": 385,
+            "origin_slot": 0,
+            "target_id": 9006,
+            "target_slot": 2,
+            "type": "VAE"
+          },
+          {
+            "id": 814,
+            "origin_id": 359,
+            "origin_slot": 0,
+            "target_id": 9006,
+            "target_slot": 4,
+            "type": "FLOAT"
+          },
+          {
+            "id": 815,
+            "origin_id": -10,
+            "origin_slot": 15,
+            "target_id": 9006,
+            "target_slot": 7,
+            "type": "STIMMA_KEYFRAMES"
+          },
+          {
+            "id": 816,
+            "origin_id": 9007,
+            "origin_slot": 2,
+            "target_id": 348,
+            "target_slot": 0,
+            "type": "LATENT"
+          },
+          {
+            "id": 817,
+            "origin_id": 9006,
+            "origin_slot": 0,
+            "target_id": 9007,
+            "target_slot": 0,
+            "type": "CONDITIONING"
+          },
+          {
+            "id": 818,
+            "origin_id": 9006,
+            "origin_slot": 1,
+            "target_id": 9007,
+            "target_slot": 1,
+            "type": "CONDITIONING"
+          },
+          {
+            "id": 819,
+            "origin_id": 367,
+            "origin_slot": 0,
+            "target_id": 9007,
+            "target_slot": 2,
+            "type": "LATENT"
+          },
+          {
+            "id": 820,
+            "origin_id": 9007,
+            "origin_slot": 0,
+            "target_id": 9004,
+            "target_slot": 0,
+            "type": "CONDITIONING"
+          },
+          {
+            "id": 821,
+            "origin_id": 9007,
+            "origin_slot": 1,
+            "target_id": 9004,
+            "target_slot": 1,
+            "type": "CONDITIONING"
+          },
+          {
+            "id": 822,
+            "origin_id": 9008,
+            "origin_slot": 0,
+            "target_id": 391,
+            "target_slot": 1,
+            "type": "CONDITIONING"
+          },
+          {
+            "id": 823,
+            "origin_id": 9008,
+            "origin_slot": 1,
+            "target_id": 391,
+            "target_slot": 2,
+            "type": "CONDITIONING"
+          },
+          {
+            "id": 824,
+            "origin_id": 9008,
+            "origin_slot": 2,
+            "target_id": 340,
+            "target_slot": 0,
+            "type": "LATENT"
+          },
+          {
+            "id": 825,
+            "origin_id": 9004,
+            "origin_slot": 0,
+            "target_id": 9008,
+            "target_slot": 0,
+            "type": "CONDITIONING"
+          },
+          {
+            "id": 826,
+            "origin_id": 9004,
+            "origin_slot": 1,
+            "target_id": 9008,
+            "target_slot": 1,
+            "type": "CONDITIONING"
+          },
+          {
+            "id": 827,
+            "origin_id": 9004,
+            "origin_slot": 2,
+            "target_id": 9008,
+            "target_slot": 3,
+            "type": "LATENT"
+          },
+          {
+            "id": 828,
+            "origin_id": 385,
+            "origin_slot": 0,
+            "target_id": 9008,
+            "target_slot": 2,
+            "type": "VAE"
+          },
+          {
+            "id": 829,
+            "origin_id": 359,
+            "origin_slot": 0,
+            "target_id": 9008,
+            "target_slot": 4,
+            "type": "FLOAT"
+          },
+          {
+            "id": 830,
+            "origin_id": -10,
+            "origin_slot": 15,
+            "target_id": 9008,
+            "target_slot": 7,
+            "type": "STIMMA_KEYFRAMES"
+          },
+          {
+            "id": 831,
+            "origin_id": 9009,
+            "origin_slot": 2,
+            "target_id": 374,
+            "target_slot": 0,
+            "type": "LATENT"
+          },
+          {
+            "id": 832,
+            "origin_id": 9008,
+            "origin_slot": 0,
+            "target_id": 9009,
+            "target_slot": 0,
+            "type": "CONDITIONING"
+          },
+          {
+            "id": 833,
+            "origin_id": 9008,
+            "origin_slot": 1,
+            "target_id": 9009,
+            "target_slot": 1,
+            "type": "CONDITIONING"
+          },
+          {
+            "id": 834,
+            "origin_id": 369,
+            "origin_slot": 0,
+            "target_id": 9009,
+            "target_slot": 2,
+            "type": "LATENT"
           }
         ],
         "extra": {}

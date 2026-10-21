@@ -959,7 +959,7 @@
         "Generate video from ordered image, video, and audio references with synchronized stereo audio. Includes selectable INT8/FP8 precision and Sol tuning. LightX2V 768p eight-step adapter with conservative Sol attention.",
         "MiniMax",
         "MiniMax H3 Ref2VA",
-        "References (input_images, input_videos, input_audios) steer identity, style, motion, and voice, and the prompt names them by tag. Keyframes pin stills or clips at exact times. For a long shot, render segments that share the same voice reference and pin each segment's start and end to frames or short clips from one master take."
+        "References (input_images, input_videos, input_audios) steer identity, style, motion, and voice, and the prompt names them by tag. Keyframes pin stills or clips at exact times. To continue a video, pin its last second with sound at 0 and pass the same video in input_audios for the voice. The output opens with that pinned clip, so trim the clip's length off its start when joining it to the original. For a long shot, render segments that share the same voice reference and pin each segment's start and end to frames or short clips from one master take."
       ]
     },
     {
