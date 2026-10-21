@@ -854,5 +854,69 @@ class TestAgentInstructions(unittest.TestCase):
                 ], name)
 
 
+class TestKeyframes(unittest.TestCase):
+    KF_INPUTS = {
+        "name": "keyframes", "max_items": 6, "positions": "any", "fps": 24,
+        "clip_min_frames": 5, "clip_step_frames": 17, "allow_sound": True,
+        "timeline_param": "duration", "ui_order": 15, "instructions": "Pin things.",
+    }
+
+    def _schema(self, kf_inputs, task_types=("reference-to-video",)):
+        workflow = DiscoveredWorkflow(
+            file_path="kf.json", api_prompt={},
+            tool_info={"slug": "kf", "display_name": "KF", "task_types": list(task_types), "description": ""},
+            field_nodes=[
+                field("img", "StimmaImageParam", {"required": False, "ui_control": "image_picker", "ui_order": 1}),
+                field("kf", "StimmaKeyframesParam", kf_inputs),
+            ],
+        )
+        return _build_single_tool(workflow, object_info=None, config=object(), provider=object()).to_descriptor().parameter_schema
+
+    def test_schema_shape(self):
+        schema = self._schema(self.KF_INPUTS)
+        kf = schema["properties"]["keyframes"]
+        self.assertEqual(kf["x-control"], "keyframes")
+        self.assertEqual(kf["x-max-items"], 6)
+        self.assertEqual(kf["x-positions"], "any")
+        self.assertEqual(kf["x-timeline"], {"duration": "duration", "fps": 24})
+        self.assertEqual(kf["x-clip-frames"], {"min": 5, "step": 17})
+        self.assertEqual(kf["description"], "Pin things.")
+        items = kf["items"]
+        self.assertEqual(items["required"], ["media", "at"])
+        self.assertEqual(items["properties"]["media"]["x-media"], ["image", "video"])
+        self.assertEqual(set(items["properties"]), {"media", "at", "from", "length", "sound"})
+        self.assertNotIn("keyframes", schema.get("required", []))
+        self.assertIn({"required": ["keyframes"], "properties": {"keyframes": {"minItems": 1}}}, schema["anyOf"])
+
+    def test_stills_only_omits_clip_fields(self):
+        kf = self._schema(dict(self.KF_INPUTS, clip_min_frames=0), task_types=("image-to-video",))["properties"]["keyframes"]
+        self.assertEqual(set(kf["items"]["properties"]), {"media", "at", "from"})
+        self.assertNotIn("x-clip-frames", kf)
+
+    def test_h3_reference_workflows_wire_keyframes_into_the_guider(self):
+        for name in ("Stimma-MiniMax-H3-R2V.json", "Stimma-MiniMax-H3-R2V-Turbo.json"):
+            wf = json.loads((Path(ROOT) / "workflows" / name).read_text())
+            nodes = {n["id"]: n for n in wf["nodes"]}
+            links = {l[0]: l for l in wf["links"]}
+            for link_id, src, src_slot, dst, dst_slot, _ in wf["links"]:
+                self.assertIn(link_id, nodes[src]["outputs"][src_slot]["links"], name)
+                self.assertEqual(nodes[dst]["inputs"][dst_slot]["link"], link_id, name)
+            adapter = next(n for n in wf["nodes"] if n["type"] == "StimmaApplyKeyframesH3")
+            sources = {i["name"]: nodes[links[i["link"]][1]]["type"] for i in adapter["inputs"]}
+            self.assertEqual(sources, {
+                "positive": "MiniMaxH3ReferenceToVideo", "latent": "MiniMaxH3ReferenceToVideo",
+                "vae": "VAELoader", "audio_vae": "VAELoader", "keyframes": "StimmaKeyframesParam",
+                "duration": "StimmaFloatParam",
+            }, name)
+            out = links[adapter["outputs"][0]["links"][0]]
+            self.assertEqual(nodes[out[3]]["type"], "BasicGuider", name)
+            kf = next(n for n in wf["nodes"] if n["type"] == "StimmaKeyframesParam")
+            saved = [i["name"] for i in kf["inputs"] if i.get("widget")]
+            self.assertEqual(saved[-1], "instructions", name)
+            self.assertEqual(len(kf["widgets_values"]), len(saved), name)
+            self.assertEqual(wf["last_link_id"], max(links), name)
+            self.assertEqual(wf["last_node_id"], max(nodes), name)
+
+
 if __name__ == "__main__":
     unittest.main()

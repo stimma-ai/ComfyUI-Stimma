@@ -547,5 +547,52 @@ class TestReferenceChainExpansion(unittest.TestCase):
         self.assertIn("third.png", source_images)
 
 
+class TestInjectKeyframes(unittest.TestCase):
+    def _run(self, input_data, task_types=("reference-to-video",)):
+        import asyncio
+        from unittest.mock import AsyncMock
+
+        wf = MagicMock()
+        wf.tool_info = {"task_types": list(task_types)}
+        wf.field_nodes = [{
+            "node_id": "30", "class_type": "StimmaKeyframesParam", "name": "keyframes", "inputs": {},
+        }]
+        prompt = {"30": {"class_type": "StimmaKeyframesParam", "inputs": {"_stimma_keyframes": ""}}}
+        context = MagicMock()
+        context.request_id = "req"
+        context.assets.download = AsyncMock(return_value=b"data")
+        instance = MagicMock()
+        instance.upload_video = AsyncMock(side_effect=lambda path: "up_" + os.path.basename(path)[-8:])
+        unprovided = asyncio.get_event_loop().run_until_complete(
+            _inject_fields(prompt, wf, input_data, context, instance)
+        )
+        return prompt, unprovided, instance
+
+    def test_items_are_uploaded_and_serialized(self):
+        prompt, unprovided, instance = self._run({"keyframes": [
+            {"media": "a1.png", "at": 0},
+            {"media": "v1.mp4", "at": 4.5, "from": 3.25, "length": 0.9, "sound": True},
+        ]})
+        self.assertEqual(unprovided, [])
+        wire = json.loads(prompt["30"]["inputs"]["_stimma_keyframes"])
+        self.assertEqual([w["at"] for w in wire], [0.0, 4.5])
+        self.assertNotIn("length", wire[0])
+        self.assertEqual((wire[1]["from"], wire[1]["length"], wire[1]["sound"]), (3.25, 0.9, True))
+        self.assertTrue(all(w["file"].startswith("up_") for w in wire))
+        self.assertEqual(instance.upload_video.await_count, 2)
+
+    def test_keyframes_alone_satisfy_reference_to_video(self):
+        _, unprovided, _ = self._run({"keyframes": [{"media": "a1.png", "at": 0}]})
+        self.assertEqual(unprovided, [])
+
+    def test_no_keyframes_marks_node_unprovided(self):
+        _, unprovided, _ = self._run({"keyframes": []}, task_types=("image-to-video",))
+        self.assertEqual(unprovided, ["30"])
+
+    def test_reference_to_video_still_needs_some_input(self):
+        with self.assertRaises(RuntimeError):
+            self._run({"keyframes": []})
+
+
 if __name__ == "__main__":
     unittest.main()

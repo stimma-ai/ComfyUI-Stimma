@@ -16,7 +16,7 @@ STIMMA_TOOL_INFO = "StimmaToolInfo"
 STIMMA_FIELD_TYPES = {
     "StimmaPromptParam", "StimmaImageParam", "StimmaMaskParam",
     "StimmaImagesParam", "StimmaVideoParam", "StimmaVideosParam", "StimmaAudioParam",
-    "StimmaSeedParam", "StimmaResolutionParam",
+    "StimmaSeedParam", "StimmaResolutionParam", "StimmaKeyframesParam",
 }
 STIMMA_PARAM_TYPES = {
     "StimmaIntParam", "StimmaFloatParam", "StimmaStringParam",

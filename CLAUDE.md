@@ -74,6 +74,7 @@ Protocol reference: https://github.com/stimma-ai/stimma-tools-protocol
 | `StimmaVideoParam` | Video upload | `name`, `required`, `instructions` |
 | `StimmaAudioParam` | Audio upload (audio-conditioned tools) | `required`, `ui_label`, `audio_role` (`driving`/`reference`), `instructions` |
 | `StimmaMaskParam` | Mask editor | `name`, `source_image_field` |
+| `StimmaKeyframesParam` | Stills or clips pinned at times on the output (`x-control: keyframes`, items `{media, at, from, length, sound}` with nested `x-media`) | `name`, `max_items`, `positions`, `fps`, `clip_min_frames`/`clip_step_frames`, `allow_sound`, `timeline_param`, `instructions`. Outputs `STIMMA_KEYFRAMES` for a model adapter (`StimmaApplyKeyframesH3` loops `MiniMaxH3AddGuide`; a new model needs only its own adapter) |
 | `StimmaResolutionParam` | Width/height | `width`, `height`, `step`, `supported_resolutions` |
 | `StimmaSeedParam` | Random seed | `name` |
 | `StimmaIntParam` | Integer slider | `name`, `value`, `minimum`, `maximum`, `step` |

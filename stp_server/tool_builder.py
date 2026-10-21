@@ -392,8 +392,65 @@ def _build_field_parameter(node: Dict[str, Any]) -> Optional[ToolParameter]:
             ),
         ]
 
+    elif class_type == "StimmaKeyframesParam":
+        return _build_keyframes_parameter(inputs)
+
     logger.warning(f"Unknown input node type: {class_type}")
     return None
+
+
+def _build_keyframes_parameter(inputs: Dict[str, Any]) -> ToolParameter:
+    """Stills or clips pinned at times on the output (STP `x-control: keyframes`)."""
+    fps = int(inputs.get("fps") or 24)
+    clip_min = int(inputs.get("clip_min_frames") or 0)
+    clip_step = max(1, int(inputs.get("clip_step_frames") or 1))
+    props: Dict[str, Any] = {
+        "media": {
+            "type": "string",
+            "x-media": ["image", "video"],
+            "description": "A still image, or a video to take a frame or clip from.",
+        },
+        "at": {
+            "type": "number",
+            "description": "Seconds into the output where this keyframe lands. Negative counts back from the end.",
+        },
+        "from": {
+            "type": "number",
+            "minimum": 0,
+            "default": 0,
+            "description": "For a video: the second to take the frame or clip from.",
+        },
+    }
+    hints: Dict[str, Any] = {
+        "control": "keyframes",
+        "max-items": int(inputs.get("max_items") or 6),
+        "positions": inputs.get("positions") or "any",
+        "timeline": {"duration": inputs.get("timeline_param") or "duration", "fps": fps},
+    }
+    if clip_min > 0:
+        props["length"] = {
+            "type": "number",
+            "minimum": 0,
+            "description": (
+                f"Clip length in seconds. Leave out to pin a single frame. Clips snap to "
+                f"{clip_min} + {clip_step}k frames at {fps} fps."
+            ),
+        }
+        hints["clip-frames"] = {"min": clip_min, "step": clip_step}
+        if inputs.get("allow_sound"):
+            props["sound"] = {
+                "type": "boolean",
+                "default": False,
+                "description": "Pin the clip's sound along with its picture.",
+            }
+    return ToolParameter(
+        name=inputs.get("name") or "keyframes",
+        type="array",
+        description=_instructions(inputs),
+        required=False,
+        items={"type": "object", "required": ["media", "at"], "properties": props},
+        ui_hints=hints,
+    )
 
 
 def _build_param_parameter(
@@ -926,7 +983,10 @@ def _build_single_tool(
         model_vendor=(info.get("model_vendor") or "").strip() or None,
         model=(info.get("model") or "").strip() or None,
         required_any=(
-            [["input_images"], ["input_videos"], ["input_audios"]]
+            [["input_images"], ["input_videos"], ["input_audios"]] + [
+                [p.name] for p in media_parameters
+                if (p.ui_hints or {}).get("control") == "keyframes"
+            ]
             if "reference-to-video" in task_types else None
         ),
     )

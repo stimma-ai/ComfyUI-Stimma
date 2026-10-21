@@ -29,6 +29,7 @@ _INPUT_DATA_FIELDS = {
     "StimmaVideosParam": "video",
     "StimmaAudioParam": "audio",
     "StimmaSeedParam": "value",
+    "StimmaKeyframesParam": "_stimma_keyframes",
 }
 
 _PARAM_DATA_FIELDS = {
@@ -446,9 +447,14 @@ async def _inject_fields(
         audio_values = [audio_values]
 
     if "reference-to-video" in (workflow.tool_info.get("task_types", []) or []):
-        if not image_values and not video_values and not audio_values:
+        keyframe_values = [
+            input_data.get(n.get("name", ""))
+            for n in workflow.field_nodes
+            if n["class_type"] == "StimmaKeyframesParam"
+        ]
+        if not image_values and not video_values and not audio_values and not any(keyframe_values):
             raise RuntimeError(
-                "Reference-to-video requires at least one reference image, video, or audio file"
+                "Reference-to-video requires at least one reference image, video, audio file, or keyframe"
             )
 
     logger.warning(
@@ -645,6 +651,32 @@ async def _inject_fields(
 
             uploaded_name = await _download_and_upload_audio(consumed[0], context, instance)
             prompt[node_id]["inputs"][data_field] = uploaded_name
+            continue
+
+        if class_type == "StimmaKeyframesParam":
+            items = input_data.get(node.get("name", "")) or []
+            if not isinstance(items, list):
+                items = [items]
+            wire = []
+            for item in items:
+                if not isinstance(item, dict) or not item.get("media"):
+                    raise RuntimeError("Each keyframe needs a media file and an `at` time in seconds")
+                entry = {
+                    # Stills and videos share ComfyUI's input upload; the node
+                    # tells them apart when it loads the file.
+                    "file": await _download_and_upload_video(item["media"], context, instance),
+                    "at": float(item.get("at") or 0.0),
+                }
+                for key in ("from", "length"):
+                    if item.get(key) is not None:
+                        entry[key] = float(item[key])
+                if item.get("sound"):
+                    entry["sound"] = True
+                wire.append(entry)
+            if not wire:
+                unprovided_node_ids.append(node_id)
+                continue
+            prompt[node_id]["inputs"][data_field] = json.dumps(wire)
             continue
 
         if class_type == "StimmaSeedParam":

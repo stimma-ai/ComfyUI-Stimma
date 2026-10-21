@@ -1,8 +1,8 @@
 {
   "id": "e3f2b845-8f2c-4b5a-9caf-eac1029d3e7e",
   "revision": 1,
-  "last_node_id": 188,
-  "last_link_id": 330,
+  "last_node_id": 193,
+  "last_link_id": 339,
   "nodes": [
     {
       "id": 116,
@@ -73,7 +73,8 @@
           "type": "VAE",
           "links": [
             251,
-            273
+            273,
+            335
           ]
         }
       ],
@@ -112,7 +113,8 @@
           "type": "VAE",
           "links": [
             250,
-            274
+            274,
+            336
           ]
         }
       ],
@@ -393,7 +395,7 @@
         {
           "name": "conditioning",
           "type": "CONDITIONING",
-          "link": 270
+          "link": 338
         }
       ],
       "outputs": [
@@ -822,7 +824,8 @@
           "name": "LATENT",
           "type": "LATENT",
           "links": [
-            271
+            271,
+            334
           ]
         }
       ],
@@ -933,6 +936,15 @@
             "name": "model"
           },
           "shape": 7
+        },
+        {
+          "name": "instructions",
+          "type": "STRING",
+          "widget": {
+            "name": "instructions"
+          },
+          "link": null,
+          "shape": 7
         }
       ],
       "outputs": [],
@@ -946,7 +958,8 @@
         "Open Weights\nNative Audio\nMultimodal References\nINT8 Default",
         "Generate video from ordered image, video, and audio references with synchronized stereo audio. Includes selectable INT8/FP8 precision and native Sol attention.",
         "MiniMax",
-        "MiniMax H3 Ref2VA"
+        "MiniMax H3 Ref2VA",
+        "References (input_images, input_videos, input_audios) steer identity, style, motion, and voice, and the prompt names them by tag. Keyframes pin stills or clips at exact times. For a long shot, render segments that share the same voice reference and pin each segment's start and end to frames or short clips from one master take."
       ]
     },
     {
@@ -1214,7 +1227,8 @@
           "name": "value",
           "type": "FLOAT",
           "links": [
-            285
+            285,
+            339
           ],
           "slot_index": 0
         }
@@ -4373,6 +4387,208 @@
       "properties": {
         "Node name for S&R": "BlockSparseAttention"
       }
+    },
+    {
+      "id": 192,
+      "type": "StimmaKeyframesParam",
+      "pos": [
+        -1170,
+        5460
+      ],
+      "size": [
+        400,
+        420
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "name",
+          "type": "STRING",
+          "widget": {
+            "name": "name"
+          },
+          "link": null
+        },
+        {
+          "name": "max_items",
+          "type": "INT",
+          "widget": {
+            "name": "max_items"
+          },
+          "link": null
+        },
+        {
+          "name": "positions",
+          "type": "COMBO",
+          "widget": {
+            "name": "positions"
+          },
+          "link": null
+        },
+        {
+          "name": "fps",
+          "type": "INT",
+          "widget": {
+            "name": "fps"
+          },
+          "link": null
+        },
+        {
+          "name": "clip_min_frames",
+          "type": "INT",
+          "widget": {
+            "name": "clip_min_frames"
+          },
+          "link": null
+        },
+        {
+          "name": "clip_step_frames",
+          "type": "INT",
+          "widget": {
+            "name": "clip_step_frames"
+          },
+          "link": null
+        },
+        {
+          "name": "allow_sound",
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "allow_sound"
+          },
+          "link": null
+        },
+        {
+          "name": "timeline_param",
+          "type": "STRING",
+          "widget": {
+            "name": "timeline_param"
+          },
+          "link": null
+        },
+        {
+          "name": "ui_order",
+          "type": "INT",
+          "widget": {
+            "name": "ui_order"
+          },
+          "link": null
+        },
+        {
+          "name": "_stimma_keyframes",
+          "type": "STRING",
+          "widget": {
+            "name": "_stimma_keyframes"
+          },
+          "link": null,
+          "shape": 7
+        },
+        {
+          "name": "instructions",
+          "type": "STRING",
+          "widget": {
+            "name": "instructions"
+          },
+          "link": null,
+          "shape": 7
+        }
+      ],
+      "outputs": [
+        {
+          "name": "keyframes",
+          "type": "STIMMA_KEYFRAMES",
+          "links": [
+            337
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "StimmaKeyframesParam"
+      },
+      "widgets_values": [
+        "keyframes",
+        6,
+        "any",
+        24,
+        5,
+        17,
+        true,
+        "duration",
+        15,
+        "",
+        "Pin stills or short clips at exact times in the output. A still at 0 is the first frame; a still with `at` equal to the duration is the last frame. A clip pinned with its sound carries that picture and audio into the output from where it lands, so the last second of an earlier take pinned at 0 continues it. Pinned images are not shown to the prompt; to name one as <Picture N>, also pass it in input_images."
+      ],
+      "title": "Keyframes"
+    },
+    {
+      "id": 193,
+      "type": "StimmaApplyKeyframesH3",
+      "pos": [
+        -750,
+        5460
+      ],
+      "size": [
+        320,
+        120
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "positive",
+          "type": "CONDITIONING",
+          "link": 270
+        },
+        {
+          "name": "latent",
+          "type": "LATENT",
+          "link": 334
+        },
+        {
+          "name": "vae",
+          "type": "VAE",
+          "link": 335
+        },
+        {
+          "name": "audio_vae",
+          "type": "VAE",
+          "link": 336
+        },
+        {
+          "name": "keyframes",
+          "type": "STIMMA_KEYFRAMES",
+          "link": 337,
+          "shape": 7
+        },
+        {
+          "name": "duration",
+          "type": "FLOAT",
+          "widget": {
+            "name": "duration"
+          },
+          "link": 339,
+          "shape": 7
+        }
+      ],
+      "outputs": [
+        {
+          "name": "positive",
+          "type": "CONDITIONING",
+          "links": [
+            338
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "StimmaApplyKeyframesH3"
+      },
+      "widgets_values": [
+        0.0
+      ]
     }
   ],
   "links": [
@@ -4444,8 +4660,8 @@
       270,
       136,
       0,
-      126,
-      1,
+      193,
+      0,
       "CONDITIONING"
     ],
     [
@@ -4831,6 +5047,54 @@
       188,
       0,
       "MODEL"
+    ],
+    [
+      334,
+      136,
+      1,
+      193,
+      1,
+      "LATENT"
+    ],
+    [
+      335,
+      119,
+      0,
+      193,
+      2,
+      "VAE"
+    ],
+    [
+      336,
+      120,
+      0,
+      193,
+      3,
+      "VAE"
+    ],
+    [
+      337,
+      192,
+      0,
+      193,
+      4,
+      "STIMMA_KEYFRAMES"
+    ],
+    [
+      338,
+      193,
+      0,
+      126,
+      1,
+      "CONDITIONING"
+    ],
+    [
+      339,
+      144,
+      0,
+      193,
+      5,
+      "FLOAT"
     ]
   ],
   "groups": [
