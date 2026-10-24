@@ -1,0 +1,1167 @@
+{
+  "Drama3CodecLoader": {
+    "input": {
+      "required": {
+        "codec_name": [
+          "COMBO",
+          {
+            "options": [
+              "drama3_codec.safetensors"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "Drama3Decode": {
+    "input": {
+      "required": {
+        "codec": [
+          "DRAMA3_CODEC",
+          {}
+        ],
+        "codes": [
+          "DRAMA3_CODES",
+          {}
+        ],
+        "shorten_long_pauses": [
+          "BOOLEAN",
+          {
+            "default": true
+          }
+        ]
+      }
+    }
+  },
+  "Drama3EncodeVoice": {
+    "input": {
+      "required": {
+        "codec": [
+          "DRAMA3_CODEC",
+          {}
+        ],
+        "audio": [
+          "AUDIO",
+          {}
+        ],
+        "transcript": [
+          "STRING",
+          {}
+        ]
+      }
+    }
+  },
+  "Drama3Generate": {
+    "input": {
+      "required": {
+        "model": [
+          "DRAMA3_MODEL",
+          {}
+        ],
+        "text": [
+          "STRING",
+          {}
+        ],
+        "voices": [
+          "COMFY_AUTOGROW_V3",
+          {
+            "template": {
+              "input": {
+                "required": {
+                  "voice": [
+                    "DRAMA3_VOICE",
+                    {}
+                  ]
+                }
+              },
+              "prefix": "voice",
+              "min": 0,
+              "max": 16
+            }
+          }
+        ],
+        "seed": [
+          "INT",
+          {
+            "default": 0,
+            "control_after_generate": true
+          }
+        ],
+        "temperature": [
+          "FLOAT",
+          {
+            "default": 1.0
+          }
+        ],
+        "top_p": [
+          "FLOAT",
+          {
+            "default": 0.9
+          }
+        ],
+        "top_k": [
+          "INT",
+          {
+            "default": 0
+          }
+        ],
+        "max_frames": [
+          "INT",
+          {
+            "default": 600
+          }
+        ],
+        "split_long_text": [
+          "BOOLEAN",
+          {
+            "default": true
+          }
+        ],
+        "speakers": [
+          "COMBO",
+          {
+            "default": "one take per line",
+            "options": [
+              "one take per line",
+              "one take per line, hearing the line before",
+              "one take per speaker",
+              "together"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "Drama3Loader": {
+    "input": {
+      "required": {
+        "model_name": [
+          "COMBO",
+          {
+            "options": [
+              "drama3_fp8experts_bf16.safetensors"
+            ]
+          }
+        ],
+        "experts": [
+          "COMBO",
+          {
+            "default": "in RAM",
+            "options": [
+              "in RAM",
+              "in VRAM"
+            ]
+          }
+        ],
+        "expert_cache_gb": [
+          "FLOAT",
+          {
+            "default": 0.0
+          }
+        ],
+        "second_gpu": [
+          "COMBO",
+          {
+            "default": "none",
+            "options": [
+              "none",
+              "cuda:0"
+            ]
+          }
+        ],
+        "split_layer": [
+          "INT",
+          {
+            "default": 0
+          }
+        ]
+      }
+    }
+  },
+  "Qwen3ASRLoader": {
+    "input": {
+      "required": {
+        "model_name": [
+          "COMBO",
+          {
+            "options": [
+              "qwen3_asr_0.6b_bf16.safetensors"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "Qwen3ASRTranscribe": {
+    "input": {
+      "required": {
+        "model": [
+          "QWEN3_ASR_MODEL",
+          {}
+        ],
+        "audio": [
+          "AUDIO",
+          {}
+        ],
+        "language": [
+          "COMBO",
+          {
+            "default": "auto",
+            "options": [
+              "auto",
+              "Chinese",
+              "English",
+              "Cantonese",
+              "Arabic",
+              "German",
+              "French",
+              "Spanish",
+              "Portuguese",
+              "Indonesian",
+              "Italian",
+              "Korean",
+              "Russian",
+              "Thai",
+              "Vietnamese",
+              "Japanese",
+              "Turkish",
+              "Hindi",
+              "Malay",
+              "Dutch",
+              "Swedish",
+              "Danish",
+              "Finnish",
+              "Polish",
+              "Czech",
+              "Filipino",
+              "Persian",
+              "Greek",
+              "Romanian",
+              "Hungarian",
+              "Macedonian"
+            ]
+          }
+        ],
+        "context": [
+          "STRING",
+          {
+            "default": ""
+          }
+        ],
+        "max_new_tokens": [
+          "INT",
+          {
+            "default": 4096
+          }
+        ]
+      }
+    }
+  },
+  "StimmaAudioOutput": {
+    "input": {
+      "required": {
+        "audio": [
+          "AUDIO",
+          {}
+        ],
+        "filename_prefix": [
+          "STRING",
+          {
+            "default": "Stimma/audio"
+          }
+        ]
+      },
+      "optional": {
+        "_stimma_output_dir": [
+          "STRING",
+          {
+            "default": ""
+          }
+        ]
+      }
+    }
+  },
+  "StimmaAudioParam": {
+    "input": {
+      "required": {
+        "audio": [
+          [
+            "reference.wav"
+          ],
+          {}
+        ],
+        "required": [
+          "BOOLEAN",
+          {
+            "default": true
+          }
+        ],
+        "ui_control": [
+          [
+            "audio_picker"
+          ],
+          {}
+        ],
+        "ui_order": [
+          "INT",
+          {
+            "default": 0
+          }
+        ],
+        "ui_label": [
+          "STRING",
+          {
+            "default": "Audio"
+          }
+        ],
+        "audio_role": [
+          [
+            "driving",
+            "reference"
+          ],
+          {}
+        ]
+      },
+      "optional": {
+        "instructions": [
+          "STRING",
+          {
+            "default": ""
+          }
+        ]
+      }
+    }
+  },
+  "StimmaBoolParam": {
+    "input": {
+      "required": {
+        "name": [
+          "STRING",
+          {
+            "default": "enabled"
+          }
+        ],
+        "value": [
+          "BOOLEAN",
+          {
+            "default": true
+          }
+        ],
+        "ui_order": [
+          "INT",
+          {
+            "default": 0
+          }
+        ],
+        "ui_description": [
+          "STRING",
+          {
+            "default": ""
+          }
+        ]
+      }
+    }
+  },
+  "StimmaDropdownParam": {
+    "input": {
+      "required": {
+        "name": [
+          "STRING",
+          {
+            "default": "sampler"
+          }
+        ],
+        "value": [
+          "STRING",
+          {
+            "default": "euler"
+          }
+        ],
+        "ui_order": [
+          "INT",
+          {
+            "default": 0
+          }
+        ],
+        "ui_description": [
+          "STRING",
+          {
+            "default": ""
+          }
+        ]
+      }
+    }
+  },
+  "StimmaFloatParam": {
+    "input": {
+      "required": {
+        "name": [
+          "STRING",
+          {
+            "default": "cfg"
+          }
+        ],
+        "value": [
+          "FLOAT",
+          {
+            "default": 4.0
+          }
+        ],
+        "minimum": [
+          "FLOAT",
+          {
+            "default": 0.0
+          }
+        ],
+        "maximum": [
+          "FLOAT",
+          {
+            "default": 20.0
+          }
+        ],
+        "step": [
+          "FLOAT",
+          {
+            "default": 0.1
+          }
+        ],
+        "ui_control": [
+          [
+            "input",
+            "slider",
+            "upscale_resolution"
+          ],
+          {}
+        ],
+        "ui_order": [
+          "INT",
+          {
+            "default": 0
+          }
+        ],
+        "ui_description": [
+          "STRING",
+          {
+            "default": ""
+          }
+        ],
+        "ui_format": [
+          [
+            "",
+            "percent",
+            "seconds"
+          ],
+          {}
+        ]
+      }
+    }
+  },
+  "StimmaIntParam": {
+    "input": {
+      "required": {
+        "name": [
+          "STRING",
+          {
+            "default": "steps"
+          }
+        ],
+        "value": [
+          "INT",
+          {
+            "default": 20
+          }
+        ],
+        "minimum": [
+          "INT",
+          {
+            "default": 1
+          }
+        ],
+        "maximum": [
+          "INT",
+          {
+            "default": 150
+          }
+        ],
+        "step": [
+          "INT",
+          {
+            "default": 1
+          }
+        ],
+        "ui_control": [
+          [
+            "input",
+            "slider",
+            "upscale_resolution"
+          ],
+          {}
+        ],
+        "ui_order": [
+          "INT",
+          {
+            "default": 0
+          }
+        ],
+        "ui_description": [
+          "STRING",
+          {
+            "default": ""
+          }
+        ],
+        "ui_format": [
+          [
+            "",
+            "percent",
+            "seconds"
+          ],
+          {}
+        ]
+      }
+    }
+  },
+  "StimmaLayoutGroup": {
+    "input": {
+      "required": {
+        "group_label": [
+          "STRING",
+          {
+            "default": "Settings"
+          }
+        ],
+        "param_names": [
+          "STRING",
+          {
+            "default": ""
+          }
+        ],
+        "collapsed": [
+          "BOOLEAN",
+          {
+            "default": false
+          }
+        ],
+        "ui_order": [
+          "INT",
+          {
+            "default": 0
+          }
+        ]
+      }
+    }
+  },
+  "StimmaPromptParam": {
+    "input": {
+      "required": {
+        "name": [
+          "STRING",
+          {
+            "default": "prompt"
+          }
+        ],
+        "default_text": [
+          "STRING",
+          {
+            "default": ""
+          }
+        ],
+        "required": [
+          "BOOLEAN",
+          {
+            "default": true
+          }
+        ],
+        "ui_order": [
+          "INT",
+          {
+            "default": 0
+          }
+        ],
+        "ui_description": [
+          "STRING",
+          {
+            "default": "Text prompt"
+          }
+        ]
+      }
+    }
+  },
+  "StimmaSeedParam": {
+    "input": {
+      "required": {
+        "name": [
+          "STRING",
+          {
+            "default": "seed"
+          }
+        ],
+        "value": [
+          "INT",
+          {
+            "default": 0
+          }
+        ],
+        "ui_order": [
+          "INT",
+          {
+            "default": 99
+          }
+        ]
+      }
+    }
+  },
+  "StimmaToolInfo": {
+    "input": {
+      "required": {
+        "slug": [
+          "STRING",
+          {
+            "default": "my-tool"
+          }
+        ],
+        "display_name": [
+          "STRING",
+          {
+            "default": "My Tool"
+          }
+        ],
+        "task_types": [
+          "STRING",
+          {
+            "default": "text-to-image"
+          }
+        ],
+        "badges": [
+          "STRING",
+          {
+            "default": ""
+          }
+        ],
+        "description": [
+          "STRING",
+          {
+            "default": ""
+          }
+        ]
+      },
+      "optional": {
+        "model_vendor": [
+          "STRING",
+          {
+            "default": ""
+          }
+        ],
+        "model": [
+          "STRING",
+          {
+            "default": ""
+          }
+        ],
+        "instructions": [
+          "STRING",
+          {
+            "default": ""
+          }
+        ]
+      }
+    }
+  },
+  "FB_Qwen3TTSCustomVoice": {
+    "input": {
+      "required": {
+        "text": [
+          "STRING",
+          {
+            "default": "Hello world"
+          }
+        ],
+        "speaker": [
+          [
+            "Aiden",
+            "Dylan",
+            "Eric",
+            "Ono_anna",
+            "Ryan",
+            "Serena",
+            "Sohee",
+            "Uncle_fu",
+            "Vivian"
+          ],
+          {
+            "default": "Ryan"
+          }
+        ],
+        "model_choice": [
+          [
+            "0.6B",
+            "1.7B"
+          ],
+          {
+            "default": "1.7B"
+          }
+        ],
+        "device": [
+          [
+            "auto",
+            "cuda",
+            "xpu",
+            "mps",
+            "cpu"
+          ],
+          {
+            "default": "auto"
+          }
+        ],
+        "precision": [
+          [
+            "bf16",
+            "fp32"
+          ],
+          {
+            "default": "bf16"
+          }
+        ],
+        "language": [
+          [
+            "Auto",
+            "Chinese",
+            "English",
+            "Japanese",
+            "Korean",
+            "French",
+            "German",
+            "Spanish",
+            "Portuguese",
+            "Russian",
+            "Italian"
+          ],
+          {
+            "default": "Auto"
+          }
+        ]
+      },
+      "optional": {
+        "seed": [
+          "INT",
+          {
+            "default": 0,
+            "control_after_generate": true
+          }
+        ],
+        "instruct": [
+          "STRING",
+          {
+            "default": ""
+          }
+        ],
+        "max_new_tokens": [
+          "INT",
+          {
+            "default": 2048
+          }
+        ],
+        "top_p": [
+          "FLOAT",
+          {
+            "default": 1.0
+          }
+        ],
+        "top_k": [
+          "INT",
+          {
+            "default": 50
+          }
+        ],
+        "temperature": [
+          "FLOAT",
+          {
+            "default": 0.9
+          }
+        ],
+        "repetition_penalty": [
+          "FLOAT",
+          {
+            "default": 1.05
+          }
+        ],
+        "attention": [
+          [
+            "auto",
+            "sage_attn",
+            "flash_attn",
+            "sdpa",
+            "eager"
+          ],
+          {
+            "default": "auto"
+          }
+        ],
+        "unload_model_after_generate": [
+          "BOOLEAN",
+          {
+            "default": false
+          }
+        ],
+        "custom_model_path": [
+          "STRING",
+          {
+            "default": ""
+          }
+        ],
+        "custom_speaker_name": [
+          "STRING",
+          {
+            "default": ""
+          }
+        ]
+      }
+    }
+  },
+  "FB_Qwen3TTSVoiceDesign": {
+    "input": {
+      "required": {
+        "text": [
+          "STRING",
+          {
+            "default": "Hello world"
+          }
+        ],
+        "instruct": [
+          "STRING",
+          {
+            "default": ""
+          }
+        ],
+        "model_choice": [
+          [
+            "0.6B",
+            "1.7B"
+          ],
+          {
+            "default": "1.7B"
+          }
+        ],
+        "device": [
+          [
+            "auto",
+            "cuda",
+            "xpu",
+            "mps",
+            "cpu"
+          ],
+          {
+            "default": "auto"
+          }
+        ],
+        "precision": [
+          [
+            "bf16",
+            "fp32"
+          ],
+          {
+            "default": "bf16"
+          }
+        ],
+        "language": [
+          [
+            "Auto",
+            "Chinese",
+            "English",
+            "Japanese",
+            "Korean",
+            "French",
+            "German",
+            "Spanish",
+            "Portuguese",
+            "Russian",
+            "Italian"
+          ],
+          {
+            "default": "Auto"
+          }
+        ]
+      },
+      "optional": {
+        "seed": [
+          "INT",
+          {
+            "default": 0,
+            "control_after_generate": true
+          }
+        ],
+        "max_new_tokens": [
+          "INT",
+          {
+            "default": 2048
+          }
+        ],
+        "top_p": [
+          "FLOAT",
+          {
+            "default": 1.0
+          }
+        ],
+        "top_k": [
+          "INT",
+          {
+            "default": 50
+          }
+        ],
+        "temperature": [
+          "FLOAT",
+          {
+            "default": 0.9
+          }
+        ],
+        "repetition_penalty": [
+          "FLOAT",
+          {
+            "default": 1.05
+          }
+        ],
+        "attention": [
+          [
+            "auto",
+            "sage_attn",
+            "flash_attn",
+            "sdpa",
+            "eager"
+          ],
+          {
+            "default": "auto"
+          }
+        ],
+        "unload_model_after_generate": [
+          "BOOLEAN",
+          {
+            "default": false
+          }
+        ]
+      }
+    }
+  },
+  "FB_Qwen3TTSVoiceClone": {
+    "input": {
+      "required": {
+        "target_text": [
+          "STRING",
+          {
+            "default": "Good one. Okay, fine, I'm just gonna leave this sock monkey here. Goodbye."
+          }
+        ],
+        "model_choice": [
+          [
+            "0.6B",
+            "1.7B"
+          ],
+          {
+            "default": "0.6B"
+          }
+        ],
+        "device": [
+          [
+            "auto",
+            "cuda",
+            "xpu",
+            "mps",
+            "cpu"
+          ],
+          {
+            "default": "auto"
+          }
+        ],
+        "precision": [
+          [
+            "bf16",
+            "fp32"
+          ],
+          {
+            "default": "bf16"
+          }
+        ],
+        "language": [
+          [
+            "Auto",
+            "Chinese",
+            "English",
+            "Japanese",
+            "Korean",
+            "French",
+            "German",
+            "Spanish",
+            "Portuguese",
+            "Russian",
+            "Italian"
+          ],
+          {
+            "default": "Auto"
+          }
+        ]
+      },
+      "optional": {
+        "ref_audio": [
+          "AUDIO",
+          {}
+        ],
+        "ref_text": [
+          "STRING",
+          {
+            "default": ""
+          }
+        ],
+        "voice_clone_prompt": [
+          "VOICE_CLONE_PROMPT",
+          {}
+        ],
+        "seed": [
+          "INT",
+          {
+            "default": 0,
+            "control_after_generate": true
+          }
+        ],
+        "max_new_tokens": [
+          "INT",
+          {
+            "default": 2048
+          }
+        ],
+        "top_p": [
+          "FLOAT",
+          {
+            "default": 1.0
+          }
+        ],
+        "top_k": [
+          "INT",
+          {
+            "default": 50
+          }
+        ],
+        "temperature": [
+          "FLOAT",
+          {
+            "default": 0.9
+          }
+        ],
+        "repetition_penalty": [
+          "FLOAT",
+          {
+            "default": 1.05
+          }
+        ],
+        "x_vector_only": [
+          "BOOLEAN",
+          {
+            "default": false
+          }
+        ],
+        "instruct": [
+          "STRING",
+          {
+            "default": ""
+          }
+        ],
+        "attention": [
+          [
+            "auto",
+            "sage_attn",
+            "flash_attn",
+            "sdpa",
+            "eager"
+          ],
+          {
+            "default": "auto"
+          }
+        ],
+        "unload_model_after_generate": [
+          "BOOLEAN",
+          {
+            "default": false
+          }
+        ],
+        "custom_model_path": [
+          "STRING",
+          {
+            "default": ""
+          }
+        ]
+      }
+    }
+  },
+  "StimmaStringParam": {
+    "input": {
+      "required": {
+        "name": [
+          "STRING",
+          {
+            "default": "sampler"
+          }
+        ],
+        "value": [
+          "STRING",
+          {
+            "default": "euler"
+          }
+        ],
+        "enum_values": [
+          "STRING",
+          {
+            "default": "",
+            "multiline": true
+          }
+        ],
+        "ui_control": [
+          [
+            "dropdown",
+            "textarea"
+          ]
+        ],
+        "ui_order": [
+          "INT",
+          {
+            "default": 0,
+            "min": 0,
+            "max": 2147483647,
+            "display": "number"
+          }
+        ],
+        "ui_description": [
+          "STRING",
+          {
+            "default": "",
+            "multiline": true
+          }
+        ]
+      }
+    },
+    "input_order": {
+      "required": [
+        "name",
+        "value",
+        "enum_values",
+        "ui_control",
+        "ui_order",
+        "ui_description"
+      ]
+    },
+    "is_input_list": false,
+    "output": [
+      "STRING"
+    ],
+    "output_is_list": [
+      false
+    ],
+    "output_name": [
+      "value"
+    ],
+    "name": "StimmaStringParam",
+    "display_name": "Stimma String",
+    "description": "",
+    "python_module": "custom_nodes.ComfyUI-Stimma",
+    "category": "Stimma/Params",
+    "output_node": false,
+    "has_intermediate_output": false,
+    "search_aliases": []
+  }
+}

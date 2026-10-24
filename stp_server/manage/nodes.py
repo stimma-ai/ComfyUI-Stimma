@@ -32,6 +32,21 @@ _PACK_OVERRIDES: Dict[str, dict] = {
     },
 }
 
+for _class_type in (
+    "Drama3Loader", "Drama3CodecLoader", "Drama3EncodeVoice", "Drama3Generate",
+    "Drama3Decode", "Qwen3ASRLoader", "Qwen3ASRTranscribe",
+):
+    _PACK_OVERRIDES[_class_type] = {
+        "url": "https://github.com/PedroMarinhoDev/ComfyUI-Drama3",
+        "title": "Fish Audio Drama 3",
+    }
+
+for _class_type in ("FB_Qwen3TTSCustomVoice", "FB_Qwen3TTSVoiceDesign", "FB_Qwen3TTSVoiceClone"):
+    _PACK_OVERRIDES[_class_type] = {
+        "url": "https://github.com/flybirdxx/ComfyUI-Qwen-TTS",
+        "title": "Qwen3-TTS",
+    }
+
 _node_map: Dict[str, Any] = {"loaded_at": 0, "by_class": {}}
 
 

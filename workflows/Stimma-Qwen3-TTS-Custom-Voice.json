@@ -1,0 +1,1505 @@
+{
+  "last_node_id": 14,
+  "last_link_id": 11,
+  "nodes": [
+    {
+      "id": 1,
+      "type": "StimmaToolInfo",
+      "pos": [
+        -520,
+        0
+      ],
+      "size": [
+        430,
+        190
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "slug",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "slug"
+          }
+        },
+        {
+          "name": "display_name",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "display_name"
+          }
+        },
+        {
+          "name": "task_types",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "task_types"
+          }
+        },
+        {
+          "name": "badges",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "badges"
+          }
+        },
+        {
+          "name": "description",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "description"
+          }
+        },
+        {
+          "name": "model_vendor",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "model_vendor"
+          }
+        },
+        {
+          "name": "model",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "model"
+          }
+        },
+        {
+          "name": "instructions",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "instructions"
+          }
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "Node name for S&R": "StimmaToolInfo"
+      },
+      "widgets_values": [
+        "qwen3-tts-custom-voice",
+        "Qwen3-TTS Custom Voice",
+        "text-to-speech",
+        "",
+        "Generate speech locally with Qwen3-TTS 1.7B preset speakers and controllable delivery.",
+        "Qwen",
+        "Qwen3-TTS-12Hz-1.7B-CustomVoice",
+        "The prompt is the exact text to speak. Set language to the target language; voice direction belongs in instruct, not in the spoken text. For long narration, generate sentence or paragraph sections, reuse the same voice, and assemble the audio before generating video. Choose a preset speaker, such as Aiden or Ryan for English. Use instruct for delivery, emotion, and pace."
+      ]
+    },
+    {
+      "id": 2,
+      "type": "StimmaPromptParam",
+      "pos": [
+        -520,
+        280
+      ],
+      "size": [
+        430,
+        240
+      ],
+      "flags": {},
+      "order": 1,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "name",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "name"
+          }
+        },
+        {
+          "name": "default_text",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "default_text"
+          }
+        },
+        {
+          "name": "required",
+          "type": "BOOLEAN",
+          "link": null,
+          "widget": {
+            "name": "required"
+          }
+        },
+        {
+          "name": "ui_order",
+          "type": "INT",
+          "link": null,
+          "widget": {
+            "name": "ui_order"
+          }
+        },
+        {
+          "name": "ui_description",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "ui_description"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "text",
+          "type": "STRING",
+          "links": [
+            1
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "StimmaPromptParam"
+      },
+      "widgets_values": [
+        "prompt",
+        "Welcome! Let’s make something wonderful together.",
+        true,
+        0,
+        "The exact words to speak."
+      ]
+    },
+    {
+      "id": 3,
+      "type": "FB_Qwen3TTSCustomVoice",
+      "pos": [
+        520,
+        0
+      ],
+      "size": [
+        500,
+        600
+      ],
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "text",
+          "type": "STRING",
+          "link": 1,
+          "widget": {
+            "name": "text"
+          }
+        },
+        {
+          "name": "speaker",
+          "type": "COMBO",
+          "link": 4,
+          "widget": {
+            "name": "speaker"
+          }
+        },
+        {
+          "name": "model_choice",
+          "type": "COMBO",
+          "link": null,
+          "widget": {
+            "name": "model_choice"
+          }
+        },
+        {
+          "name": "device",
+          "type": "COMBO",
+          "link": null,
+          "widget": {
+            "name": "device"
+          }
+        },
+        {
+          "name": "precision",
+          "type": "COMBO",
+          "link": null,
+          "widget": {
+            "name": "precision"
+          }
+        },
+        {
+          "name": "language",
+          "type": "COMBO",
+          "link": 3,
+          "widget": {
+            "name": "language"
+          }
+        },
+        {
+          "name": "seed",
+          "type": "INT",
+          "link": 11,
+          "widget": {
+            "name": "seed"
+          }
+        },
+        {
+          "name": "instruct",
+          "type": "STRING",
+          "link": 5,
+          "widget": {
+            "name": "instruct"
+          }
+        },
+        {
+          "name": "max_new_tokens",
+          "type": "INT",
+          "link": 9,
+          "widget": {
+            "name": "max_new_tokens"
+          }
+        },
+        {
+          "name": "top_p",
+          "type": "FLOAT",
+          "link": 7,
+          "widget": {
+            "name": "top_p"
+          }
+        },
+        {
+          "name": "top_k",
+          "type": "INT",
+          "link": 8,
+          "widget": {
+            "name": "top_k"
+          }
+        },
+        {
+          "name": "temperature",
+          "type": "FLOAT",
+          "link": 6,
+          "widget": {
+            "name": "temperature"
+          }
+        },
+        {
+          "name": "repetition_penalty",
+          "type": "FLOAT",
+          "link": 10,
+          "widget": {
+            "name": "repetition_penalty"
+          }
+        },
+        {
+          "name": "attention",
+          "type": "COMBO",
+          "link": null,
+          "widget": {
+            "name": "attention"
+          }
+        },
+        {
+          "name": "unload_model_after_generate",
+          "type": "BOOLEAN",
+          "link": null,
+          "widget": {
+            "name": "unload_model_after_generate"
+          }
+        },
+        {
+          "name": "custom_model_path",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "custom_model_path"
+          }
+        },
+        {
+          "name": "custom_speaker_name",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "custom_speaker_name"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "audio",
+          "type": "AUDIO",
+          "links": [
+            2
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "FB_Qwen3TTSCustomVoice",
+        "aux_id": "flybirdxx/ComfyUI-Qwen-TTS",
+        "models": [
+          {
+            "name": "Qwen3-TTS-12Hz-1.7B-CustomVoice/config.json",
+            "directory": "qwen-tts",
+            "url": "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-CustomVoice/resolve/0c0e3051f131929182e2c023b9537f8b1c68adfe/config.json",
+            "hash": "17a07f527a1c25ea30b4e023a184482a23d3e279d697b1dc81b1bde498d29cf9",
+            "hash_type": "sha256"
+          },
+          {
+            "name": "Qwen3-TTS-12Hz-1.7B-CustomVoice/generation_config.json",
+            "directory": "qwen-tts",
+            "url": "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-CustomVoice/resolve/0c0e3051f131929182e2c023b9537f8b1c68adfe/generation_config.json",
+            "hash": "f1b90b4513f3b34c62851049e2492d7b4c5940daf1276f89c82b8ef04127f3aa",
+            "hash_type": "sha256"
+          },
+          {
+            "name": "Qwen3-TTS-12Hz-1.7B-CustomVoice/merges.txt",
+            "directory": "qwen-tts",
+            "url": "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-CustomVoice/resolve/0c0e3051f131929182e2c023b9537f8b1c68adfe/merges.txt",
+            "hash": "599bab54075088774b1733fde865d5bd747cbcc7a547c5bc12610e874e26f5e3",
+            "hash_type": "sha256"
+          },
+          {
+            "name": "Qwen3-TTS-12Hz-1.7B-CustomVoice/model.safetensors",
+            "directory": "qwen-tts",
+            "url": "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-CustomVoice/resolve/0c0e3051f131929182e2c023b9537f8b1c68adfe/model.safetensors",
+            "hash": "38b1d5971bdbd982b561cccec982669a53b0537c3cf5e9bd4778ed07bb2f5137",
+            "hash_type": "sha256"
+          },
+          {
+            "name": "Qwen3-TTS-12Hz-1.7B-CustomVoice/preprocessor_config.json",
+            "directory": "qwen-tts",
+            "url": "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-CustomVoice/resolve/0c0e3051f131929182e2c023b9537f8b1c68adfe/preprocessor_config.json",
+            "hash": "efdde1022ea9d76928bf7a9cd53139138f5ba2e466e837f08f6105ab1af1c119",
+            "hash_type": "sha256"
+          },
+          {
+            "name": "Qwen3-TTS-12Hz-1.7B-CustomVoice/speech_tokenizer/config.json",
+            "directory": "qwen-tts",
+            "url": "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-CustomVoice/resolve/0c0e3051f131929182e2c023b9537f8b1c68adfe/speech_tokenizer/config.json",
+            "hash": "ee65bb901c876664ab8707c487157aa1a6ee57c65969b28fb5ec9dc211e68167",
+            "hash_type": "sha256"
+          },
+          {
+            "name": "Qwen3-TTS-12Hz-1.7B-CustomVoice/speech_tokenizer/configuration.json",
+            "directory": "qwen-tts",
+            "url": "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-CustomVoice/resolve/0c0e3051f131929182e2c023b9537f8b1c68adfe/speech_tokenizer/configuration.json",
+            "hash": "6bc26d64eb5024b4d1dab5a52371958b429256d6c9d59787f1f5294a54e0cebd",
+            "hash_type": "sha256"
+          },
+          {
+            "name": "Qwen3-TTS-12Hz-1.7B-CustomVoice/speech_tokenizer/model.safetensors",
+            "directory": "qwen-tts",
+            "url": "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-CustomVoice/resolve/0c0e3051f131929182e2c023b9537f8b1c68adfe/speech_tokenizer/model.safetensors",
+            "hash": "836b7b357f5ea43e889936a3709af68dfe3751881acefe4ecf0dbd30ba571258",
+            "hash_type": "sha256"
+          },
+          {
+            "name": "Qwen3-TTS-12Hz-1.7B-CustomVoice/speech_tokenizer/preprocessor_config.json",
+            "directory": "qwen-tts",
+            "url": "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-CustomVoice/resolve/0c0e3051f131929182e2c023b9537f8b1c68adfe/speech_tokenizer/preprocessor_config.json",
+            "hash": "fcb3805e597e786d4067706e602f6688524640f8d3396790e2e09b5942fcbdfb",
+            "hash_type": "sha256"
+          },
+          {
+            "name": "Qwen3-TTS-12Hz-1.7B-CustomVoice/tokenizer_config.json",
+            "directory": "qwen-tts",
+            "url": "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-CustomVoice/resolve/0c0e3051f131929182e2c023b9537f8b1c68adfe/tokenizer_config.json",
+            "hash": "dc3c31c3bdaedd5016382bb3cbe07323026775ad51f5a4fb564505992ae4a670",
+            "hash_type": "sha256"
+          },
+          {
+            "name": "Qwen3-TTS-12Hz-1.7B-CustomVoice/vocab.json",
+            "directory": "qwen-tts",
+            "url": "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-CustomVoice/resolve/0c0e3051f131929182e2c023b9537f8b1c68adfe/vocab.json",
+            "hash": "ca10d7e9fb3ed18575dd1e277a2579c16d108e32f27439684afa0e10b1440910",
+            "hash_type": "sha256"
+          },
+          {
+            "name": "Qwen3-TTS-Tokenizer-12Hz/config.json",
+            "directory": "qwen-tts",
+            "url": "https://huggingface.co/Qwen/Qwen3-TTS-Tokenizer-12Hz/resolve/7dd38ad4e9bad454aae9cd937d0cd577604fe229/config.json",
+            "hash": "ee65bb901c876664ab8707c487157aa1a6ee57c65969b28fb5ec9dc211e68167",
+            "hash_type": "sha256"
+          },
+          {
+            "name": "Qwen3-TTS-Tokenizer-12Hz/configuration.json",
+            "directory": "qwen-tts",
+            "url": "https://huggingface.co/Qwen/Qwen3-TTS-Tokenizer-12Hz/resolve/7dd38ad4e9bad454aae9cd937d0cd577604fe229/configuration.json",
+            "hash": "6bc26d64eb5024b4d1dab5a52371958b429256d6c9d59787f1f5294a54e0cebd",
+            "hash_type": "sha256"
+          },
+          {
+            "name": "Qwen3-TTS-Tokenizer-12Hz/model.safetensors",
+            "directory": "qwen-tts",
+            "url": "https://huggingface.co/Qwen/Qwen3-TTS-Tokenizer-12Hz/resolve/7dd38ad4e9bad454aae9cd937d0cd577604fe229/model.safetensors",
+            "hash": "836b7b357f5ea43e889936a3709af68dfe3751881acefe4ecf0dbd30ba571258",
+            "hash_type": "sha256"
+          },
+          {
+            "name": "Qwen3-TTS-Tokenizer-12Hz/preprocessor_config.json",
+            "directory": "qwen-tts",
+            "url": "https://huggingface.co/Qwen/Qwen3-TTS-Tokenizer-12Hz/resolve/7dd38ad4e9bad454aae9cd937d0cd577604fe229/preprocessor_config.json",
+            "hash": "fcb3805e597e786d4067706e602f6688524640f8d3396790e2e09b5942fcbdfb",
+            "hash_type": "sha256"
+          }
+        ]
+      },
+      "widgets_values": [
+        "",
+        "Aiden",
+        "1.7B",
+        "auto",
+        "bf16",
+        "English",
+        0,
+        "fixed",
+        "Speak clearly and naturally, with a warm conversational tone.",
+        2048,
+        1.0,
+        50,
+        0.9,
+        1.05,
+        "sdpa",
+        true,
+        "",
+        ""
+      ]
+    },
+    {
+      "id": 4,
+      "type": "StimmaAudioOutput",
+      "pos": [
+        1100,
+        0
+      ],
+      "size": [
+        430,
+        190
+      ],
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "audio",
+          "type": "AUDIO",
+          "link": 2
+        },
+        {
+          "name": "filename_prefix",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "filename_prefix"
+          }
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "Node name for S&R": "StimmaAudioOutput"
+      },
+      "widgets_values": [
+        "Stimma/qwen3-tts-custom-voice"
+      ]
+    },
+    {
+      "id": 5,
+      "type": "StimmaDropdownParam",
+      "pos": [
+        -520,
+        600
+      ],
+      "size": [
+        430,
+        190
+      ],
+      "flags": {},
+      "order": 4,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "name",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "name"
+          }
+        },
+        {
+          "name": "value",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "value"
+          }
+        },
+        {
+          "name": "ui_order",
+          "type": "INT",
+          "link": null,
+          "widget": {
+            "name": "ui_order"
+          }
+        },
+        {
+          "name": "ui_description",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "ui_description"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "value",
+          "type": "*",
+          "links": [
+            3
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "StimmaDropdownParam"
+      },
+      "widgets_values": [
+        "language",
+        "English",
+        2,
+        "Target speech language. Set it explicitly for predictable pronunciation."
+      ]
+    },
+    {
+      "id": 6,
+      "type": "StimmaDropdownParam",
+      "pos": [
+        -520,
+        850
+      ],
+      "size": [
+        430,
+        190
+      ],
+      "flags": {},
+      "order": 5,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "name",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "name"
+          }
+        },
+        {
+          "name": "value",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "value"
+          }
+        },
+        {
+          "name": "ui_order",
+          "type": "INT",
+          "link": null,
+          "widget": {
+            "name": "ui_order"
+          }
+        },
+        {
+          "name": "ui_description",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "ui_description"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "value",
+          "type": "*",
+          "links": [
+            4
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "StimmaDropdownParam"
+      },
+      "widgets_values": [
+        "speaker",
+        "Aiden",
+        1,
+        "Preset voice. Aiden and Ryan are native English speakers."
+      ]
+    },
+    {
+      "id": 7,
+      "type": "StimmaStringParam",
+      "pos": [
+        0,
+        0
+      ],
+      "size": [
+        430,
+        190
+      ],
+      "flags": {},
+      "order": 6,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "name",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "name"
+          }
+        },
+        {
+          "name": "value",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "value"
+          }
+        },
+        {
+          "name": "enum_values",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "enum_values"
+          }
+        },
+        {
+          "name": "ui_control",
+          "type": "COMBO",
+          "link": null,
+          "widget": {
+            "name": "ui_control"
+          }
+        },
+        {
+          "name": "ui_order",
+          "type": "INT",
+          "link": null,
+          "widget": {
+            "name": "ui_order"
+          }
+        },
+        {
+          "name": "ui_description",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "ui_description"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "value",
+          "type": "STRING",
+          "links": [
+            5
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "StimmaStringParam"
+      },
+      "widgets_values": [
+        "instruct",
+        "Speak clearly and naturally, with a warm conversational tone.",
+        "",
+        "textarea",
+        3,
+        "Describe delivery, emotion, pace, or accent. These directions are not spoken."
+      ]
+    },
+    {
+      "id": 8,
+      "type": "StimmaFloatParam",
+      "pos": [
+        1100,
+        280
+      ],
+      "size": [
+        430,
+        190
+      ],
+      "flags": {},
+      "order": 7,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "name",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "name"
+          }
+        },
+        {
+          "name": "value",
+          "type": "FLOAT",
+          "link": null,
+          "widget": {
+            "name": "value"
+          }
+        },
+        {
+          "name": "minimum",
+          "type": "FLOAT",
+          "link": null,
+          "widget": {
+            "name": "minimum"
+          }
+        },
+        {
+          "name": "maximum",
+          "type": "FLOAT",
+          "link": null,
+          "widget": {
+            "name": "maximum"
+          }
+        },
+        {
+          "name": "step",
+          "type": "FLOAT",
+          "link": null,
+          "widget": {
+            "name": "step"
+          }
+        },
+        {
+          "name": "ui_control",
+          "type": "COMBO",
+          "link": null,
+          "widget": {
+            "name": "ui_control"
+          }
+        },
+        {
+          "name": "ui_order",
+          "type": "INT",
+          "link": null,
+          "widget": {
+            "name": "ui_order"
+          }
+        },
+        {
+          "name": "ui_description",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "ui_description"
+          }
+        },
+        {
+          "name": "ui_format",
+          "type": "COMBO",
+          "link": null,
+          "widget": {
+            "name": "ui_format"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "value",
+          "type": "FLOAT",
+          "links": [
+            6
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "StimmaFloatParam"
+      },
+      "widgets_values": [
+        "temperature",
+        0.9,
+        0.1,
+        2.0,
+        0.1,
+        "slider",
+        10,
+        "Sampling temperature.",
+        ""
+      ]
+    },
+    {
+      "id": 9,
+      "type": "StimmaFloatParam",
+      "pos": [
+        1580,
+        280
+      ],
+      "size": [
+        430,
+        190
+      ],
+      "flags": {},
+      "order": 8,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "name",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "name"
+          }
+        },
+        {
+          "name": "value",
+          "type": "FLOAT",
+          "link": null,
+          "widget": {
+            "name": "value"
+          }
+        },
+        {
+          "name": "minimum",
+          "type": "FLOAT",
+          "link": null,
+          "widget": {
+            "name": "minimum"
+          }
+        },
+        {
+          "name": "maximum",
+          "type": "FLOAT",
+          "link": null,
+          "widget": {
+            "name": "maximum"
+          }
+        },
+        {
+          "name": "step",
+          "type": "FLOAT",
+          "link": null,
+          "widget": {
+            "name": "step"
+          }
+        },
+        {
+          "name": "ui_control",
+          "type": "COMBO",
+          "link": null,
+          "widget": {
+            "name": "ui_control"
+          }
+        },
+        {
+          "name": "ui_order",
+          "type": "INT",
+          "link": null,
+          "widget": {
+            "name": "ui_order"
+          }
+        },
+        {
+          "name": "ui_description",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "ui_description"
+          }
+        },
+        {
+          "name": "ui_format",
+          "type": "COMBO",
+          "link": null,
+          "widget": {
+            "name": "ui_format"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "value",
+          "type": "FLOAT",
+          "links": [
+            7
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "StimmaFloatParam"
+      },
+      "widgets_values": [
+        "top_p",
+        1.0,
+        0.0,
+        1.0,
+        0.05,
+        "slider",
+        11,
+        "Nucleus sampling probability.",
+        ""
+      ]
+    },
+    {
+      "id": 10,
+      "type": "StimmaIntParam",
+      "pos": [
+        1100,
+        540
+      ],
+      "size": [
+        430,
+        190
+      ],
+      "flags": {},
+      "order": 9,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "name",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "name"
+          }
+        },
+        {
+          "name": "value",
+          "type": "INT",
+          "link": null,
+          "widget": {
+            "name": "value"
+          }
+        },
+        {
+          "name": "minimum",
+          "type": "INT",
+          "link": null,
+          "widget": {
+            "name": "minimum"
+          }
+        },
+        {
+          "name": "maximum",
+          "type": "INT",
+          "link": null,
+          "widget": {
+            "name": "maximum"
+          }
+        },
+        {
+          "name": "step",
+          "type": "INT",
+          "link": null,
+          "widget": {
+            "name": "step"
+          }
+        },
+        {
+          "name": "ui_control",
+          "type": "COMBO",
+          "link": null,
+          "widget": {
+            "name": "ui_control"
+          }
+        },
+        {
+          "name": "ui_order",
+          "type": "INT",
+          "link": null,
+          "widget": {
+            "name": "ui_order"
+          }
+        },
+        {
+          "name": "ui_description",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "ui_description"
+          }
+        },
+        {
+          "name": "ui_format",
+          "type": "COMBO",
+          "link": null,
+          "widget": {
+            "name": "ui_format"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "value",
+          "type": "INT",
+          "links": [
+            8
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "StimmaIntParam"
+      },
+      "widgets_values": [
+        "top_k",
+        50,
+        0,
+        100,
+        1,
+        "slider",
+        12,
+        "Top-k sampling candidate limit.",
+        ""
+      ]
+    },
+    {
+      "id": 11,
+      "type": "StimmaIntParam",
+      "pos": [
+        1580,
+        540
+      ],
+      "size": [
+        430,
+        190
+      ],
+      "flags": {},
+      "order": 10,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "name",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "name"
+          }
+        },
+        {
+          "name": "value",
+          "type": "INT",
+          "link": null,
+          "widget": {
+            "name": "value"
+          }
+        },
+        {
+          "name": "minimum",
+          "type": "INT",
+          "link": null,
+          "widget": {
+            "name": "minimum"
+          }
+        },
+        {
+          "name": "maximum",
+          "type": "INT",
+          "link": null,
+          "widget": {
+            "name": "maximum"
+          }
+        },
+        {
+          "name": "step",
+          "type": "INT",
+          "link": null,
+          "widget": {
+            "name": "step"
+          }
+        },
+        {
+          "name": "ui_control",
+          "type": "COMBO",
+          "link": null,
+          "widget": {
+            "name": "ui_control"
+          }
+        },
+        {
+          "name": "ui_order",
+          "type": "INT",
+          "link": null,
+          "widget": {
+            "name": "ui_order"
+          }
+        },
+        {
+          "name": "ui_description",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "ui_description"
+          }
+        },
+        {
+          "name": "ui_format",
+          "type": "COMBO",
+          "link": null,
+          "widget": {
+            "name": "ui_format"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "value",
+          "type": "INT",
+          "links": [
+            9
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "StimmaIntParam"
+      },
+      "widgets_values": [
+        "max_new_tokens",
+        2048,
+        512,
+        4096,
+        256,
+        "slider",
+        13,
+        "Maximum generated speech tokens. Reaching this limit can cut speech short.",
+        ""
+      ]
+    },
+    {
+      "id": 12,
+      "type": "StimmaFloatParam",
+      "pos": [
+        1100,
+        800
+      ],
+      "size": [
+        430,
+        190
+      ],
+      "flags": {},
+      "order": 11,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "name",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "name"
+          }
+        },
+        {
+          "name": "value",
+          "type": "FLOAT",
+          "link": null,
+          "widget": {
+            "name": "value"
+          }
+        },
+        {
+          "name": "minimum",
+          "type": "FLOAT",
+          "link": null,
+          "widget": {
+            "name": "minimum"
+          }
+        },
+        {
+          "name": "maximum",
+          "type": "FLOAT",
+          "link": null,
+          "widget": {
+            "name": "maximum"
+          }
+        },
+        {
+          "name": "step",
+          "type": "FLOAT",
+          "link": null,
+          "widget": {
+            "name": "step"
+          }
+        },
+        {
+          "name": "ui_control",
+          "type": "COMBO",
+          "link": null,
+          "widget": {
+            "name": "ui_control"
+          }
+        },
+        {
+          "name": "ui_order",
+          "type": "INT",
+          "link": null,
+          "widget": {
+            "name": "ui_order"
+          }
+        },
+        {
+          "name": "ui_description",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "ui_description"
+          }
+        },
+        {
+          "name": "ui_format",
+          "type": "COMBO",
+          "link": null,
+          "widget": {
+            "name": "ui_format"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "value",
+          "type": "FLOAT",
+          "links": [
+            10
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "StimmaFloatParam"
+      },
+      "widgets_values": [
+        "repetition_penalty",
+        1.05,
+        1.0,
+        2.0,
+        0.05,
+        "slider",
+        14,
+        "Penalty for repeated speech tokens.",
+        ""
+      ]
+    },
+    {
+      "id": 13,
+      "type": "StimmaSeedParam",
+      "pos": [
+        -520,
+        1220
+      ],
+      "size": [
+        430,
+        190
+      ],
+      "flags": {},
+      "order": 12,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "name",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "name"
+          }
+        },
+        {
+          "name": "value",
+          "type": "INT",
+          "link": null,
+          "widget": {
+            "name": "value"
+          }
+        },
+        {
+          "name": "ui_order",
+          "type": "INT",
+          "link": null,
+          "widget": {
+            "name": "ui_order"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "seed",
+          "type": "INT",
+          "links": [
+            11
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "StimmaSeedParam"
+      },
+      "widgets_values": [
+        "seed",
+        0,
+        99
+      ]
+    },
+    {
+      "id": 14,
+      "type": "StimmaLayoutGroup",
+      "pos": [
+        1580,
+        1060
+      ],
+      "size": [
+        430,
+        190
+      ],
+      "flags": {},
+      "order": 13,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "group_label",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "group_label"
+          }
+        },
+        {
+          "name": "param_names",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "param_names"
+          }
+        },
+        {
+          "name": "collapsed",
+          "type": "BOOLEAN",
+          "link": null,
+          "widget": {
+            "name": "collapsed"
+          }
+        },
+        {
+          "name": "ui_order",
+          "type": "INT",
+          "link": null,
+          "widget": {
+            "name": "ui_order"
+          }
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "Node name for S&R": "StimmaLayoutGroup"
+      },
+      "widgets_values": [
+        "Speech settings",
+        "temperature\ntop_p\ntop_k\nmax_new_tokens\nrepetition_penalty",
+        true,
+        10
+      ]
+    }
+  ],
+  "links": [
+    [
+      1,
+      2,
+      0,
+      3,
+      0,
+      "STRING"
+    ],
+    [
+      2,
+      3,
+      0,
+      4,
+      0,
+      "AUDIO"
+    ],
+    [
+      3,
+      5,
+      0,
+      3,
+      5,
+      "*"
+    ],
+    [
+      4,
+      6,
+      0,
+      3,
+      1,
+      "*"
+    ],
+    [
+      5,
+      7,
+      0,
+      3,
+      7,
+      "STRING"
+    ],
+    [
+      6,
+      8,
+      0,
+      3,
+      11,
+      "FLOAT"
+    ],
+    [
+      7,
+      9,
+      0,
+      3,
+      9,
+      "FLOAT"
+    ],
+    [
+      8,
+      10,
+      0,
+      3,
+      10,
+      "INT"
+    ],
+    [
+      9,
+      11,
+      0,
+      3,
+      8,
+      "INT"
+    ],
+    [
+      10,
+      12,
+      0,
+      3,
+      12,
+      "FLOAT"
+    ],
+    [
+      11,
+      13,
+      0,
+      3,
+      6,
+      "INT"
+    ]
+  ],
+  "groups": [],
+  "config": {},
+  "extra": {
+    "ds": {
+      "scale": 0.65,
+      "offset": [
+        620,
+        100
+      ]
+    }
+  },
+  "version": 0.4
+}

@@ -1,4 +1,4 @@
-"""Paths and pinned sources for the optional isolated MOSS audio runtime."""
+"""Audio pipeline dependencies and paths for the isolated MOSS runtime."""
 
 import os
 from pathlib import Path
@@ -27,6 +27,32 @@ MOSS_FILES = (
     "transformer/config.json", "transformer/diffusion_pytorch_model.safetensors",
     "vae/config.json", "vae/vae_128d_48k.pth",
 )
+
+QWEN_TTS_MODELS = {
+    "FB_Qwen3TTSCustomVoice": "CustomVoice",
+    "FB_Qwen3TTSVoiceDesign": "VoiceDesign",
+    "FB_Qwen3TTSVoiceClone": "Base",
+}
+QWEN_TTS_FILES = (
+    "config.json", "generation_config.json", "merges.txt", "model.safetensors",
+    "preprocessor_config.json", "tokenizer_config.json", "vocab.json",
+    "speech_tokenizer/config.json", "speech_tokenizer/configuration.json",
+    "speech_tokenizer/model.safetensors", "speech_tokenizer/preprocessor_config.json",
+)
+QWEN_TOKENIZER_FILES = (
+    "config.json", "configuration.json", "model.safetensors", "preprocessor_config.json",
+)
+
+
+def qwen_tts_dependencies(model_roots, class_type, family="1.7B"):
+    """The node pack selects a model family rather than individual files."""
+    kind = QWEN_TTS_MODELS[class_type]
+    model = f"Qwen3-TTS-12Hz-{family}-{kind}"
+    files = [f"{model}/{name}" for name in QWEN_TTS_FILES]
+    files += [f"Qwen3-TTS-Tokenizer-12Hz/{name}" for name in QWEN_TOKENIZER_FILES]
+    return [{"filename": name, "folder": "qwen-tts",
+             "installed": any((Path(root) / name).is_file() for root in model_roots)}
+            for name in files]
 
 
 def runtime_python():

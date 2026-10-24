@@ -25,6 +25,75 @@ pip install -r ComfyUI-Stimma/requirements.txt
 
 Restart ComfyUI. The plugin registers its nodes and starts the STP server automatically.
 
+## Qwen3-TTS
+
+Three bundled workflows use the 1.7B Qwen3-TTS models locally:
+
+- **Qwen3-TTS Custom Voice** (`qwen3-tts-custom-voice`): choose a preset speaker
+  and give delivery instructions. Aiden and Ryan are native English voices.
+- **Qwen3-TTS Voice Design** (`qwen3-tts-voice-design`): describe a voice and
+  speak sample text. Reuse an accepted sample with Voice Clone for consistent
+  identity across subsequent jobs.
+- **Qwen3-TTS Voice Clone** (`qwen3-tts-voice-clone`): supply one clean speech
+  reference and new text. Qwen3-ASR transcribes the reference automatically.
+
+Workflow setup installs
+[ComfyUI-Qwen-TTS](https://github.com/flybirdxx/ComfyUI-Qwen-TTS) and downloads
+the selected model and its shared speech tokenizer into `models/qwen-tts`.
+The clone workflow also needs ComfyUI-Drama3's Qwen3-ASR nodes and 0.6B ASR
+checkpoint. Model files are pinned and SHA-256 verified by the manager.
+
+The node pack was tested at revision
+`374c2e05dc705231258237a16258d2f8fae8e32a`, which supports Transformers 5 as
+well as 4.57.3. Do not downgrade an existing ComfyUI environment to install it.
+Install missing dependencies from the pack's requirements using the same Python
+environment as ComfyUI. The bundled workflows use PyTorch SDPA attention,
+BF16 where supported, and release their TTS model after generation.
+
+Put the words to speak in `prompt` and voice/delivery directions in `instruct`.
+Choose the target `language` explicitly. For long narration, render sentence
+or paragraph sections with the same speaker or reference, then assemble and
+check the audio before producing video. The speech-token limit is a cap, not
+a target duration. Output is a 24 kHz mono WAV.
+
+## Fish Audio Drama 3
+
+Three bundled workflows run speech generation locally:
+
+- **Fish Audio Drama 3** (`fish-audio-drama-3-tts`): text to speech with a
+  seed-generated voice. Use voice cloning to keep a chosen voice across jobs.
+- **Fish Audio Drama 3 Voice Clone** (`fish-audio-drama-3-voice-clone`): supply
+  one voice reference and the text to speak. The reference is transcribed
+  automatically with Qwen3-ASR.
+- **Fish Audio Drama 3 Dialogue** (`fish-audio-drama-3-dialogue`): supply two
+  references, in speaker 0 / speaker 1 order, and start each script line with
+  `<|speaker:0|>` or `<|speaker:1|>`.
+
+Use the manager's workflow setup to install
+[ComfyUI-Drama3](https://github.com/PedroMarinhoDev/ComfyUI-Drama3) and download
+the models, then restart ComfyUI. The workflows were tested with node-pack
+revision `67a733a96890637dc27b1914974ad00c569405fb`. The pack uses ComfyUI's
+existing dependencies; no additional Python environment is required.
+
+Model downloads are pinned and SHA-256 verified: the original FP8 expert
+weights (`drama3_fp8experts_bf16.safetensors`, 38.6 GB) go in
+`models/diffusion_models`, the codec (1.6 GB) in `models/vae`, and Qwen3-ASR
+0.6B (1.6 GB, for the reference workflows) in `models/asr`. The default keeps
+experts in system RAM and caches active experts in VRAM. Upstream recommends
+an NVIDIA GPU with at least 8 GB VRAM and about 48 GB system RAM for FP8.
+
+The prompt contains the words to speak. Use `[laughs]`, `[sighs]`, `[whispers]`,
+or natural-language directions for delivery; parentheses are spoken. Voice
+references should contain a few seconds of clean speech from one speaker,
+cut between sentences so automatic transcription covers the whole clip.
+
+Long scripts are split automatically with earlier speech as context. The
+advanced `max_frames` setting limits **each chunk**, not the whole recording
+(600 frames is about 28 seconds). Increase it for slow delivery; reaching it
+can truncate speech. The defaults are temperature 1.0, top-p 0.9, and top-k 0
+(no candidate cap). If a take becomes silent or skips words, try a new seed
+or another reference. Output is a 44.1 kHz mono WAV. Built with Fish Audio.
+
 ## MOSS-Image
 
 `MOSS-Image SFT` (`moss-image-sft`) is the recommended everyday generation

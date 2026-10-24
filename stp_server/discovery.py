@@ -342,6 +342,9 @@ _LOADER_FOLDER_HINTS = {
     ("AudioEncoderLoader", "audio_encoder_name"): "audio_encoders",
     ("ModelPatchLoader", "name"): "model_patches",
     ("StyleModelLoader", "style_model_name"): "style_models",
+    ("Drama3Loader", "model_name"): "diffusion_models",
+    ("Drama3CodecLoader", "codec_name"): "vae",
+    ("Qwen3ASRLoader", "model_name"): "asr",
 }
 
 
@@ -388,6 +391,26 @@ def _validate_workflow(
 
     for node_id, node_data in api_prompt.items():
         class_type = node_data.get("class_type", "")
+
+        if class_type in {"FB_Qwen3TTSCustomVoice", "FB_Qwen3TTSVoiceDesign", "FB_Qwen3TTSVoiceClone"} and class_type in object_info:
+            try:
+                import folder_paths
+                from audio_runtime import qwen_tts_dependencies
+                roots = folder_paths.get_folder_paths("qwen-tts")
+                roots = [*roots, os.path.join(folder_paths.models_dir, "qwen-tts")]
+                family = node_data.get("inputs", {}).get("model_choice", "1.7B")
+                optional = str(node_id) in optional_nodes
+                for dependency in qwen_tts_dependencies(roots, class_type, family):
+                    if dependency["installed"] or dependency["filename"] in seen_missing_models:
+                        continue
+                    seen_missing_models.add(dependency["filename"])
+                    if not optional:
+                        warnings.append(f"missing model: {dependency['filename']}")
+                    issues.append({"kind": "missing_model", "name": dependency["filename"],
+                                   "folder": dependency["folder"], "class_type": class_type,
+                                   "optional": optional})
+            except ImportError:
+                pass  # Offline workflow inspection has no ComfyUI filesystem.
 
         if class_type == "StimmaMossSoundEffect" and class_type in object_info:
             # The runtime and pipeline files are ordinary setup dependencies,
@@ -2007,13 +2030,15 @@ def _collect_model_hints(data: Any) -> Dict[str, Dict[str, Any]]:
             url = m.get("url")
             if not name or not url:
                 continue
-            base = os.path.basename(str(name).replace("\\", "/"))
-            hints.setdefault(base, {
+            filename = str(name).replace("\\", "/")
+            hint = {
                 "url": url,
                 "directory": m.get("directory"),
                 "hash": m.get("hash"),
                 "hash_type": m.get("hash_type"),
-            })
+            }
+            hints.setdefault(filename, hint)
+            hints.setdefault(os.path.basename(filename), hint)
     # Subgraph definitions (frontend >= 1.20) carry their own nodes
     if isinstance(data, dict):
         for sg in (data.get("definitions") or {}).get("subgraphs", []) or []:

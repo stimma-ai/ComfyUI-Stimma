@@ -1,0 +1,1655 @@
+{
+  "last_node_id": 19,
+  "last_link_id": 18,
+  "nodes": [
+    {
+      "id": 1,
+      "type": "StimmaToolInfo",
+      "pos": [
+        -550,
+        0
+      ],
+      "size": [
+        430,
+        190
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "slug",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "slug"
+          }
+        },
+        {
+          "name": "display_name",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "display_name"
+          }
+        },
+        {
+          "name": "task_types",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "task_types"
+          }
+        },
+        {
+          "name": "badges",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "badges"
+          }
+        },
+        {
+          "name": "description",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "description"
+          }
+        },
+        {
+          "name": "model_vendor",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "model_vendor"
+          }
+        },
+        {
+          "name": "model",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "model"
+          }
+        },
+        {
+          "name": "instructions",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "instructions"
+          }
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "Node name for S&R": "StimmaToolInfo"
+      },
+      "widgets_values": [
+        "fish-audio-drama-3-voice-clone",
+        "Fish Audio Drama 3 Voice Clone",
+        "text-to-speech",
+        "",
+        "Generate speech locally in the voice of a supplied audio reference. The reference is transcribed automatically; long text is generated in chunks with prior speech as context.",
+        "Fish Audio",
+        "Drama 3",
+        "The prompt is the exact text to speak. Place cues such as [sighs], [laughs], or [whispers] where they should happen; parentheses are spoken aloud. Long text is split automatically. If a take becomes silent or skips words, retry with another seed or a different reference. Supply exactly one clean voice reference in input_audios (a few seconds, one speaker, cut between sentences). It controls voice identity, not the words spoken. Use plain text or <|speaker:0|> for this voice. The per-chunk generation limit can truncate slow or very long speech; it is not a target duration. Check that the full script was spoken."
+      ]
+    },
+    {
+      "id": 2,
+      "type": "StimmaPromptParam",
+      "pos": [
+        -550,
+        290
+      ],
+      "size": [
+        480,
+        250
+      ],
+      "flags": {},
+      "order": 1,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "name",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "name"
+          }
+        },
+        {
+          "name": "default_text",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "default_text"
+          }
+        },
+        {
+          "name": "required",
+          "type": "BOOLEAN",
+          "link": null,
+          "widget": {
+            "name": "required"
+          }
+        },
+        {
+          "name": "ui_order",
+          "type": "INT",
+          "link": null,
+          "widget": {
+            "name": "ui_order"
+          }
+        },
+        {
+          "name": "ui_description",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "ui_description"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "text",
+          "type": "STRING",
+          "links": [
+            2
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "StimmaPromptParam"
+      },
+      "widgets_values": [
+        "prompt",
+        "Welcome! Let’s make something wonderful together.",
+        true,
+        0,
+        "Write the words to speak. Use [laughs], [sighs], or [whispers] for expressive cues."
+      ]
+    },
+    {
+      "id": 3,
+      "type": "Drama3Loader",
+      "pos": [
+        50,
+        0
+      ],
+      "size": [
+        430,
+        190
+      ],
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "model_name",
+          "type": "COMBO",
+          "link": null,
+          "widget": {
+            "name": "model_name"
+          }
+        },
+        {
+          "name": "experts",
+          "type": "COMBO",
+          "link": null,
+          "widget": {
+            "name": "experts"
+          }
+        },
+        {
+          "name": "expert_cache_gb",
+          "type": "FLOAT",
+          "link": null,
+          "widget": {
+            "name": "expert_cache_gb"
+          }
+        },
+        {
+          "name": "second_gpu",
+          "type": "COMBO",
+          "link": null,
+          "widget": {
+            "name": "second_gpu"
+          }
+        },
+        {
+          "name": "split_layer",
+          "type": "INT",
+          "link": null,
+          "widget": {
+            "name": "split_layer"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "DRAMA3_MODEL",
+          "type": "DRAMA3_MODEL",
+          "links": [
+            1
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "Drama3Loader",
+        "aux_id": "PedroMarinhoDev/ComfyUI-Drama3",
+        "models": [
+          {
+            "name": "drama3_fp8experts_bf16.safetensors",
+            "url": "https://huggingface.co/PedroMarinhoDev/Drama-3-ComfyUI/resolve/681e2fae64af1f12e64b9c19c82930a5f3bba1a4/drama3_fp8experts_bf16.safetensors",
+            "directory": "diffusion_models",
+            "hash": "5d053a200cf0f77faa13c087c78ef200c3b53f288451a6b9e7a8fa421c03a67b",
+            "hash_type": "sha256"
+          }
+        ]
+      },
+      "widgets_values": [
+        "drama3_fp8experts_bf16.safetensors",
+        "in RAM",
+        0.0,
+        "none",
+        0
+      ]
+    },
+    {
+      "id": 4,
+      "type": "Drama3CodecLoader",
+      "pos": [
+        50,
+        240
+      ],
+      "size": [
+        430,
+        190
+      ],
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "codec_name",
+          "type": "COMBO",
+          "link": null,
+          "widget": {
+            "name": "codec_name"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "DRAMA3_CODEC",
+          "type": "DRAMA3_CODEC",
+          "links": [
+            3,
+            8
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "Drama3CodecLoader",
+        "aux_id": "PedroMarinhoDev/ComfyUI-Drama3",
+        "models": [
+          {
+            "name": "drama3_codec.safetensors",
+            "url": "https://huggingface.co/PedroMarinhoDev/Drama-3-ComfyUI/resolve/681e2fae64af1f12e64b9c19c82930a5f3bba1a4/drama3_codec.safetensors",
+            "directory": "vae",
+            "hash": "4fecf102907a48414230da9a74d72d07c3a92368eab53fab655797837bddf5ae",
+            "hash_type": "sha256"
+          }
+        ]
+      },
+      "widgets_values": [
+        "drama3_codec.safetensors"
+      ]
+    },
+    {
+      "id": 5,
+      "type": "Drama3Generate",
+      "pos": [
+        650,
+        0
+      ],
+      "size": [
+        540,
+        420
+      ],
+      "flags": {},
+      "order": 4,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "model",
+          "type": "DRAMA3_MODEL",
+          "link": 1
+        },
+        {
+          "name": "text",
+          "type": "STRING",
+          "link": 2,
+          "widget": {
+            "name": "text"
+          }
+        },
+        {
+          "name": "voices.voice0",
+          "type": "DRAMA3_VOICE",
+          "link": 11
+        },
+        {
+          "name": "voices.voice1",
+          "type": "DRAMA3_VOICE",
+          "link": null,
+          "shape": 7
+        },
+        {
+          "name": "seed",
+          "type": "INT",
+          "link": 18,
+          "widget": {
+            "name": "seed"
+          }
+        },
+        {
+          "name": "temperature",
+          "type": "FLOAT",
+          "link": 12,
+          "widget": {
+            "name": "temperature"
+          }
+        },
+        {
+          "name": "top_p",
+          "type": "FLOAT",
+          "link": 13,
+          "widget": {
+            "name": "top_p"
+          }
+        },
+        {
+          "name": "top_k",
+          "type": "INT",
+          "link": 14,
+          "widget": {
+            "name": "top_k"
+          }
+        },
+        {
+          "name": "max_frames",
+          "type": "INT",
+          "link": 15,
+          "widget": {
+            "name": "max_frames"
+          }
+        },
+        {
+          "name": "split_long_text",
+          "type": "BOOLEAN",
+          "link": 16,
+          "widget": {
+            "name": "split_long_text"
+          }
+        },
+        {
+          "name": "speakers",
+          "type": "COMBO",
+          "link": null,
+          "widget": {
+            "name": "speakers"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "codes",
+          "type": "DRAMA3_CODES",
+          "links": [
+            4
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "Drama3Generate",
+        "aux_id": "PedroMarinhoDev/ComfyUI-Drama3"
+      },
+      "widgets_values": [
+        "Welcome! Let’s make something wonderful together.",
+        0,
+        "fixed",
+        1.0,
+        0.9,
+        0,
+        600,
+        true,
+        "one take per line"
+      ]
+    },
+    {
+      "id": 6,
+      "type": "Drama3Decode",
+      "pos": [
+        1260,
+        0
+      ],
+      "size": [
+        430,
+        190
+      ],
+      "flags": {},
+      "order": 5,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "codec",
+          "type": "DRAMA3_CODEC",
+          "link": 3
+        },
+        {
+          "name": "codes",
+          "type": "DRAMA3_CODES",
+          "link": 4
+        },
+        {
+          "name": "shorten_long_pauses",
+          "type": "BOOLEAN",
+          "link": 17,
+          "widget": {
+            "name": "shorten_long_pauses"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "audio",
+          "type": "AUDIO",
+          "links": [
+            5
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "Drama3Decode",
+        "aux_id": "PedroMarinhoDev/ComfyUI-Drama3"
+      },
+      "widgets_values": [
+        true
+      ]
+    },
+    {
+      "id": 7,
+      "type": "StimmaAudioOutput",
+      "pos": [
+        1740,
+        0
+      ],
+      "size": [
+        430,
+        190
+      ],
+      "flags": {},
+      "order": 6,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "audio",
+          "type": "AUDIO",
+          "link": 5
+        },
+        {
+          "name": "filename_prefix",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "filename_prefix"
+          }
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "Node name for S&R": "StimmaAudioOutput"
+      },
+      "widgets_values": [
+        "Stimma/fish-audio-drama-3-voice-clone"
+      ]
+    },
+    {
+      "id": 8,
+      "type": "Qwen3ASRLoader",
+      "pos": [
+        50,
+        500
+      ],
+      "size": [
+        430,
+        190
+      ],
+      "flags": {},
+      "order": 7,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "model_name",
+          "type": "COMBO",
+          "link": null,
+          "widget": {
+            "name": "model_name"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "QWEN3_ASR_MODEL",
+          "type": "QWEN3_ASR_MODEL",
+          "links": [
+            6
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "Qwen3ASRLoader",
+        "aux_id": "PedroMarinhoDev/ComfyUI-Drama3",
+        "models": [
+          {
+            "name": "qwen3_asr_0.6b_bf16.safetensors",
+            "url": "https://huggingface.co/PedroMarinhoDev/Qwen3-ASR-ComfyUI/resolve/6ad8c9be026925839479a8d97749068a4202fbe9/qwen3_asr_0.6b_bf16.safetensors",
+            "directory": "asr",
+            "hash": "eb350ce7510a538eb136d8320db470a0761713c47de6e12b0fca090d4fc15ecf",
+            "hash_type": "sha256"
+          }
+        ]
+      },
+      "widgets_values": [
+        "qwen3_asr_0.6b_bf16.safetensors"
+      ]
+    },
+    {
+      "id": 9,
+      "type": "StimmaAudioParam",
+      "pos": [
+        -550,
+        620
+      ],
+      "size": [
+        430,
+        190
+      ],
+      "flags": {},
+      "order": 8,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "audio",
+          "type": "COMBO",
+          "link": null,
+          "widget": {
+            "name": "audio"
+          }
+        },
+        {
+          "name": "required",
+          "type": "BOOLEAN",
+          "link": null,
+          "widget": {
+            "name": "required"
+          }
+        },
+        {
+          "name": "ui_control",
+          "type": "COMBO",
+          "link": null,
+          "widget": {
+            "name": "ui_control"
+          }
+        },
+        {
+          "name": "ui_order",
+          "type": "INT",
+          "link": null,
+          "widget": {
+            "name": "ui_order"
+          }
+        },
+        {
+          "name": "ui_label",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "ui_label"
+          }
+        },
+        {
+          "name": "audio_role",
+          "type": "COMBO",
+          "link": null,
+          "widget": {
+            "name": "audio_role"
+          }
+        },
+        {
+          "name": "instructions",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "instructions"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "audio",
+          "type": "AUDIO",
+          "links": [
+            7,
+            9
+          ]
+        },
+        {
+          "name": "duration",
+          "type": "FLOAT",
+          "links": []
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "StimmaAudioParam"
+      },
+      "widgets_values": [
+        "",
+        true,
+        "audio_picker",
+        1,
+        "Voice reference",
+        "reference",
+        "Clean voice reference for speaker 0. A few seconds of one speaker, cut between sentences. This defines voice identity; the prompt supplies the words to speak."
+      ]
+    },
+    {
+      "id": 10,
+      "type": "Qwen3ASRTranscribe",
+      "pos": [
+        50,
+        740
+      ],
+      "size": [
+        430,
+        190
+      ],
+      "flags": {},
+      "order": 9,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "model",
+          "type": "QWEN3_ASR_MODEL",
+          "link": 6
+        },
+        {
+          "name": "audio",
+          "type": "AUDIO",
+          "link": 7
+        },
+        {
+          "name": "language",
+          "type": "COMBO",
+          "link": null,
+          "widget": {
+            "name": "language"
+          }
+        },
+        {
+          "name": "context",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "context"
+          }
+        },
+        {
+          "name": "max_new_tokens",
+          "type": "INT",
+          "link": null,
+          "widget": {
+            "name": "max_new_tokens"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "text",
+          "type": "STRING",
+          "links": [
+            10
+          ]
+        },
+        {
+          "name": "language",
+          "type": "STRING",
+          "links": []
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "Qwen3ASRTranscribe",
+        "aux_id": "PedroMarinhoDev/ComfyUI-Drama3"
+      },
+      "widgets_values": [
+        "auto",
+        "",
+        4096
+      ]
+    },
+    {
+      "id": 11,
+      "type": "Drama3EncodeVoice",
+      "pos": [
+        650,
+        600
+      ],
+      "size": [
+        430,
+        190
+      ],
+      "flags": {},
+      "order": 10,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "codec",
+          "type": "DRAMA3_CODEC",
+          "link": 8
+        },
+        {
+          "name": "audio",
+          "type": "AUDIO",
+          "link": 9
+        },
+        {
+          "name": "transcript",
+          "type": "STRING",
+          "link": 10,
+          "widget": {
+            "name": "transcript"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "voice",
+          "type": "DRAMA3_VOICE",
+          "links": [
+            11
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "Drama3EncodeVoice",
+        "aux_id": "PedroMarinhoDev/ComfyUI-Drama3"
+      },
+      "widgets_values": [
+        ""
+      ]
+    },
+    {
+      "id": 12,
+      "type": "StimmaFloatParam",
+      "pos": [
+        1260,
+        300
+      ],
+      "size": [
+        430,
+        190
+      ],
+      "flags": {},
+      "order": 11,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "name",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "name"
+          }
+        },
+        {
+          "name": "value",
+          "type": "FLOAT",
+          "link": null,
+          "widget": {
+            "name": "value"
+          }
+        },
+        {
+          "name": "minimum",
+          "type": "FLOAT",
+          "link": null,
+          "widget": {
+            "name": "minimum"
+          }
+        },
+        {
+          "name": "maximum",
+          "type": "FLOAT",
+          "link": null,
+          "widget": {
+            "name": "maximum"
+          }
+        },
+        {
+          "name": "step",
+          "type": "FLOAT",
+          "link": null,
+          "widget": {
+            "name": "step"
+          }
+        },
+        {
+          "name": "ui_control",
+          "type": "COMBO",
+          "link": null,
+          "widget": {
+            "name": "ui_control"
+          }
+        },
+        {
+          "name": "ui_order",
+          "type": "INT",
+          "link": null,
+          "widget": {
+            "name": "ui_order"
+          }
+        },
+        {
+          "name": "ui_description",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "ui_description"
+          }
+        },
+        {
+          "name": "ui_format",
+          "type": "COMBO",
+          "link": null,
+          "widget": {
+            "name": "ui_format"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "value",
+          "type": "FLOAT",
+          "links": [
+            12
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "StimmaFloatParam"
+      },
+      "widgets_values": [
+        "temperature",
+        1.0,
+        0.0,
+        2.0,
+        0.05,
+        "slider",
+        10,
+        "Sampling temperature. The recommended starting point is 1.0; lower values can produce silence.",
+        ""
+      ]
+    },
+    {
+      "id": 13,
+      "type": "StimmaFloatParam",
+      "pos": [
+        1750,
+        300
+      ],
+      "size": [
+        430,
+        190
+      ],
+      "flags": {},
+      "order": 12,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "name",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "name"
+          }
+        },
+        {
+          "name": "value",
+          "type": "FLOAT",
+          "link": null,
+          "widget": {
+            "name": "value"
+          }
+        },
+        {
+          "name": "minimum",
+          "type": "FLOAT",
+          "link": null,
+          "widget": {
+            "name": "minimum"
+          }
+        },
+        {
+          "name": "maximum",
+          "type": "FLOAT",
+          "link": null,
+          "widget": {
+            "name": "maximum"
+          }
+        },
+        {
+          "name": "step",
+          "type": "FLOAT",
+          "link": null,
+          "widget": {
+            "name": "step"
+          }
+        },
+        {
+          "name": "ui_control",
+          "type": "COMBO",
+          "link": null,
+          "widget": {
+            "name": "ui_control"
+          }
+        },
+        {
+          "name": "ui_order",
+          "type": "INT",
+          "link": null,
+          "widget": {
+            "name": "ui_order"
+          }
+        },
+        {
+          "name": "ui_description",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "ui_description"
+          }
+        },
+        {
+          "name": "ui_format",
+          "type": "COMBO",
+          "link": null,
+          "widget": {
+            "name": "ui_format"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "value",
+          "type": "FLOAT",
+          "links": [
+            13
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "StimmaFloatParam"
+      },
+      "widgets_values": [
+        "top_p",
+        0.9,
+        0.05,
+        1.0,
+        0.05,
+        "slider",
+        11,
+        "Nucleus sampling. Start at 0.9.",
+        ""
+      ]
+    },
+    {
+      "id": 14,
+      "type": "StimmaIntParam",
+      "pos": [
+        1260,
+        590
+      ],
+      "size": [
+        430,
+        190
+      ],
+      "flags": {},
+      "order": 13,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "name",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "name"
+          }
+        },
+        {
+          "name": "value",
+          "type": "INT",
+          "link": null,
+          "widget": {
+            "name": "value"
+          }
+        },
+        {
+          "name": "minimum",
+          "type": "INT",
+          "link": null,
+          "widget": {
+            "name": "minimum"
+          }
+        },
+        {
+          "name": "maximum",
+          "type": "INT",
+          "link": null,
+          "widget": {
+            "name": "maximum"
+          }
+        },
+        {
+          "name": "step",
+          "type": "INT",
+          "link": null,
+          "widget": {
+            "name": "step"
+          }
+        },
+        {
+          "name": "ui_control",
+          "type": "COMBO",
+          "link": null,
+          "widget": {
+            "name": "ui_control"
+          }
+        },
+        {
+          "name": "ui_order",
+          "type": "INT",
+          "link": null,
+          "widget": {
+            "name": "ui_order"
+          }
+        },
+        {
+          "name": "ui_description",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "ui_description"
+          }
+        },
+        {
+          "name": "ui_format",
+          "type": "COMBO",
+          "link": null,
+          "widget": {
+            "name": "ui_format"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "value",
+          "type": "INT",
+          "links": [
+            14
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "StimmaIntParam"
+      },
+      "widgets_values": [
+        "top_k",
+        0,
+        0,
+        4096,
+        1,
+        "slider",
+        12,
+        "Candidate limit. Zero disables the limit, which helps avoid silent takes.",
+        ""
+      ]
+    },
+    {
+      "id": 15,
+      "type": "StimmaIntParam",
+      "pos": [
+        1750,
+        590
+      ],
+      "size": [
+        430,
+        190
+      ],
+      "flags": {},
+      "order": 14,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "name",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "name"
+          }
+        },
+        {
+          "name": "value",
+          "type": "INT",
+          "link": null,
+          "widget": {
+            "name": "value"
+          }
+        },
+        {
+          "name": "minimum",
+          "type": "INT",
+          "link": null,
+          "widget": {
+            "name": "minimum"
+          }
+        },
+        {
+          "name": "maximum",
+          "type": "INT",
+          "link": null,
+          "widget": {
+            "name": "maximum"
+          }
+        },
+        {
+          "name": "step",
+          "type": "INT",
+          "link": null,
+          "widget": {
+            "name": "step"
+          }
+        },
+        {
+          "name": "ui_control",
+          "type": "COMBO",
+          "link": null,
+          "widget": {
+            "name": "ui_control"
+          }
+        },
+        {
+          "name": "ui_order",
+          "type": "INT",
+          "link": null,
+          "widget": {
+            "name": "ui_order"
+          }
+        },
+        {
+          "name": "ui_description",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "ui_description"
+          }
+        },
+        {
+          "name": "ui_format",
+          "type": "COMBO",
+          "link": null,
+          "widget": {
+            "name": "ui_format"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "value",
+          "type": "INT",
+          "links": [
+            15
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "StimmaIntParam"
+      },
+      "widgets_values": [
+        "max_frames",
+        600,
+        1,
+        8192,
+        1,
+        "slider",
+        13,
+        "Maximum audio frames per text chunk (about 21.5 frames per second). Increase for slow delivery; reaching this limit can cut speech short.",
+        ""
+      ]
+    },
+    {
+      "id": 16,
+      "type": "StimmaBoolParam",
+      "pos": [
+        1260,
+        880
+      ],
+      "size": [
+        430,
+        190
+      ],
+      "flags": {},
+      "order": 15,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "name",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "name"
+          }
+        },
+        {
+          "name": "value",
+          "type": "BOOLEAN",
+          "link": null,
+          "widget": {
+            "name": "value"
+          }
+        },
+        {
+          "name": "ui_order",
+          "type": "INT",
+          "link": null,
+          "widget": {
+            "name": "ui_order"
+          }
+        },
+        {
+          "name": "ui_description",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "ui_description"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "value",
+          "type": "BOOLEAN",
+          "links": [
+            16
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "StimmaBoolParam"
+      },
+      "widgets_values": [
+        "split_long_text",
+        true,
+        14,
+        "Split long scripts into chunks while retaining prior speech as context."
+      ]
+    },
+    {
+      "id": 17,
+      "type": "StimmaBoolParam",
+      "pos": [
+        1750,
+        880
+      ],
+      "size": [
+        430,
+        190
+      ],
+      "flags": {},
+      "order": 16,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "name",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "name"
+          }
+        },
+        {
+          "name": "value",
+          "type": "BOOLEAN",
+          "link": null,
+          "widget": {
+            "name": "value"
+          }
+        },
+        {
+          "name": "ui_order",
+          "type": "INT",
+          "link": null,
+          "widget": {
+            "name": "ui_order"
+          }
+        },
+        {
+          "name": "ui_description",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "ui_description"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "value",
+          "type": "BOOLEAN",
+          "links": [
+            17
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "StimmaBoolParam"
+      },
+      "widgets_values": [
+        "shorten_long_pauses",
+        true,
+        15,
+        "Trim silent edges and shorten pauses longer than 0.75 seconds."
+      ]
+    },
+    {
+      "id": 18,
+      "type": "StimmaSeedParam",
+      "pos": [
+        -550,
+        1580
+      ],
+      "size": [
+        430,
+        190
+      ],
+      "flags": {},
+      "order": 17,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "name",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "name"
+          }
+        },
+        {
+          "name": "value",
+          "type": "INT",
+          "link": null,
+          "widget": {
+            "name": "value"
+          }
+        },
+        {
+          "name": "ui_order",
+          "type": "INT",
+          "link": null,
+          "widget": {
+            "name": "ui_order"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "seed",
+          "type": "INT",
+          "links": [
+            18
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "StimmaSeedParam"
+      },
+      "widgets_values": [
+        "seed",
+        0,
+        99
+      ]
+    },
+    {
+      "id": 19,
+      "type": "StimmaLayoutGroup",
+      "pos": [
+        1740,
+        1180
+      ],
+      "size": [
+        430,
+        190
+      ],
+      "flags": {},
+      "order": 18,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "group_label",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "group_label"
+          }
+        },
+        {
+          "name": "param_names",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "param_names"
+          }
+        },
+        {
+          "name": "collapsed",
+          "type": "BOOLEAN",
+          "link": null,
+          "widget": {
+            "name": "collapsed"
+          }
+        },
+        {
+          "name": "ui_order",
+          "type": "INT",
+          "link": null,
+          "widget": {
+            "name": "ui_order"
+          }
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "Node name for S&R": "StimmaLayoutGroup"
+      },
+      "widgets_values": [
+        "Speech settings",
+        "temperature\ntop_p\ntop_k\nmax_frames\nsplit_long_text\nshorten_long_pauses",
+        true,
+        10
+      ]
+    }
+  ],
+  "links": [
+    [
+      1,
+      3,
+      0,
+      5,
+      0,
+      "DRAMA3_MODEL"
+    ],
+    [
+      2,
+      2,
+      0,
+      5,
+      1,
+      "STRING"
+    ],
+    [
+      3,
+      4,
+      0,
+      6,
+      0,
+      "DRAMA3_CODEC"
+    ],
+    [
+      4,
+      5,
+      0,
+      6,
+      1,
+      "DRAMA3_CODES"
+    ],
+    [
+      5,
+      6,
+      0,
+      7,
+      0,
+      "AUDIO"
+    ],
+    [
+      6,
+      8,
+      0,
+      10,
+      0,
+      "QWEN3_ASR_MODEL"
+    ],
+    [
+      7,
+      9,
+      0,
+      10,
+      1,
+      "AUDIO"
+    ],
+    [
+      8,
+      4,
+      0,
+      11,
+      0,
+      "DRAMA3_CODEC"
+    ],
+    [
+      9,
+      9,
+      0,
+      11,
+      1,
+      "AUDIO"
+    ],
+    [
+      10,
+      10,
+      0,
+      11,
+      2,
+      "STRING"
+    ],
+    [
+      11,
+      11,
+      0,
+      5,
+      2,
+      "DRAMA3_VOICE"
+    ],
+    [
+      12,
+      12,
+      0,
+      5,
+      5,
+      "FLOAT"
+    ],
+    [
+      13,
+      13,
+      0,
+      5,
+      6,
+      "FLOAT"
+    ],
+    [
+      14,
+      14,
+      0,
+      5,
+      7,
+      "INT"
+    ],
+    [
+      15,
+      15,
+      0,
+      5,
+      8,
+      "INT"
+    ],
+    [
+      16,
+      16,
+      0,
+      5,
+      9,
+      "BOOLEAN"
+    ],
+    [
+      17,
+      17,
+      0,
+      6,
+      2,
+      "BOOLEAN"
+    ],
+    [
+      18,
+      18,
+      0,
+      5,
+      4,
+      "INT"
+    ]
+  ],
+  "groups": [],
+  "config": {},
+  "extra": {
+    "ds": {
+      "scale": 0.65,
+      "offset": [
+        620,
+        100
+      ]
+    }
+  },
+  "version": 0.4
+}

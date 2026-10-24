@@ -65,7 +65,7 @@ def resolve_source(filename: str, hints: Optional[Dict[str, Dict[str, Any]]] = N
 
     # 1. embedded workflow hint
     if hints:
-        h = hints.get(base) or hints.get(fname)
+        h = hints.get(fname) or hints.get(base)
         if h and h.get("url"):
             sha = None
             if h.get("hash") and (h.get("hash_type") or "").lower() in ("", "sha256") and len(str(h["hash"])) == 64:
