@@ -1075,7 +1075,7 @@
           "widget": {
             "name": "path_filter",
             "config": {
-              "default": "sdxl/**"
+              "default": "moss-image/**"
             }
           },
           "link": null
