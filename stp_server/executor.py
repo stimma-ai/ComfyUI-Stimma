@@ -1309,8 +1309,8 @@ def _is_input_required(
             prefix = template.get("prefix")
             if prefix and member.startswith(prefix):
                 suffix = member[len(prefix):]
-                if suffix.isdigit() and 1 <= int(suffix) <= template.get("max", 100):
-                    return int(suffix) <= minimum
+                if suffix.isdigit() and 0 <= int(suffix) < template.get("max", 100):
+                    return int(suffix) < minimum
     # If in required, or if we can't determine, assume required
     return True
 

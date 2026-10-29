@@ -97,12 +97,13 @@ class MossImageTests(unittest.TestCase):
                     _strip_unprovided_input_chains(api, ['121', '122', '123'], info)
                     for encoder in ('11', '12'):
                         self.assertEqual(api[encoder]['inputs']['edit_format'], 'ai-toolkit')
-                        self.assertIn('images.image_1', api[encoder]['inputs'])
-                        self.assertNotIn('images.image_2', api[encoder]['inputs'])
+                        self.assertIn('images.image_0', api[encoder]['inputs'])
+                        self.assertNotIn('images.image_1', api[encoder]['inputs'])
                     self.assertIn('19', api)
-                    self.assertTrue(_is_input_required('TextEncodeMOSSImageEdit', 'images.image_1', info))
-                    self.assertFalse(_is_input_required('TextEncodeMOSSImageEdit', 'images.image_2', info))
-                    self.assertTrue(_is_input_required('TextEncodeMOSSImageEdit', 'images.image_11', info))
+                    self.assertTrue(_is_input_required('TextEncodeMOSSImageEdit', 'images.image_0', info))
+                    self.assertFalse(_is_input_required('TextEncodeMOSSImageEdit', 'images.image_1', info))
+                    self.assertFalse(_is_input_required('TextEncodeMOSSImageEdit', 'images.image_9', info))
+                    self.assertTrue(_is_input_required('TextEncodeMOSSImageEdit', 'images.image_10', info))
                 else:
                     self.assertNotIn('input_images', props)
                     expected = 'base' if variant.startswith('Base') else 'sft'
