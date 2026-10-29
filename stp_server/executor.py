@@ -1288,9 +1288,8 @@ def _is_input_required(
 
     if input_name in input_def.get("optional", {}):
         return False
-    # Expanded V3 Autogrow sockets may live in a required group whose minimum
-    # is zero (Qwen Image 2.1 references). Missing references must not remove
-    # the encoder and its downstream sampler.
+    # Required V3 Autogrow groups may still have optional members beyond their
+    # minimum (MOSS editing needs image 1, but images 2+ are optional).
     group, separator, member = input_name.partition(".")
     if separator:
         # A member of an optional Autogrow group (FLUX.3's ReferenceMultiLatent
@@ -1303,8 +1302,15 @@ def _is_input_required(
             if len(spec) < 2 or spec[0] != "COMFY_AUTOGROW_V3":
                 continue
             template = spec[1].get("template", {})
-            if member in template.get("names", []) and template.get("min", 1) == 0:
-                return False
+            names = template.get("names", [])
+            minimum = template.get("min", 1)
+            if member in names:
+                return names.index(member) < minimum
+            prefix = template.get("prefix")
+            if prefix and member.startswith(prefix):
+                suffix = member[len(prefix):]
+                if suffix.isdigit() and 1 <= int(suffix) <= template.get("max", 100):
+                    return int(suffix) <= minimum
     # If in required, or if we can't determine, assume required
     return True
 

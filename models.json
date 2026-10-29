@@ -1655,7 +1655,9 @@
         "path": "diffusion_models/moss_image_sft_int8_convrot.safetensors"
       },
       "used_by": [
-        "Stimma-MOSS-Image-SFT.json"
+        "Stimma-MOSS-Image-SFT.json",
+        "Stimma-MOSS-Image-SFT-Turbo.json",
+        "Stimma-MOSS-Image-Edit-SFT.json"
       ],
       "size": 5413698958,
       "sha256": "b4d1475bc7eeffd7b809e82ea13a1fba1fb85c4e18365af3813722faa5c0fe4f",
@@ -1673,7 +1675,10 @@
       },
       "used_by": [
         "Stimma-MOSS-Image-SFT.json",
-        "Stimma-MOSS-Image-Base.json"
+        "Stimma-MOSS-Image-Base.json",
+        "Stimma-MOSS-Image-Base-Turbo.json",
+        "Stimma-MOSS-Image-SFT-Turbo.json",
+        "Stimma-MOSS-Image-Edit-SFT.json"
       ],
       "size": 9748121532,
       "sha256": "32e3787472f708fa5f83624acbf5ef23f7fc89c439e05065ea57cfe5a97f025a",
@@ -1691,7 +1696,10 @@
       },
       "used_by": [
         "Stimma-MOSS-Image-SFT.json",
-        "Stimma-MOSS-Image-Base.json"
+        "Stimma-MOSS-Image-Base.json",
+        "Stimma-MOSS-Image-Base-Turbo.json",
+        "Stimma-MOSS-Image-SFT-Turbo.json",
+        "Stimma-MOSS-Image-Edit-SFT.json"
       ],
       "size": 249521340,
       "sha256": "d8d52ba036475f5fb07c8b435e176d3d97ebfa82f0d1a1c317f9cc1e25bd013b",
@@ -1708,7 +1716,8 @@
         "path": "diffusion_models/moss_image_base_int8_convrot.safetensors"
       },
       "used_by": [
-        "Stimma-MOSS-Image-Base.json"
+        "Stimma-MOSS-Image-Base.json",
+        "Stimma-MOSS-Image-Base-Turbo.json"
       ],
       "size": 5413698958,
       "sha256": "f601c1e1161915fb3fea003da0c1782e374dd960fbb3978bc0e4e3fa1f2d8e6f",
@@ -2329,6 +2338,57 @@
         "Stimma-Qwen3-TTS-Voice-Design.json",
         "Stimma-Qwen3-TTS-Voice-Clone.json"
       ]
+    },
+    "moss-image-presets/moss_image_base_lodestone_8step_dmd.safetensors": {
+      "directory": "loras",
+      "source": {
+        "type": "huggingface",
+        "repo": "lodestones/MOSS-Image-Base-8-steps-dmd",
+        "revision": "da05cb3b52899179e2bb5f7efe1058fefcbae21b",
+        "path": "lora.safetensors"
+      },
+      "used_by": [
+        "Stimma-MOSS-Image-Base-Turbo.json"
+      ],
+      "size": 1189176800,
+      "sha256": "f0e6cd07f222dfaea798afe3b796e2c2995cadfd44ad56e02ca616f0467aec28",
+      "gated": false,
+      "license": "Apache-2.0",
+      "license_url": "https://huggingface.co/lodestones/MOSS-Image-Base-8-steps-dmd"
+    },
+    "moss-image-presets/moss_image_sft_lodestone_8step_dmd.safetensors": {
+      "directory": "loras",
+      "source": {
+        "type": "huggingface",
+        "repo": "lodestones/MOSS-Image-SFT-8-steps-dmd",
+        "revision": "f95df83b5e90ae91ea412434b3f9b7f1c8c6314f",
+        "path": "lora.safetensors"
+      },
+      "used_by": [
+        "Stimma-MOSS-Image-SFT-Turbo.json"
+      ],
+      "size": 1189176800,
+      "sha256": "4abb14e39c1a59018907581e609f43616ec6810126144ec2b1d2e6f8969628fe",
+      "gated": false,
+      "license": "Apache-2.0",
+      "license_url": "https://huggingface.co/lodestones/MOSS-Image-SFT-8-steps-dmd"
+    },
+    "moss-image-presets/moss_image_edit_hq_armV5.safetensors": {
+      "directory": "loras",
+      "source": {
+        "type": "huggingface",
+        "repo": "akhaliq/MOSS-Image-Edit-HQ",
+        "revision": "ee1493ba577437e70b88bc4499b85cc7aa4594ca",
+        "path": "weights/armV5/armV5.safetensors"
+      },
+      "used_by": [
+        "Stimma-MOSS-Image-Edit-SFT.json"
+      ],
+      "size": 495514936,
+      "sha256": "1fbfae4eaaafc62c66a298e63e16fc5211566e1e3de1c58f83c35c6bc226c9f9",
+      "gated": false,
+      "license": "Apache-2.0",
+      "license_url": "https://huggingface.co/akhaliq/MOSS-Image-Edit-HQ"
     }
   },
   "unresolved": [

@@ -126,6 +126,33 @@ The released Base/SFT checkpoints are text-to-image models. They do not provide
 reference-image instruction editing, dedicated inpainting, or outpainting;
 separately trained community adapters have different requirements.
 
+`MOSS-Image Base Turbo` (`moss-image-base-turbo`) and `MOSS-Image SFT Turbo`
+(`moss-image-sft-turbo`) add Lodestone's eight-step DMD adapter trained on the
+corresponding checkpoint. Defaults are 8 steps, CFG 1, shift 5, Euler/simple.
+The speed adapters are fixed parts of these workflows; the optional LoRA
+selector remains available for additional models under `moss-image/`.
+
+`MOSS-Image SFT Edit` (`moss-image-edit-sft`) uses the community
+[Edit-HQ armV5 adapter](https://huggingface.co/akhaliq/MOSS-Image-Edit-HQ)
+on SFT. Update ComfyUI to include native `TextEncodeMOSSImageEdit` support
+(merged October 22, 2026). The existing Qwen3.5 encoder includes the vision tower
+this adapter needs. The workflow uses native ComfyUI nodes without an additional
+plugin or runtime. Defaults are 30 steps, CFG 3, shift 5, Euler/simple and
+negative-branch skipping at layer 22.
+
+Supply one image to edit, optionally followed by up to three reference images.
+Describe each image's role in the instruction. Output defaults to about one
+megapixel at the first image's aspect ratio, aligned to 16 pixels. Advanced
+exposes a separate reference pixel budget: keep the default one megapixel for
+preservation, or try 0.25 for background replacement if the original scene
+persists. Smaller references may change faces, text or other untouched details.
+Pose changes and precise text edits remain limited. The requested seed is
+combined with the source pixels to avoid reusing its generation noise.
+
+The manager downloads all three adapters from pinned revisions with SHA-256
+verification into `loras/moss-image-presets/`. Base editing and turbo editing
+are not bundled.
+
 ## Qwen Image 2.1
 
 `Qwen Image 2.1` (`qwen-image-2.1`) is one unified generation/editing tool.
