@@ -153,6 +153,34 @@ The manager downloads all three adapters from pinned revisions with SHA-256
 verification into `loras/moss-image-presets/`. Base editing and turbo editing
 are not bundled.
 
+## Qwen and MOSS inpainting
+
+The image editor's Repaint picker includes three dedicated masked-edit tools:
+
+- **Qwen Image 2.1 Inpaint** (`qwen-image-2.1-inpaint`)
+- **Qwen Image 2.1 Turbo Inpaint** (`qwen-image-2.1-turbo-inpaint`)
+- **MOSS-Image SFT Inpaint** (`moss-image-inpaint-sft`), using the HQ v5 edit adapter
+
+Select a region and describe its replacement. The first image is the edit
+source; optional images after it are references (up to nine for Qwen, three
+for MOSS). In Tool View, supply an alpha mask: transparent pixels select the
+area to repaint, opaque pixels preserve it.
+
+These workflows crop around the mask, mark the region for the edit model,
+constrain sampling with a latent noise mask, and stitch the result back at
+the source image's exact dimensions, including sizes off the model's latent
+grid. Pixels outside the grown and feathered mask are preserved. Mask grow,
+mask feather, and surrounding context are adjustable. As with the existing
+FLUX inpaint tools, the editor applies its own selection mask to the result.
+
+They use the same model files as the corresponding edit tools, plus
+[ComfyUI-Inpaint-CropAndStitch](https://github.com/lquesada/ComfyUI-Inpaint-CropAndStitch)
+and [ComfyUI-KJNodes](https://github.com/kijai/ComfyUI-KJNodes), also used by
+the bundled FLUX inpaint workflows. The manager can install missing node packs
+and models. Update the plugin and restart ComfyUI to install the new bundled
+workflows, then reopen the image editor to refresh its picker. No Stimma app
+update is required.
+
 ## Qwen Image 2.1
 
 `Qwen Image 2.1` (`qwen-image-2.1`) is one unified generation/editing tool.
