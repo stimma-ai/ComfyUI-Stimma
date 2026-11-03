@@ -6,12 +6,13 @@ import os
 from typing import Optional, Dict, Any, List
 
 from stimma_tools_protocol.provider import Provider, ProviderConfig
-from stimma_tools_protocol.protocol import JsonRpcResponse
+from stimma_tools_protocol.protocol import JsonRpcError, JsonRpcErrorCode, JsonRpcResponse
 from stimma_tools_protocol.tool import ToolRegistry
 from stimma_tools_protocol.transport import Transport
 
 from .config import Config
 from .comfy_client import Comfy
+from .lora_fingerprints import LoraFingerprints, pair_fingerprint
 from .version import PRODUCT_NAME, PRODUCT_VERSION
 from .manage.icon import COMFYUI_ICON_DATA_URI
 
@@ -77,6 +78,10 @@ class StimmaPluginProvider(Provider):
         self.manager = None
         # Provider-level state last sent to the host.
         self._last_state: Optional[tuple] = None
+        self._lora_fingerprints = LoraFingerprints()
+
+    def _build_capabilities(self) -> dict:
+        return {**super()._build_capabilities(), "file_fingerprints": True}
 
     @property
     def plugin_config(self) -> Config:
@@ -99,6 +104,7 @@ class StimmaPluginProvider(Provider):
         """Start provider and begin background filesystem watching immediately."""
         await super().start(asset_manager=asset_manager)
         self._ensure_watcher_started()
+        self._lora_fingerprints.kick()
 
     async def stop(self) -> None:
         """Stop provider and cancel background filesystem watching."""
@@ -189,6 +195,7 @@ class StimmaPluginProvider(Provider):
             self._tool_registry.register(tool)
 
         self._last_build_wf_snapshot = wf_snapshot
+        self._lora_fingerprints.kick()
 
         # Check if tool list changed (identity or readiness)
         current_slugs = {(t.slug, t.status) for t in tools}
@@ -456,7 +463,35 @@ class StimmaPluginProvider(Provider):
             return await self._handle_tools_upload(request)
         elif request.method == "tools.upload_complete":
             return await self._handle_tools_upload_complete(request)
+        elif request.method == "tools.file_fingerprints":
+            return self._handle_file_fingerprints(request)
         return await super()._handle_request(request)
+
+    def _handle_file_fingerprints(self, request):
+        """Answer from memory; hashing happens on the background worker."""
+        params = request.params or {}
+        tool = self._tool_registry.get(params.get("tool_id"))
+        parameter = next((p for p in tool.parameters if p.name == params.get("parameter")), None) if tool else None
+        if parameter is None:
+            error = JsonRpcError.from_code(JsonRpcErrorCode.INVALID_PARAMS, "Unknown tool or parameter")
+            return JsonRpcResponse.failure(request.id, error)
+
+        items = parameter.items or {}
+        values = ((items.get("properties") or {}).get("path") or {}).get("enum") or []
+        pairs = {p["display"]: p for p in items.get("x-pairs") or []}
+        names = []
+        for value in values:
+            pair = pairs.get(value)
+            names.extend((pair["high"], pair["low"]) if pair else (value,))
+        found, pending = self._lora_fingerprints.lookup(names)
+
+        fingerprints = {}
+        for value in values:
+            pair = pairs.get(value)
+            fingerprints[value] = (
+                pair_fingerprint(found.get(pair["high"]), found.get(pair["low"])) if pair else found.get(value)
+            )
+        return JsonRpcResponse.success(request.id, {"fingerprints": fingerprints, "pending": pending})
 
     async def _handle_tools_upload(self, request):
         """Handle tools.upload — accept an incoming LoRA file upload."""
