@@ -1,8 +1,8 @@
 {
   "id": "243c79f4-20ce-5ba3-b599-009930e62231",
   "revision": 1,
-  "last_node_id": 193,
-  "last_link_id": 339,
+  "last_node_id": 194,
+  "last_link_id": 344,
   "nodes": [
     {
       "id": 116,
@@ -74,7 +74,8 @@
           "links": [
             251,
             273,
-            335
+            335,
+            341
           ]
         }
       ],
@@ -114,7 +115,8 @@
           "links": [
             250,
             274,
-            336
+            336,
+            342
           ]
         }
       ],
@@ -358,7 +360,8 @@
           "type": "LATENT",
           "links": [
             280,
-            281
+            281,
+            340
           ]
         },
         {
@@ -959,7 +962,7 @@
         "Generate video from ordered image, video, and audio references with synchronized stereo audio. Includes selectable INT8/FP8 precision and Sol tuning. LightX2V 768p eight-step adapter with conservative Sol attention.",
         "MiniMax",
         "MiniMax H3 Ref2VA",
-        "References (input_images, input_videos, input_audios) steer identity, style, motion, and voice, and the prompt names them by tag. Keyframes pin stills or clips at exact times. To continue a video, pin its last second with sound at 0 and pass the same video in input_audios for the voice. The output opens with that pinned clip, so trim the clip's length off its start when joining it to the original. For a long shot, render segments that share the same voice reference and pin each segment's start and end to frames or short clips from one master take."
+        "References (input_images, input_videos, input_audios) steer identity, style, motion, and voice, and the prompt names them by tag. Keyframes pin stills or clips at exact times. To continue a video, pin its last second with sound at 0 and pass the same video in input_audios for the voice. The output opens with that pinned clip, so trim the clip's length off its start when joining it to the original. For a long shot, render segments that share the same voice reference and pin each segment's start and end to frames or short clips from one master take. For clean continuation, pin the final 39 frames (1.625 seconds) of the source at time 0 with sound. Original generation state is reused automatically when compatible. Remove that overlap with a plain frame-accurate trim before concatenating; avoid automatic grading or crossfades unless needed."
       ]
     },
     {
@@ -3260,6 +3263,21 @@
             "name": "_stimma_output_dir"
           },
           "shape": 7
+        },
+        {
+          "name": "remove_audio",
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "remove_audio"
+          },
+          "link": null,
+          "shape": 7
+        },
+        {
+          "name": "sidecars",
+          "type": "STIMMA_SIDECARS",
+          "link": 344,
+          "shape": 7
         }
       ],
       "outputs": [],
@@ -3270,7 +3288,8 @@
         24,
         "Stimma",
         true,
-        ""
+        "",
+        false
       ]
     },
     {
@@ -4577,7 +4596,8 @@
           "name": "keyframes",
           "type": "STIMMA_KEYFRAMES",
           "links": [
-            337
+            337,
+            343
           ],
           "slot_index": 0
         }
@@ -4666,6 +4686,68 @@
       },
       "widgets_values": [
         0.0
+      ]
+    },
+    {
+      "id": 194,
+      "type": "StimmaH3GenerationState",
+      "pos": [
+        420,
+        5400
+      ],
+      "size": [
+        330,
+        190
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "samples",
+          "type": "LATENT",
+          "link": 340
+        },
+        {
+          "name": "vae",
+          "type": "VAE",
+          "link": 341
+        },
+        {
+          "name": "audio_vae",
+          "type": "VAE",
+          "link": 342
+        },
+        {
+          "name": "keyframes",
+          "type": "STIMMA_KEYFRAMES",
+          "link": 343,
+          "shape": 7
+        },
+        {
+          "name": "_stimma_output_dir",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "_stimma_output_dir"
+          },
+          "shape": 7
+        }
+      ],
+      "outputs": [
+        {
+          "name": "sidecars",
+          "type": "STIMMA_SIDECARS",
+          "links": [
+            344
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "StimmaH3GenerationState"
+      },
+      "widgets_values": [
+        ""
       ]
     }
   ],
@@ -5189,6 +5271,46 @@
       193,
       5,
       "FLOAT"
+    ],
+    [
+      340,
+      125,
+      0,
+      194,
+      0,
+      "LATENT"
+    ],
+    [
+      341,
+      119,
+      0,
+      194,
+      1,
+      "VAE"
+    ],
+    [
+      342,
+      120,
+      0,
+      194,
+      2,
+      "VAE"
+    ],
+    [
+      343,
+      192,
+      0,
+      194,
+      3,
+      "STIMMA_KEYFRAMES"
+    ],
+    [
+      344,
+      194,
+      0,
+      168,
+      7,
+      "STIMMA_SIDECARS"
     ]
   ],
   "groups": [

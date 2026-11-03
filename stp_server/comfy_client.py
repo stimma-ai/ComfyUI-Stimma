@@ -176,7 +176,10 @@ class SingleComfy:
                 return response.get("name", filename)
 
     async def upload_video(self, video_path: str, overwrite: bool = True) -> str:
-        """Upload a video to ComfyUI's input directory."""
+        return await self.upload_file(video_path, overwrite=overwrite)
+
+    async def upload_file(self, video_path: str, overwrite: bool = True) -> str:
+        """Upload opaque bytes through ComfyUI's generic file endpoint."""
         from pathlib import Path
 
         if not os.path.exists(video_path):
@@ -188,7 +191,7 @@ class SingleComfy:
             ".mp4": "video/mp4", ".webm": "video/webm",
             ".mov": "video/quicktime", ".avi": "video/x-msvideo",
         }
-        content_type = content_type_map.get(ext, "video/mp4")
+        content_type = content_type_map.get(ext, "application/octet-stream")
 
         session = await self._get_session()
         with open(video_path, "rb") as f:

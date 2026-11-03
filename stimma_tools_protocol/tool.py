@@ -2,6 +2,7 @@
 Tool decorator and registry for defining STP tools.
 """
 
+from stimma_tools_protocol.sidecars import SIDECAR_SCHEMA
 from dataclasses import dataclass, field
 from typing import Any, Callable, Optional, List, Dict, Awaitable
 from functools import wraps
@@ -185,6 +186,7 @@ class Tool:
                             "asset_id": {"type": "string"},
                             "type": {"type": "string", "enum": ["image", "video", "audio", "document"]},
                             "role": {"type": "string"},
+                            "sidecars": SIDECAR_SCHEMA,
                         },
                     },
                 },

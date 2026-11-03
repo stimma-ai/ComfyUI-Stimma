@@ -191,6 +191,7 @@ class StimmaVideoOutput:
                 # Appended after _stimma_output_dir so existing workflows'
                 # widgets_values stay aligned with the input order.
                 "remove_audio": ("BOOLEAN", {"default": False}),
+                "sidecars": ("STIMMA_SIDECARS",),
             },
         }
 
@@ -200,7 +201,7 @@ class StimmaVideoOutput:
     CATEGORY = "Stimma/Outputs"
 
     def execute(self, frames, fps=16, filename_prefix="Stimma", audio=None,
-                generate_audio=True, _stimma_output_dir="", remove_audio=False):
+                generate_audio=True, _stimma_output_dir="", remove_audio=False, sidecars=None):
         import folder_paths
         import tempfile
         import subprocess
@@ -260,8 +261,8 @@ class StimmaVideoOutput:
                 "-movflags", "+faststart",
             ]
             if audio_path:
-                # Map the video stream + audio stream; end at the shorter input.
-                cmd += ["-c:a", "aac", "-b:a", "192k", "-shortest"]
+                # Keep every generated video frame; pad/trim audio to that duration.
+                cmd += ["-c:a", "aac", "-b:a", "192k", "-af", "apad", "-t", str(num_frames / fps)]
             cmd += [output_path]
 
             # stderr goes to a temp file (not a pipe) so ffmpeg can never block
@@ -292,11 +293,14 @@ class StimmaVideoOutput:
                     err = stderr_file.read().decode(errors="replace")
                     raise RuntimeError(f"ffmpeg encoding failed: {err[-4000:]}")
 
+            from .sidecars import publish_sidecars
+            publish_sidecars(sidecars, output_path, fps, num_frames, width, height, ["video", "audio"] if audio_path else ["video"])
             filename = os.path.basename(output_path)
-            if _stimma_output_dir:
-                return {"ui": {"videos": [{"filename": filename, "subfolder": "", "type": "output"}]}}
-            else:
-                return {"ui": {"videos": [{"filename": filename, "subfolder": "", "type": "output"}]}}
+            subfolder = "" if _stimma_output_dir else os.path.relpath(os.path.dirname(output_path), folder_paths.get_output_directory())
+            if subfolder == ".":
+                subfolder = ""
+            return {"ui": {"videos": [{"filename": filename, "subfolder": subfolder, "type": "output"}],
+                           "stimma_manifests": [{"filename": filename + ".manifest.json", "subfolder": subfolder, "type": "output"}]}}
 
         finally:
             if temp_dir is not None:

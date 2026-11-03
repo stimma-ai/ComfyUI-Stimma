@@ -1,7 +1,9 @@
 """Workflow executor — injects values, handles LoRAs, captures output."""
 
 import asyncio
+import aiohttp
 import copy
+import hashlib
 import json
 import logging
 import os
@@ -204,6 +206,19 @@ async def execute_workflow(
                     f"that need to be expanded. Try re-saving the workflow without group nodes."
                 )
 
+    # A completed render survives mandatory upload failure. Retrying this exact
+    # execution captures those files instead of sampling again.
+    receipt_key = hashlib.sha256(json.dumps([context.request_id, workflow.api_prompt], sort_keys=True).encode()).hexdigest()
+    receipt = Path(tempfile.gettempdir()) / "stimma-capture-receipts" / (receipt_key + ".json")
+    if receipt.is_file():
+        saved = json.loads(receipt.read_text())
+        async with provider.comfy_client.acquire() as instance:
+            recovered = await _capture_output(saved["output_dir"], {}, context, instance, saved["prompt_id"])
+        recovered["generation_time"] = saved["generation_time"]
+        shutil.rmtree(saved["output_dir"], ignore_errors=True)
+        receipt.unlink(missing_ok=True)
+        return recovered
+
     # Step 2: Create temp output directory
     output_dir = tempfile.mkdtemp(prefix="stimma_output_")
 
@@ -266,7 +281,7 @@ async def execute_workflow(
                     del prompt[nid]
 
             # Step 6: Inject output directory
-            _inject_output_dir(prompt, workflow, output_dir)
+            _inject_output_dir(prompt, workflow, output_dir, provider.object_info)
             _hydrate_missing_widget_defaults(prompt, object_info)
             if workflow.output_nodes:
                 logger.info(f"Injected output dir into {len(workflow.output_nodes)} output nodes")
@@ -344,6 +359,11 @@ async def execute_workflow(
                     nid for nid, nd in prompt.items()
                     if nd.get("class_type") in {"StimmaImageOutput", "StimmaVideoOutput", "StimmaAudioOutput"}
                 ]
+                receipt.parent.mkdir(parents=True, exist_ok=True)
+                pending_receipt = receipt.with_suffix(".tmp")
+                pending_receipt.write_text(json.dumps({"output_dir": output_dir, "prompt_id": prompt_id,
+                                                       "generation_time": time.time() - start_time}))
+                os.replace(pending_receipt, receipt)
                 result = await _capture_output(
                     output_dir,
                     prompt,
@@ -352,6 +372,7 @@ async def execute_workflow(
                     prompt_id,
                     expected_output_node_ids=expected_output_node_ids,
                 )
+                receipt.unlink(missing_ok=True)
                 t_cap = time.time() - t_cap0
             finally:
                 # Privacy: drop the job's ComfyUI history entry (it holds the
@@ -380,8 +401,9 @@ async def execute_workflow(
             return result
 
     finally:
-        # Cleanup output directory
-        shutil.rmtree(output_dir, ignore_errors=True)
+        # Failed mandatory capture is retryable without re-running the graph.
+        if not receipt.exists():
+            shutil.rmtree(output_dir, ignore_errors=True)
         # Privacy: remove this job's uploaded assets from ComfyUI's input dir
         _cleanup_uploaded_inputs(uploaded_files)
 
@@ -670,6 +692,27 @@ async def _inject_fields(
                 for key in ("from", "length"):
                     if item.get(key) is not None:
                         entry[key] = float(item[key])
+                companions = []
+                for original in getattr(context, "input_sidecars", {}).get(item["media"], []):
+                    companion = dict(original)
+                    if companion.get("status") != "unavailable":
+                        try:
+                            raw = await context.assets.download(companion["asset_id"])
+                            if companion.get("sha256") and hashlib.sha256(raw).hexdigest() != companion["sha256"]:
+                                raise ValueError("integrity_failed")
+                            if companion.get("byte_size") is not None and len(raw) != companion["byte_size"]:
+                                raise ValueError("integrity_failed")
+                            with tempfile.NamedTemporaryFile(prefix=f"stimma_upload_{context.request_id}_", suffix=".bin") as saved:
+                                saved.write(raw)
+                                saved.flush()
+                                companion["file"] = await instance.upload_file(saved.name)
+                            _track_upload(context, companion["file"])
+                        except (OSError, ValueError, RuntimeError, KeyError, aiohttp.ClientError) as exc:
+                            companion.pop("file", None)
+                            companion.update(status="unavailable", unavailable_reason="integrity_failed" if isinstance(exc, ValueError) else "provider_asset_missing")
+                    companions.append(companion)
+                if companions:
+                    entry["sidecars"] = companions
                 if item.get("sound"):
                     entry["sound"] = True
                 wire.append(entry)
@@ -1484,12 +1527,19 @@ def _inject_output_dir(
     prompt: Dict[str, Any],
     workflow: "DiscoveredWorkflow",
     output_dir: str,
+    object_info=None,
 ):
-    """Inject _stimma_output_dir into all output nodes."""
+    """Give each publishing/preparation node a private per-execution directory."""
     for node in workflow.output_nodes:
         node_id = node["node_id"]
         if node_id in prompt:
-            prompt[node_id]["inputs"]["_stimma_output_dir"] = output_dir
+            prompt[node_id]["inputs"]["_stimma_output_dir"] = str(Path(output_dir) / node_id)
+    for node_id, node in prompt.items():
+        info = (object_info or {}).get(node.get("class_type"), {})
+        optional = info.get("input", {}).get("optional", {})
+        if "_stimma_output_dir" in optional:
+            node["inputs"]["_stimma_output_dir"] = str(Path(output_dir) / node_id)
+
 
 
 def _schedule_ws_close(ws) -> None:
@@ -1700,33 +1750,47 @@ async def _capture_output(
     expected_output_node_ids: Optional[List[str]] = None,
 ) -> dict:
     """Capture output files from the temp directory and upload to STP assets."""
-    output_files = sorted(Path(output_dir).glob("stimma_output_*"))
-
-    if not output_files:
-        # Fallback: try to get output from ComfyUI history
-        logger.info(f"No stimma_output_* files in {output_dir}, falling back to history")
-        return await _capture_from_history(
-            instance,
-            prompt_id,
-            context,
-            expected_output_node_ids=expected_output_node_ids or [],
-        )
-
-    # Upload the first output file. The Stimma output node (StimmaImageOutput)
-    # already writes ComfyUI's prompt + workflow into the PNG's text chunks when
-    # it saves, so we must NOT decode + re-encode here to "add" metadata — that
-    # re-encode cost hundreds of ms (and over a second under event-loop
-    # contention) to duplicate metadata the file already has. Just stream the
-    # bytes straight through. The read runs in a worker thread so a large file
-    # never blocks the shared STP event loop / asset serving.
-    output_path = output_files[0]
-    ext = output_path.suffix.lower()
-
-    output_bytes = await asyncio.to_thread(output_path.read_bytes)
-    asset_id = await context.assets.upload(output_bytes, ext)
-    logger.info(f"Uploaded output: {asset_id} ({len(output_bytes)} bytes)")
-
-    return {"asset_id": asset_id}
+    root = Path(output_dir)
+    assets, usage, owned = [], [], set()
+    for path in sorted(root.rglob("*.manifest.json")):
+        manifest = json.loads(await asyncio.to_thread(path.read_text))
+        usage.extend(manifest.get("input_usage", []))
+        for source in manifest.get("assets", []):
+            primary = (path.parent / source["file"]).resolve()
+            if not primary.is_relative_to(root.resolve()):
+                raise ValueError("Output manifest escapes execution directory")
+            owned.add(primary)
+            asset = {k: v for k, v in source.items() if k not in ("file", "sidecars")}
+            asset["asset_id"] = await context.assets.upload(await asyncio.to_thread(primary.read_bytes), primary.suffix)
+            if getattr(getattr(context, "_provider", None), "host_wants_media_sidecars", False):
+                companions = []
+                for original in source.get("sidecars", []):
+                    companion = {k: v for k, v in original.items() if k != "file"}
+                    if original.get("status") != "unavailable":
+                        try:
+                            raw_path = (path.parent / original["file"]).resolve()
+                            if not raw_path.is_relative_to(root.resolve()):
+                                raise ValueError("Companion path escapes execution directory")
+                            raw = await asyncio.to_thread(raw_path.read_bytes)
+                            companion["asset_id"] = await context.assets.upload(raw, raw_path.suffix)
+                        except (OSError, ValueError, RuntimeError, aiohttp.ClientError):
+                            companion.update(status="unavailable", unavailable_reason="capture_failed")
+                    companions.append(companion)
+                if companions:
+                    asset["sidecars"] = companions
+            assets.append(asset)
+    for path in sorted(root.rglob("stimma_output_*")):
+        if not path.is_file() or path.resolve() in owned or ".manifest." in path.name or ".state_" in path.name:
+            continue
+        kind = "video" if path.suffix.lower() in (".mp4", ".webm", ".mov") else "audio" if path.suffix.lower() in (".wav", ".mp3", ".ogg") else "image"
+        assets.append({"asset_id": await context.assets.upload(await asyncio.to_thread(path.read_bytes), path.suffix), "type": kind, "role": "primary"})
+    if not assets:
+        return await _capture_from_history(instance, prompt_id, context, expected_output_node_ids or [])
+    # Existing single-output helper callers also receive the ergonomic alias.
+    result = {"assets": assets, "input_usage": usage}
+    if len(assets) == 1:
+        result["asset_id"] = assets[0]["asset_id"]
+    return result
 
 
 async def _capture_from_history(
@@ -1750,49 +1814,52 @@ async def _capture_from_history(
         f"status: {status}"
     )
 
+    assets, usage = [], []
+    async def fetch(info):
+        params = {k: info[k] for k in ("filename", "type", "subfolder") if info.get(k)}
+        params.setdefault("type", "output")
+        async with aiohttp.ClientSession(auto_decompress=False) as session:
+            async with session.get(f"http://{instance.addr}/view", params=params) as resp:
+                if resp.status != 200:
+                    raise RuntimeError(f"Output fetch failed: HTTP {resp.status}")
+                return await resp.read()
+
     for node_id, output in outputs.items():
-        # Check for images
-        images = output.get("images", [])
-        for img_info in images:
-            filename = img_info.get("filename", "")
-            if filename:
-                # Fetch image from ComfyUI
-                params = {"filename": filename, "type": img_info.get("type", "output")}
-                subfolder = img_info.get("subfolder", "")
-                if subfolder:
-                    params["subfolder"] = subfolder
-
-                import aiohttp
-                async with aiohttp.ClientSession(auto_decompress=False) as session:
-                    async with session.get(
-                        f"http://{instance.addr}/view", params=params
-                    ) as resp:
-                        if resp.status == 200:
-                            data = await resp.read()
-                            ext = Path(filename).suffix or ".png"
-                            asset_id = await context.assets.upload(data, ext)
-                            return {"asset_id": asset_id}
-
-        # Check for videos
-        videos = output.get("videos", output.get("gifs", [])) + output.get("audio", [])
-        for vid_info in videos:
-            filename = vid_info.get("filename", "")
-            if filename:
-                subfolder = vid_info.get("subfolder", "")
-                params = {"filename": filename, "type": vid_info.get("type", "output")}
-                if subfolder:
-                    params["subfolder"] = subfolder
-
-                import aiohttp
-                async with aiohttp.ClientSession(auto_decompress=False) as session:
-                    async with session.get(
-                        f"http://{instance.addr}/view", params=params
-                    ) as resp:
-                        if resp.status == 200:
-                            data = await resp.read()
-                            ext = Path(filename).suffix or ".mp4"
-                            asset_id = await context.assets.upload(data, ext)
-                            return {"asset_id": asset_id}
+        manifests = output.get("stimma_manifests", [])
+        if manifests:
+            for manifest_info in manifests:
+                manifest = json.loads(await fetch(manifest_info))
+                usage.extend(manifest.get("input_usage", []))
+                for original in manifest.get("assets", []):
+                    info = {**manifest_info, "filename": original["file"]}
+                    raw = await fetch(info)
+                    asset = {k: v for k, v in original.items() if k not in ("file", "sidecars")}
+                    asset["asset_id"] = await context.assets.upload(raw, Path(original["file"]).suffix)
+                    if getattr(getattr(context, "_provider", None), "host_wants_media_sidecars", False):
+                        companions = []
+                        for record in original.get("sidecars", []):
+                            entry = {k: v for k, v in record.items() if k != "file"}
+                            if entry.get("status") != "unavailable":
+                                try:
+                                    raw = await fetch({**manifest_info, "filename": record["file"]})
+                                    entry["asset_id"] = await context.assets.upload(raw, Path(record["file"]).suffix)
+                                except (OSError, ValueError, RuntimeError, KeyError, aiohttp.ClientError):
+                                    entry.update(status="unavailable", unavailable_reason="capture_failed")
+                            companions.append(entry)
+                        asset["sidecars"] = companions
+                    assets.append(asset)
+            continue
+        for key, kind in (("images", "image"), ("videos", "video"), ("gifs", "video"), ("audio", "audio")):
+            for info in output.get(key, []):
+                if info.get("filename"):
+                    raw = await fetch(info)
+                    assets.append({"asset_id": await context.assets.upload(raw, Path(info["filename"]).suffix),
+                                   "type": kind, "role": "primary"})
+    if assets:
+        result = {"assets": assets, "input_usage": usage}
+        if len(assets) == 1:
+            result["asset_id"] = assets[0]["asset_id"]
+        return result
 
     # Check history status messages for error details before giving up
     status_messages = status.get("messages", [])

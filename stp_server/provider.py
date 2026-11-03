@@ -39,6 +39,7 @@ class StimmaPluginProvider(Provider):
             server=f"{PRODUCT_NAME}/{PRODUCT_VERSION}",
             max_concurrent=max_concurrent,
             supports_cancel=True,
+            media_sidecars=True,
             preview_frames=True,
             presentation={
                 "icon": COMFYUI_ICON_DATA_URI,

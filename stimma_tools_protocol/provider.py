@@ -57,10 +57,13 @@ def normalize_output(result: Any) -> dict:
         return result
     out = dict(result)
     asset_id = out.pop("asset_id", None)
+    sidecars = out.pop("sidecars", None)
     out["assets"] = (
         [{"asset_id": asset_id, "type": _infer_media_type(asset_id), "role": "primary"}]
         if asset_id else []
     )
+    if asset_id and sidecars:
+        out["assets"][0]["sidecars"] = sidecars
     return out
 
 
@@ -77,6 +80,7 @@ class ProviderConfig:
     presentation: Optional[dict] = None
     # Provider emits provider.state / provider.notify (capability `provider_state`).
     provider_state: bool = False
+    media_sidecars: bool = False
     asset_endpoint: str = "/stp-v1/assets"  # Provider's asset endpoint path
     # Provider streams in-flight preview frames on tools.progress — exposed as
     # the `preview_frames` capability so hosts can shape their generating UI.
@@ -91,6 +95,7 @@ class ExecutionContext:
     parameters: dict
     assets: AssetManager
     _provider: "Provider"
+    input_sidecars: dict = field(default_factory=dict)
     # Host wants in-flight preview frames for this execution (per-request, so
     # toggling the host setting needs no reconnect).
     preview_frames: bool = True
@@ -121,6 +126,7 @@ class Job:
     request_id: str
     tool: Tool
     parameters: dict
+    input_sidecars: dict = field(default_factory=dict)
     task: Optional[asyncio.Task] = None
     cancelled: bool = False
     preview_frames: bool = True
@@ -309,6 +315,8 @@ class Provider:
             "cancel": self._config.supports_cancel,
             "preview_frames": self._config.preview_frames,
         }
+        if self._config.media_sidecars:
+            caps["media_sidecars"] = True
         if self._config.provider_state:
             caps["provider_state"] = True
         return caps
@@ -415,6 +423,7 @@ class Provider:
             request_id=exec_request.request_id,
             tool=tool,
             parameters=exec_request.parameters,
+            input_sidecars=exec_request.input_sidecars,
             preview_frames=exec_request.preview_frames,
         )
         self._queued_jobs.append(job)
@@ -513,6 +522,7 @@ class Provider:
                 parameters=parameters,
                 assets=self._assets,
                 _provider=self,
+                input_sidecars=job.input_sidecars,
                 preview_frames=job.preview_frames,
             )
 
@@ -524,7 +534,7 @@ class Provider:
                 await self._send_result(
                     request_id=job.request_id,
                     success=True,
-                    output=normalize_output(result),
+                    output=self._output_for_host(result),
                 )
 
         except asyncio.CancelledError:
@@ -627,6 +637,19 @@ class Provider:
                 f"Failed to send result for {request_id}: {e} "
                 f"(success={success}, error={error})"
             )
+
+    def _output_for_host(self, result):
+        output = normalize_output(result)
+        if not self.host_wants_media_sidecars:
+            output = {**output, "assets": [
+                {k: v for k, v in a.items() if k != "sidecars"}
+                for a in output.get("assets", [])
+            ]}
+        return output
+
+    @property
+    def host_wants_media_sidecars(self) -> bool:
+        return bool(self.host_capabilities.get("media_sidecars"))
 
     @property
     def host_wants_tool_status(self) -> bool:

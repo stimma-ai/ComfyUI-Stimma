@@ -18,6 +18,7 @@ import numpy as np
 import torch
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
 
 
 def _load_module(tmpdir):
@@ -32,7 +33,15 @@ def _load_module(tmpdir):
         module = importlib.util.module_from_spec(spec)
         sys.modules[spec.name] = module
         spec.loader.exec_module(module)
-    return sys.modules["stimma_nodes.keyframes"]
+    keyframes = sys.modules["stimma_nodes.keyframes"]
+    from importlib import import_module
+    h3 = import_module("stimma_nodes.adapters.h3")
+    ltx = import_module("stimma_nodes.adapters.ltx")
+    for name in ("StimmaApplyKeyframesH3", "StimmaH3GenerationState", "_h3_guide_frames", "_native_guide"):
+        setattr(keyframes, name, getattr(h3, name))
+    for name in ("StimmaApplyKeyframesLTX", "_ltx_clip_frames", "_ltx_clip_start"):
+        setattr(keyframes, name, getattr(ltx, name))
+    return keyframes
 
 
 def _write_video(path, frames=48, fps=24, size=(64, 48)):
@@ -85,6 +94,38 @@ class TestKeyframes(unittest.TestCase):
         (out,) = node.execute("keyframes", 6, "any", 24, 5, 17, True, "duration", 15, wire, "")
         self.assertEqual([k["at"] for k in out], [0.0, 2.0])
         self.assertEqual(node.execute("keyframes", 6, "any", 24, 5, 17, True, "duration", 15, "", "")[0], [])
+
+    def test_original_state_is_bit_exact_and_does_not_load_pixels(self):
+        import hashlib
+        video = torch.arange(1 * 24 * 47 * 2 * 2, dtype=torch.float32).reshape(1, 24, 47, 2, 2)
+        audio = torch.arange(1 * 32 * 2 * 263, dtype=torch.float32).reshape(1, 32, 2, 263)
+        samples = {"samples": types.SimpleNamespace(tensors=(video, audio))}
+        vae = types.SimpleNamespace(_stimma_h3_encoding_id="video")
+        audio_vae = types.SimpleNamespace(_stimma_h3_encoding_id="audio")
+        model = types.ModuleType("comfy.ldm.minimax.model")
+        model.FRAME_PER_TOKEN = (1, 4, 4, 4, 4)
+        with patch.dict(sys.modules, {"comfy.ldm.minimax.model": model}):
+            (bundle,) = self.kf.StimmaH3GenerationState().execute(samples, vae, audio_vae, _stimma_output_dir=self.tmp)
+        entry = bundle["sidecars"][0]
+        entry["file"] = "sample.safetensors"
+        source = {"file": "missing-render.mp4", "from": 119/24, "length": 39/24, "at": 0, "sound": True, "sidecars": [entry]}
+        kf = self.kf.LazyKeyframe(source, 24)
+        guide = self.kf._native_guide(kf, samples, vae, audio_vae)
+        self.assertTrue(torch.equal(guide["latent"], video[:, :, -12:]))
+        self.assertTrue(torch.equal(guide["audio_latent"], audio[..., -65:]))
+        self.assertFalse(kf._loaded)
+        self.assertEqual(kf.usage["source"], "native_latent")
+        source["sound"] = False
+        self.assertNotIn("audio_latent", self.kf._native_guide(self.kf.LazyKeyframe(source, 24), samples, vae, audio_vae))
+        entry["media_mapping"]["spans"][0]["preserved_streams"] = ["video"]
+        source["sound"] = True
+        self.assertIsNone(self.kf._native_guide(self.kf.LazyKeyframe(source, 24), samples, vae, audio_vae))
+        entry["media_mapping"]["spans"][0]["preserved_streams"] = ["video", "audio"]
+        Path(self.tmp, "sample.safetensors").write_bytes(b"bad state")
+        entry["sha256"] = hashlib.sha256(b"bad state").hexdigest()
+        invalid = self.kf.LazyKeyframe(source, 24)
+        self.assertIsNone(self.kf._native_guide(invalid, samples, vae, audio_vae))
+        self.assertEqual(invalid.usage["reason"], "invalid_state")
 
     def test_h3_guide_frames(self):
         self.assertEqual([self.kf._h3_guide_frames(n) for n in (1, 4, 5, 21, 22, 38, 39)], [1, 1, 5, 5, 22, 22, 39])

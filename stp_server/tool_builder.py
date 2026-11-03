@@ -399,6 +399,30 @@ def _build_field_parameter(node: Dict[str, Any]) -> Optional[ToolParameter]:
     return None
 
 
+def _accepted_sidecars(prompt, start, object_info):
+    """Read consumer declarations from normal node input metadata, not model tables."""
+    pending, seen, accepted = [str(start)], set(), []
+    while pending:
+        source = pending.pop()
+        if source in seen:
+            continue
+        seen.add(source)
+        for node_id, node in prompt.items():
+            for name, value in node.get("inputs", {}).items():
+                if not (isinstance(value, list) and len(value) == 2 and str(value[0]) == source):
+                    continue
+                info = (object_info or {}).get(node.get("class_type"), {}).get("input", {})
+                spec = (info.get("required", {}) | info.get("optional", {})).get(name, [])
+                options = spec[1] if len(spec) > 1 and isinstance(spec[1], dict) else {}
+                formats = options.get("x-accept-sidecars", [])
+                for entry in formats:
+                    if entry not in accepted:
+                        accepted.append(entry)
+                if not formats:
+                    pending.append(str(node_id))
+    return accepted
+
+
 def _build_keyframes_parameter(inputs: Dict[str, Any]) -> ToolParameter:
     """Stills or clips pinned at times on the output (STP `x-control: keyframes`)."""
     fps = int(inputs.get("fps") or 24)
@@ -898,6 +922,13 @@ def _build_single_tool(
     media_parameters = []
     for node in workflow.field_nodes:
         result = _build_field_parameter(node)
+        if result and not isinstance(result, list):
+            accepted = _accepted_sidecars(workflow.api_prompt, node["node_id"], object_info)
+            if accepted:
+                if (result.items or {}).get("properties", {}).get("media") is not None:
+                    result.items["properties"]["media"]["x-accept-sidecars"] = accepted
+                else:
+                    result.ui_hints = {**(result.ui_hints or {}), "accept-sidecars": accepted}
         if result:
             if isinstance(result, list):
                 media_parameters.extend(result)

@@ -89,7 +89,7 @@ class AudioCaptureTests(unittest.IsolatedAsyncioTestCase):
             (Path(tmp) / "stimma_output_0000.wav").write_bytes(data)
             result = await _capture_output(tmp, {}, context, MagicMock(), "job")
         context.assets.upload.assert_awaited_once_with(data, ".wav")
-        self.assertEqual(result, {"asset_id": "result.wav"})
+        self.assertEqual(result["assets"], [{"asset_id": "result.wav", "type": "audio", "role": "primary"}])
 
     async def test_history_audio_download_preserves_temp_type(self):
         instance = MagicMock(addr="worker:8188")
@@ -110,7 +110,7 @@ class AudioCaptureTests(unittest.IsolatedAsyncioTestCase):
             result = await _capture_from_history(instance, "job", context)
         session.get.assert_called_once_with("http://worker:8188/view", params={"filename": "audio.flac", "type": "temp", "subfolder": "preview"})
         context.assets.upload.assert_awaited_once_with(b"fLaC-audio", ".flac")
-        self.assertEqual(result, {"asset_id": "result.flac"})
+        self.assertEqual(result["assets"], [{"asset_id": "result.flac", "type": "audio", "role": "primary"}])
 
     async def test_registration_precedes_broadcasts_on_new_connections(self):
         transport = ComfyUITransport(MagicMock())
@@ -162,7 +162,7 @@ class AudioWorkflowTests(unittest.TestCase):
                 output = workflow.output_nodes[0]
                 self.assertEqual(output["class_type"], "StimmaAudioOutput")
                 _inject_output_dir(api, workflow, "job-output")
-                self.assertEqual(api[output["node_id"]]["inputs"]["_stimma_output_dir"], "job-output")
+                self.assertEqual(api[output["node_id"]]["inputs"]["_stimma_output_dir"], str(Path("job-output") / output["node_id"]))
                 self.assertEqual("negative_prompt" in props, "-Base" in filename or "MOSS" in filename)
                 group = descriptor.metadata["layout"][0]
                 self.assertTrue(group["collapsed"])

@@ -235,6 +235,7 @@ class ExecuteRequest:
     request_id: str
     tool_id: str
     parameters: dict = field(default_factory=dict)
+    input_sidecars: dict = field(default_factory=dict)
     # Whether the host wants in-flight preview frames for THIS execution.
     # Per-request so the host's setting takes effect immediately without a
     # reconnect. Absent = yes (hosts that don't know about previews simply
@@ -247,6 +248,7 @@ class ExecuteRequest:
             request_id=data["request_id"],
             tool_id=data["tool_id"],
             parameters=data.get("parameters", {}),
+            input_sidecars=data.get("input_sidecars", {}),
             preview_frames=bool(data.get("preview_frames", True)),
         )
 
