@@ -294,13 +294,21 @@ class StimmaVideoOutput:
                     raise RuntimeError(f"ffmpeg encoding failed: {err[-4000:]}")
 
             from .sidecars import publish_sidecars
-            publish_sidecars(sidecars, output_path, fps, num_frames, width, height, ["video", "audio"] if audio_path else ["video"])
+            published = False
+            try:
+                publish_sidecars(sidecars, output_path, fps, num_frames, width, height, ["video", "audio"] if audio_path else ["video"])
+                published = True
+            except OSError:
+                import logging
+                logging.getLogger(__name__).warning("Optional media companion publication failed (capture_failed); returning rendered video")
             filename = os.path.basename(output_path)
             subfolder = "" if _stimma_output_dir else os.path.relpath(os.path.dirname(output_path), folder_paths.get_output_directory())
             if subfolder == ".":
                 subfolder = ""
-            return {"ui": {"videos": [{"filename": filename, "subfolder": subfolder, "type": "output"}],
-                           "stimma_manifests": [{"filename": filename + ".manifest.json", "subfolder": subfolder, "type": "output"}]}}
+            ui = {"videos": [{"filename": filename, "subfolder": subfolder, "type": "output"}]}
+            if published:
+                ui["stimma_manifests"] = [{"filename": filename + ".manifest.json", "subfolder": subfolder, "type": "output"}]
+            return {"ui": ui}
 
         finally:
             if temp_dir is not None:

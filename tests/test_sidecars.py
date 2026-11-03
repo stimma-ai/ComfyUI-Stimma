@@ -9,6 +9,13 @@ from types import SimpleNamespace
 import unittest
 from unittest.mock import AsyncMock, patch
 
+# Import extension modules outside patch.dict: restoring sys.modules must not
+# unload/reimport torch between the two real video-output checks.
+try:
+    import torch
+except ImportError:
+    pass
+
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from stp_server.executor import _capture_output
 
@@ -98,6 +105,30 @@ class VideoMuxTests(unittest.TestCase):
             path = Path(tmp) / result["ui"]["videos"][0]["filename"]
             info = json.loads(subprocess.check_output(["ffprobe", "-v", "error", "-select_streams", "v", "-show_entries", "stream=nb_frames", "-of", "json", str(path)]))
             assert info["streams"][0]["nb_frames"] == "158"
+
+class OptionalPublicationTests(unittest.IsolatedAsyncioTestCase):
+    async def test_manifest_write_failure_still_captures_healthy_video(self):
+        import importlib
+        import types
+        import numpy as np
+        package = types.ModuleType("failed_publication_nodes")
+        package.__path__ = [str(Path(__file__).resolve().parents[1] / "nodes")]
+        original_write = Path.write_text
+        def fail_manifest(path, *args, **kwargs):
+            if path.name.endswith(".manifest.tmp"):
+                raise OSError("manifest storage unavailable")
+            return original_write(path, *args, **kwargs)
+        with patch.dict(sys.modules, {"failed_publication_nodes": package, "folder_paths": types.ModuleType("folder_paths")}), tempfile.TemporaryDirectory() as tmp:
+            module = importlib.import_module("failed_publication_nodes.outputs")
+            with patch.object(Path, "write_text", fail_manifest):
+                result = module.StimmaVideoOutput().execute(np.zeros((24, 48, 64, 3), dtype=np.float32), fps=24, _stimma_output_dir=tmp)
+            assert "stimma_manifests" not in result["ui"]
+            context = SimpleNamespace(assets=SimpleNamespace(upload=AsyncMock(return_value="healthy.mp4")),
+                                      _provider=SimpleNamespace(host_wants_media_sidecars=True))
+            captured = await _capture_output(tmp, {}, context, None, "job")
+            assert captured["assets"] == [{"asset_id": "healthy.mp4", "type": "video", "role": "primary"}]
+            assert context.assets.upload.await_args.args[0][4:8] == b"ftyp"
+
 
 if __name__ == "__main__":
     unittest.main()
