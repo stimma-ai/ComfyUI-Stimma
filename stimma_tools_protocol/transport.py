@@ -7,7 +7,8 @@ Supports:
 """
 
 from abc import ABC, abstractmethod
-from typing import AsyncIterator, Optional, Callable, Awaitable
+from contextvars import ContextVar
+from typing import Any, AsyncIterator, Optional, Callable, Awaitable, Tuple
 import asyncio
 import sys
 import json
@@ -24,6 +25,11 @@ from stimma_tools_protocol.protocol import (
 
 logger = logging.getLogger(__name__)
 
+# The client that sent the request being handled (None on single-client
+# transports). Lets a request handler remember who to send later
+# notifications to, e.g. tools.result for a job it queued.
+current_request_origin: ContextVar[Any] = ContextVar("current_request_origin", default=None)
+
 
 class Transport(ABC):
     """Abstract base class for STP transports."""
@@ -39,14 +45,24 @@ class Transport(ABC):
         pass
 
     @abstractmethod
-    async def send(self, message: str) -> None:
-        """Send a message."""
+    async def send(self, message: str, to: Any = None) -> None:
+        """Send a message.
+
+        to: the client to send it to, as yielded by receive_with_origin().
+        None sends to every client. Single-client transports ignore it.
+        """
         pass
 
     @abstractmethod
     async def receive(self) -> AsyncIterator[str]:
         """Receive messages as an async iterator."""
         pass
+
+    async def receive_with_origin(self) -> AsyncIterator[Tuple[Any, str]]:
+        """Receive (origin, message) pairs. Multi-client transports override
+        this so replies can go back to the client that sent the request."""
+        async for message in self.receive():
+            yield None, message
 
     @property
     @abstractmethod
@@ -83,7 +99,7 @@ class StdioTransport(Transport):
             pass
         logger.debug("Stdio transport stopped")
 
-    async def send(self, message: str) -> None:
+    async def send(self, message: str, to: Any = None) -> None:
         """Send a message to stdout."""
         async with self._write_lock:
             line = message.rstrip("\n") + "\n"
@@ -263,7 +279,7 @@ class WebSocketTransport(Transport):
 
         logger.debug("WebSocket transport stopped")
 
-    async def send(self, message: str) -> None:
+    async def send(self, message: str, to: Any = None) -> None:
         """Send a message to all connected WebSocket clients."""
         async with self._write_lock:
             if not self._clients:
@@ -357,24 +373,31 @@ class MessageHandler:
         finally:
             self._pending_responses.pop(request_id, None)
 
-    async def send_response(self, response: JsonRpcResponse) -> None:
+    async def send_response(self, response: JsonRpcResponse, to: Any = None) -> None:
         """Send a response."""
-        await self._transport.send(response.to_json())
+        await self._transport.send(response.to_json(), to)
 
-    async def send_notification(self, method: str, params: Optional[dict] = None) -> None:
-        """Send a notification (no response expected)."""
+    async def send_notification(
+        self, method: str, params: Optional[dict] = None, to: Any = None
+    ) -> None:
+        """Send a notification (no response expected). to=None sends it to every client."""
         notification = JsonRpcNotification(method=method, params=params)
-        await self._transport.send(notification.to_json())
+        await self._transport.send(notification.to_json(), to)
 
-    async def handle_message(self, message: str) -> None:
-        """Handle an incoming message."""
+    async def handle_message(self, message: str, origin: Any = None) -> None:
+        """Handle an incoming message.
+
+        origin: the client that sent it. Replies go only to that client:
+        every host numbers its requests independently, so a reply broadcast
+        to all clients can resolve another host's request with the same id.
+        """
         try:
             parsed = parse_message(message)
         except ValueError as e:
             # Send parse error response
             error = JsonRpcError.from_code(JsonRpcErrorCode.PARSE_ERROR, str(e))
             response = JsonRpcResponse.failure(None, error)
-            await self._transport.send(response.to_json())
+            await self._transport.send(response.to_json(), origin)
             return
 
         if isinstance(parsed, JsonRpcResponse):
@@ -385,18 +408,21 @@ class MessageHandler:
         elif isinstance(parsed, JsonRpcRequest):
             # Handle incoming request
             if self._on_request:
+                token = current_request_origin.set(origin)
                 try:
                     response = await self._on_request(parsed)
-                    await self._transport.send(response.to_json())
+                    await self._transport.send(response.to_json(), origin)
                 except Exception as e:
                     logger.exception(f"Error handling request: {e}")
                     error = JsonRpcError.from_code(JsonRpcErrorCode.INTERNAL_ERROR, str(e))
                     response = JsonRpcResponse.failure(parsed.id, error)
-                    await self._transport.send(response.to_json())
+                    await self._transport.send(response.to_json(), origin)
+                finally:
+                    current_request_origin.reset(token)
             else:
                 error = JsonRpcError.from_code(JsonRpcErrorCode.METHOD_NOT_FOUND)
                 response = JsonRpcResponse.failure(parsed.id, error)
-                await self._transport.send(response.to_json())
+                await self._transport.send(response.to_json(), origin)
         elif isinstance(parsed, JsonRpcNotification):
             # Handle notification
             if self._on_notification:
@@ -415,8 +441,8 @@ class MessageHandler:
     async def run(self) -> None:
         """Run the message handling loop."""
         try:
-            async for message in self._transport.receive():
-                await self.handle_message(message)
+            async for origin, message in self._transport.receive_with_origin():
+                await self.handle_message(message, origin)
         finally:
             # Cancel any pending requests when transport closes
             self.close()

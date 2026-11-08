@@ -3,7 +3,7 @@
 import asyncio
 import json
 import logging
-from typing import AsyncIterator, Optional, Callable, Awaitable
+from typing import Any, AsyncIterator, Optional, Callable, Awaitable, Tuple
 
 from stimma_tools_protocol.transport import Transport
 
@@ -26,7 +26,8 @@ class ComfyUITransport(Transport):
         self._running = False
         self._clients: set = set()
         self._awaiting_registration: set = set()
-        self._message_queue: asyncio.Queue[str] = asyncio.Queue()
+        # (sending client, message) so replies can go back to that client.
+        self._message_queue: asyncio.Queue[Tuple[Any, str]] = asyncio.Queue()
         self._write_lock = asyncio.Lock()
         self._first_client_connected: asyncio.Event = asyncio.Event()
         self._on_client_connected: Optional[Callable[[], Awaitable[None]]] = None
@@ -62,8 +63,12 @@ class ComfyUITransport(Transport):
         self._awaiting_registration.clear()
         logger.debug("ComfyUI transport stopped")
 
-    async def send(self, message: str) -> None:
-        """Send a message to all connected STP clients."""
+    async def send(self, message: str, to: Any = None) -> None:
+        """Send a message to one STP client (to), or to all of them (to=None).
+
+        Replies and job notifications name their client: several Stimma hosts
+        can share one ComfyUI, and each numbers its requests independently.
+        """
         async with self._write_lock:
             # Only parse the (potentially large) message when we actually need
             # the method name — for a debug log, or to describe a dropped send
@@ -89,7 +94,16 @@ class ComfyUITransport(Transport):
                     logger.warning(f"No STP clients connected (dropping {method})")
                 return
 
-            for client in list(self._clients):
+            if to is not None:
+                if to not in self._clients:
+                    # Its host failed its pending work when the socket closed.
+                    logger.debug(f"STP client gone (dropping {method or 'reply'})")
+                    return
+                targets = [to]
+            else:
+                targets = list(self._clients)
+
+            for client in targets:
                 # A watcher/progress broadcast can race the registration task
                 # when a CLI connects to an already-running provider. STP hosts
                 # require provider.register to be the first frame.
@@ -105,9 +119,14 @@ class ComfyUITransport(Transport):
 
     async def receive(self) -> AsyncIterator[str]:
         """Receive messages from connected STP clients."""
+        async for _origin, message in self.receive_with_origin():
+            yield message
+
+    async def receive_with_origin(self) -> AsyncIterator[Tuple[Any, str]]:
+        """Receive (sending client, message) pairs from connected STP clients."""
         while self._running:
             try:
-                message = await asyncio.wait_for(
+                origin, message = await asyncio.wait_for(
                     self._message_queue.get(),
                     timeout=1.0,
                 )
@@ -119,7 +138,7 @@ class ComfyUITransport(Transport):
                 except Exception:
                     pass
 
-                yield message
+                yield origin, message
             except asyncio.TimeoutError:
                 continue
             except asyncio.CancelledError:
@@ -151,9 +170,9 @@ class ComfyUITransport(Transport):
         try:
             async for msg in ws:
                 if msg.type == aiohttp.WSMsgType.TEXT:
-                    await self._message_queue.put(msg.data)
+                    await self._message_queue.put((ws, msg.data))
                 elif msg.type == aiohttp.WSMsgType.BINARY:
-                    await self._message_queue.put(msg.data.decode("utf-8"))
+                    await self._message_queue.put((ws, msg.data.decode("utf-8")))
                 elif msg.type == aiohttp.WSMsgType.ERROR:
                     logger.error(f"STP WebSocket error: {ws.exception()}")
                     break

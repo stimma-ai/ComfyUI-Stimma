@@ -26,7 +26,7 @@ from stimma_tools_protocol.protocol import (
     STPError,
     STPErrorCode,
 )
-from stimma_tools_protocol.transport import Transport, MessageHandler
+from stimma_tools_protocol.transport import Transport, MessageHandler, current_request_origin
 from stimma_tools_protocol.tool import Tool, ToolRegistry, get_registry
 from stimma_tools_protocol.assets import AssetManager, LocalAssetServer
 
@@ -130,6 +130,8 @@ class Job:
     task: Optional[asyncio.Task] = None
     cancelled: bool = False
     preview_frames: bool = True
+    # Client that submitted the job; its progress and result go only there.
+    origin: Any = None
 
 
 class Provider:
@@ -425,6 +427,7 @@ class Provider:
             parameters=exec_request.parameters,
             input_sidecars=exec_request.input_sidecars,
             preview_frames=exec_request.preview_frames,
+            origin=current_request_origin.get(),
         )
         self._queued_jobs.append(job)
         self._job_available.set()
@@ -567,6 +570,10 @@ class Provider:
             self._job_semaphore.release()
             await self._send_queue_status()
 
+    def _job_origin(self, request_id: str) -> Any:
+        job = self._running_jobs.get(request_id)
+        return job.origin if job else None
+
     async def _send_queue_status(self) -> None:
         """Send queue status notification."""
         if not self._handler:
@@ -605,7 +612,9 @@ class Provider:
             progress=progress,
             preview=preview_payload,
         )
-        await self._handler.send_notification("tools.progress", notification.to_dict())
+        await self._handler.send_notification(
+            "tools.progress", notification.to_dict(), to=self._job_origin(request_id)
+        )
 
     async def _send_result(
         self,
@@ -631,7 +640,9 @@ class Provider:
             metadata=metadata or {},
         )
         try:
-            await self._handler.send_notification("tools.result", result.to_dict())
+            await self._handler.send_notification(
+                "tools.result", result.to_dict(), to=self._job_origin(request_id)
+            )
         except Exception as e:
             logger.error(
                 f"Failed to send result for {request_id}: {e} "
