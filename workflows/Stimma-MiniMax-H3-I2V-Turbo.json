@@ -1044,7 +1044,7 @@
         0.5,
         "slider",
         20,
-        "Video duration in seconds; H3 snaps it to its 24 fps frame grid. The native length is 5 s (124 frames), and the usual segment length for a longer take. A run can go up to about 15 s; a longer run takes more GPU time, by an amount that depends on settings and hardware, and one that fails is redone whole."
+        "Video duration in seconds; H3 snaps it to its 24 fps frame grid. The native length is 5 s (124 frames), and every segment or continuation hop of a longer take stays at it. Only a clip that stands alone runs longer, up to about 15 s, and only when the shot needs it. A run past the native length takes more GPU time (by an amount that depends on settings and hardware), drifts more within itself, and is redone whole when it fails, while a take built from native segments redoes only the segment that failed."
       ]
     },
     {

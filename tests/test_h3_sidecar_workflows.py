@@ -37,6 +37,9 @@ class H3WorkflowTests(unittest.TestCase):
                 description = self._widgets(path, "StimmaFloatParam", "duration")[-1]
                 assert "native length is 5 s (124 frames)" in description
                 assert "15 s" in description
+                # Segments and hops default to native; the longer run is the exception, with its cost.
+                assert "every segment or continuation hop of a longer take stays at it" in description
+                assert "redone whole" in description and "drifts" in description
                 # Scaling depends on settings and hardware; no fixed ratio is promised.
                 assert "three times" not in description
 
