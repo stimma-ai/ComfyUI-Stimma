@@ -37,6 +37,8 @@ class H3WorkflowTests(unittest.TestCase):
                 description = self._widgets(path, "StimmaFloatParam", "duration")[-1]
                 assert "native length is 5 s (124 frames)" in description
                 assert "15 s" in description
+                # Scaling depends on settings and hardware; no fixed ratio is promised.
+                assert "three times" not in description
 
     def test_long_shots_are_still_to_still_segments(self):
         for path in sorted((ROOT / "workflows").glob("Stimma-MiniMax-H3-[IR]2V*.json")):
@@ -47,8 +49,17 @@ class H3WorkflowTests(unittest.TestCase):
                     assert "still-to-still segments" in instructions
                     # Clip pins at both ends stay for joining clips that already exist.
                     assert "two existing clips" in instructions
+                    # A shot that travels continues instead of anchoring.
+                    assert "travels" in instructions and "a few hops" in instructions
                 else:
                     assert "one per pair of neighboring stills" in instructions
+
+    def test_sound_pins_keep_their_role(self):
+        for path in sorted((ROOT / "workflows").glob("Stimma-MiniMax-H3-*V*.json")):
+            with self.subTest(workflow=path.name):
+                keyframes = self._widgets(path, "StimmaKeyframesParam")[-1]
+                assert "music" in keyframes and "narration" in keyframes
+                assert "On-screen speech" in keyframes or "on-screen speech" in keyframes
 
 
 if __name__ == "__main__":
