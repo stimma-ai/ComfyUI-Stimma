@@ -581,6 +581,18 @@ class TestInjectKeyframes(unittest.TestCase):
         self.assertTrue(all(w["file"].startswith("up_") for w in wire))
         self.assertEqual(instance.upload_video.await_count, 2)
 
+    def test_sound_only_items_keep_picture_false(self):
+        prompt, _, _ = self._run({"keyframes": [
+            {"media": "a1.png", "at": 0},
+            {"media": "speech.wav", "at": 0, "from": 5.125, "length": 5.1667},
+            {"media": "v1.mp4", "at": 0, "picture": False},
+        ]})
+        wire = json.loads(prompt["30"]["inputs"]["_stimma_keyframes"])
+        self.assertNotIn("picture", wire[0])
+        self.assertEqual((wire[1]["from"], wire[1]["length"]), (5.125, 5.1667))
+        self.assertNotIn("picture", wire[1])
+        self.assertEqual((wire[2]["picture"], wire[2]["sound"]), (False, True))
+
     def test_keyframes_alone_satisfy_reference_to_video(self):
         _, unprovided, _ = self._run({"keyframes": [{"media": "a1.png", "at": 0}]})
         self.assertEqual(unprovided, [])

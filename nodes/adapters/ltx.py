@@ -61,6 +61,10 @@ class StimmaApplyKeyframesLTX:
             _, guides = get_keyframe_idxs(positive, samples.shape)
             frame_count = (latent_t - guides - 1) * time_scale + 1
 
+            if getattr(kf, "source", {}).get("picture") is False or kf["image"] is None:
+                if hasattr(kf, "usage"):
+                    kf.usage = {"source": "skipped", "reason": "unsupported_audio_pin"}
+                continue
             image = kf["image"]
             if image.shape[0] > 1:
                 want = _ltx_clip_frames(max(1, int(round(kf["length"] * fps))), time_scale)

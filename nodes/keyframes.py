@@ -1,4 +1,4 @@
-"""Keyframes: stills or short clips pinned at times on the output video.
+"""Keyframes: stills, short clips or sound pinned at times on the output video.
 
 `StimmaKeyframesParam` exposes the tool's `keyframes` parameter and loads each
 pinned item. Model adapters (`StimmaApplyKeyframesH3`, `StimmaApplyKeyframesLTX`)
@@ -34,6 +34,31 @@ def _is_still(path):
         return False
 
 
+def _has_picture(path):
+    """True when the file has a picture stream (a video), False for sound only."""
+    try:
+        import av
+    except ImportError:
+        av = None
+    if av is not None:
+        try:
+            with av.open(path) as container:
+                return any(
+                    not (getattr(s, "disposition", 0) and "attached_pic" in str(s.disposition).lower())
+                    for s in container.streams.video
+                )
+        except Exception:
+            return False
+    import cv2
+
+    cap = cv2.VideoCapture(path)
+    try:
+        ok, _ = cap.read()
+        return bool(ok)
+    finally:
+        cap.release()
+
+
 def _read_video_frames(path, start_s, length_s, fps):
     """Frames of `path` from `start_s`: one frame when `length_s` is falsy, else
     `round(length_s * fps)` frames resampled to `fps`."""
@@ -65,30 +90,43 @@ def _read_video_frames(path, start_s, length_s, fps):
 
 
 def _slice_audio(path, start_s, length_s):
+    """Sound of `path` from `start_s`: `length_s` seconds, or to the end when falsy."""
     from .fields import _load_video_audio
 
     audio = _load_video_audio(path, fallback_duration_s=length_s)
     sr = int(audio["sample_rate"])
-    a = int(round(start_s * sr))
-    b = a + max(1, int(round(length_s * sr)))
-    return {"waveform": audio["waveform"][..., a:b].contiguous(), "sample_rate": sr}
+    a = min(int(round(start_s * sr)), audio["waveform"].shape[-1])
+    b = a + max(1, int(round(length_s * sr))) if length_s else audio["waveform"].shape[-1]
+    wave = audio["waveform"][..., a:b].contiguous()
+    if wave.shape[-1] == 0:
+        raise ValueError(f"{os.path.basename(path)} has no sound at {start_s:.2f}s")
+    return {"waveform": wave, "sample_rate": sr}
 
 
 def load_keyframe(item, fps):
-    """Load one wire item: {file, at, from?, length?, sound?} → loaded keyframe."""
+    """Load one wire item: {file, at, from?, length?, sound?, picture?} → loaded keyframe.
+
+    An audio file, or a video with `picture: false`, pins sound alone: `image`
+    is None and `length` is the length of the loaded sound.
+    """
     path = folder_paths.get_annotated_filepath(item["file"])
     start = float(item.get("from") or 0.0)
     length = float(item.get("length") or 0.0)
+    at = float(item.get("at") or 0.0)
+    if item.get("picture") is False or not (_is_still(path) or _has_picture(path)):
+        audio = _slice_audio(path, start, length)
+        length = audio["waveform"].shape[-1] / audio["sample_rate"]
+        return {"at": at, "image": None, "audio": audio, "length": length}
     if _is_still(path):
         image, length = _load_still(path), 0.0
     else:
         image = _read_video_frames(path, start, length, fps)
     audio = _slice_audio(path, start, length) if (length and item.get("sound")) else None
-    return {"at": float(item.get("at") or 0.0), "image": image, "audio": audio, "length": length}
+    return {"at": at, "image": image, "audio": audio, "length": length}
 
 
 class StimmaKeyframesParam:
-    """Stills or short clips pinned at times on the output video."""
+    """Stills, short clips or sound pinned at times on the output video."""
 
     @classmethod
     def INPUT_TYPES(cls):
@@ -104,6 +142,8 @@ class StimmaKeyframesParam:
                 "allow_sound": ("BOOLEAN", {"default": False}),
                 "timeline_param": ("STRING", {"default": "duration"}),
                 "ui_order": ("INT", {"default": 15, "min": 0, "max": 100}),
+                "allow_audio": ("BOOLEAN", {"default": False,
+                                            "tooltip": "Items can pin sound alone over a span."}),
             },
             "optional": {
                 "_stimma_keyframes": ("STRING", {"default": "", "multiline": False}),
@@ -118,7 +158,8 @@ class StimmaKeyframesParam:
     CATEGORY = "Stimma/Params"
 
     def execute(self, name, max_items, positions, fps, clip_min_frames, clip_step_frames,
-                allow_sound, timeline_param, ui_order, _stimma_keyframes="", instructions=""):
+                allow_sound, timeline_param, ui_order, allow_audio=False, _stimma_keyframes="",
+                instructions=""):
         items = json.loads(_stimma_keyframes) if _stimma_keyframes else []
         return ([LazyKeyframe(item, fps) for item in items[:max_items]],)
 

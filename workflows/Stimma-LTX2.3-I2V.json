@@ -1521,6 +1521,14 @@
           "link": null
         },
         {
+          "name": "allow_audio",
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "allow_audio"
+          },
+          "link": null
+        },
+        {
           "name": "_stimma_keyframes",
           "type": "STRING",
           "widget": {
@@ -1562,6 +1570,7 @@
         false,
         "duration",
         7,
+        false,
         "",
         "Pin stills or short clips at exact times in the output. A still at 0 is the first frame (it overrides the start image there); a still with `at` equal to the duration is the last frame. A clip pins its motion from where it lands: to continue an earlier take, pass the frame where its last second begins as the start image and pin that last second at 0. Clips carry picture only, not sound. Pinned images are not shown to the prompt, so describe what happens between them."
       ]

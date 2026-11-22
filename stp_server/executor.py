@@ -715,6 +715,9 @@ async def _inject_fields(
                     entry["sidecars"] = companions
                 if item.get("sound"):
                     entry["sound"] = True
+                if item.get("picture") is False:
+                    entry["picture"] = False
+                    entry["sound"] = True
                 wire.append(entry)
             if not wire:
                 unprovided_node_ids.append(node_id)

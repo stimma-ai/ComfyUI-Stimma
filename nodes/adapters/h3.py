@@ -198,6 +198,22 @@ class StimmaApplyKeyframesH3:
         latent_t = latent["samples"].tensors[0].shape[2]
         frame_count = sum(FRAME_PER_TOKEN[k % 5] for k in range(latent_t))
         for kf in keyframes:
+            source = getattr(kf, "source", {})
+            if source.get("picture") is False or kf["image"] is None:
+                # Sound alone: an in-context copy of the output's audio from `at`,
+                # which the picture lip-syncs to. The guide node crops overlong sound.
+                idx = int(round(kf["at"] * self.FPS))
+                if idx < 0:
+                    idx += frame_count
+                idx = max(0, min(idx, frame_count - 1))
+                out = MiniMaxH3AddGuide.execute(
+                    positive=positive, latent=latent, frame_idx=idx,
+                    audio_vae=audio_vae, audio=kf["audio"],
+                )
+                positive = out.result[0]
+                if hasattr(kf, "usage"):
+                    kf.usage = {"source": "audio", "from": source.get("from", 0), "length": kf["length"]}
+                continue
             native = _native_guide(kf, latent, vae, audio_vae)
             if native is not None:
                 import node_helpers

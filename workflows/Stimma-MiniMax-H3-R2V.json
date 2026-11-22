@@ -962,7 +962,7 @@
         "Generate video from ordered image, video, and audio references with synchronized stereo audio. Includes selectable INT8/FP8 precision and native Sol attention.",
         "MiniMax",
         "MiniMax H3 Ref2VA",
-        "References (input_images, input_videos, input_audios) steer identity, style, motion, and voice, and the prompt names them by tag. Keyframes pin stills or clips at exact times. To continue a video, pin its last 39 frames (1.625 seconds) with sound at 0 and pass the same video in input_audios for the voice; a clip pinned from the library also brings its original generation state when compatible. A clip pinned at the start already sets the opening framing, so the prompt describes what happens after it and expresses any change of framing as camera movement; a different framing written in the prompt is reached with a cut. The output opens with the pinned clip, so its first 39 frames overlap the source's last 39: crossfade them when joining. Each continuation drifts a little in color, detail and framing, so for a long shot render segments from separate start stills and bridge neighbors with clips pinned at both ends, all sharing one voice reference."
+        "References (input_images, input_videos, input_audios) steer identity, style, motion, and voice, and the prompt names them by tag. Keyframes pin stills or clips at exact times. To continue a video, pin its last 39 frames (1.625 seconds) with sound at 0 and pass the same video in input_audios for the voice; a clip pinned from the library also brings its original generation state when compatible. A clip pinned at the start already sets the opening framing, so the prompt describes what happens after it and expresses any change of framing as camera movement; a different framing written in the prompt is reached with a cut. The output opens with the pinned clip, so its first 39 frames overlap the source's last 39: crossfade them when joining. Each continuation drifts a little in color, detail and framing, so for a long shot render segments from separate start stills and bridge neighbors with clips pinned at both ends, all sharing one voice reference. Keyframes can also pin audio over a span: the output then speaks that audio with its timing, so a long take with one speech track renders each segment from its slice of the track, with that track as the voice reference."
       ]
     },
     {
@@ -4495,6 +4495,14 @@
           "link": null
         },
         {
+          "name": "allow_audio",
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "allow_audio"
+          },
+          "link": null
+        },
+        {
           "name": "_stimma_keyframes",
           "type": "STRING",
           "widget": {
@@ -4537,8 +4545,9 @@
         true,
         "duration",
         15,
+        true,
         "",
-        "Pin stills or short clips at exact times in the output. A still at 0 is the first frame; a still with `at` equal to the duration is the last frame. A clip pinned with its sound carries that picture and audio into the output from where it lands, so the last second of an earlier take pinned at 0 continues it. Pinned images are not shown to the prompt; to name one as <Picture N>, also pass it in input_images."
+        "Pin stills or short clips at exact times in the output. A still at 0 is the first frame; a still with `at` equal to the duration is the last frame. A clip pinned with its sound carries that picture and audio into the output from where it lands, so the last second of an earlier take pinned at 0 continues it. Pinned images are not shown to the prompt; to name one as <Picture N>, also pass it in input_images. Audio pinned at a time sets the speech and sound from there, for `length` seconds of it from `from`, and the picture lip-syncs to it and keeps its timing; a video pinned with `picture: false` lends its sound alone. Stills and clips can be pinned alongside it. When pinning speech, also pass the same audio in input_audios as the voice reference."
       ],
       "title": "Keyframes"
     },

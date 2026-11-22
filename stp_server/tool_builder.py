@@ -467,6 +467,28 @@ def _build_keyframes_parameter(inputs: Dict[str, Any]) -> ToolParameter:
                 "default": False,
                 "description": "Pin the clip's sound along with its picture.",
             }
+    if inputs.get("allow_audio"):
+        props["media"] = {
+            "type": "string",
+            "x-media": ["image", "video", "audio"],
+            "description": "A still image, a video to take a frame or clip from, or audio to pin as sound alone.",
+        }
+        props["from"]["description"] = "For a video or audio: the second to take the frame, clip or sound from."
+        props["length"] = {
+            "type": "number",
+            "minimum": 0,
+            "description": (
+                "For a video clip: its length in seconds; leave out to pin a single frame"
+                + (f". Clips snap to {clip_min} + {clip_step}k frames at {fps} fps." if clip_min > 0 else ".")
+                + " For audio: seconds of sound from `from`; leave out to run to the end of the output."
+            ),
+        }
+        props["picture"] = {
+            "type": "boolean",
+            "default": True,
+            "description": "For a video: false pins only its sound over the span, not its frames.",
+        }
+        hints["audio"] = True
     return ToolParameter(
         name=inputs.get("name") or "keyframes",
         type="array",

@@ -63,6 +63,12 @@ class TestKeyframes(unittest.TestCase):
 
         Image.new("RGB", (32, 24), (200, 10, 10)).save(os.path.join(cls.tmp, "still.png"))
         _write_video(os.path.join(cls.tmp, "clip.mp4"))
+        import wave
+        with wave.open(os.path.join(cls.tmp, "speech.wav"), "wb") as w:
+            w.setnchannels(1)
+            w.setsampwidth(2)
+            w.setframerate(16000)
+            w.writeframes(np.zeros(48000, dtype=np.int16).tobytes())
 
     def _fake_audio(self, *_args, **_kwargs):
         return {"waveform": torch.arange(48000, dtype=torch.float32).reshape(1, 1, -1), "sample_rate": 16000}
@@ -91,9 +97,33 @@ class TestKeyframes(unittest.TestCase):
     def test_param_node_round_trip(self):
         node = self.kf.StimmaKeyframesParam()
         wire = json.dumps([{"file": "still.png", "at": 0}, {"file": "clip.mp4", "at": 2, "from": 0.2}])
-        (out,) = node.execute("keyframes", 6, "any", 24, 5, 17, True, "duration", 15, wire, "")
+        (out,) = node.execute("keyframes", 6, "any", 24, 5, 17, True, "duration", 15, True, wire, "")
         self.assertEqual([k["at"] for k in out], [0.0, 2.0])
-        self.assertEqual(node.execute("keyframes", 6, "any", 24, 5, 17, True, "duration", 15, "", "")[0], [])
+        self.assertEqual(node.execute("keyframes", 6, "any", 24, 5, 17, True, "duration", 15, True, "", "")[0], [])
+
+    def test_audio_file_pins_sound_alone(self):
+        with patch.object(sys.modules["stimma_nodes.fields"], "_load_video_audio", self._fake_audio):
+            kf = self.kf.load_keyframe({"file": "speech.wav", "at": 0, "from": 0.5, "length": 1.25}, 24)
+            whole = self.kf.load_keyframe({"file": "speech.wav", "at": 0, "from": 2.0}, 24)
+        self.assertIsNone(kf["image"])
+        self.assertEqual(kf["audio"]["waveform"].shape[-1], 20000)
+        self.assertEqual(int(kf["audio"]["waveform"][..., 0]), 8000)
+        self.assertAlmostEqual(kf["length"], 1.25)
+        # No length: the sound runs from `from` to the end of the file.
+        self.assertEqual(whole["audio"]["waveform"].shape[-1], 16000)
+        self.assertAlmostEqual(whole["length"], 1.0)
+
+    def test_video_without_picture_pins_its_sound(self):
+        with patch.object(sys.modules["stimma_nodes.fields"], "_load_video_audio", self._fake_audio):
+            kf = self.kf.load_keyframe({"file": "clip.mp4", "at": 1, "from": 1.0, "length": 0.5,
+                                        "sound": True, "picture": False}, 24)
+        self.assertIsNone(kf["image"])
+        self.assertEqual(kf["audio"]["waveform"].shape[-1], 8000)
+        self.assertEqual(kf["at"], 1.0)
+
+    def test_has_picture(self):
+        self.assertTrue(self.kf._has_picture(os.path.join(self.tmp, "clip.mp4")))
+        self.assertFalse(self.kf._has_picture(os.path.join(self.tmp, "speech.wav")))
 
     def test_original_state_is_bit_exact_and_does_not_load_pixels(self):
         import hashlib
@@ -171,6 +201,53 @@ class TestKeyframes(unittest.TestCase):
         self.assertEqual([c[3] for c in calls], [None, None, None, None, "avae"])
         self.assertEqual(self.kf.StimmaApplyKeyframesH3().execute("pos", latent, "v", "a", None), ("pos",))
 
+    def test_h3_adapter_places_audio_pins(self):
+        calls = []
+
+        class FakeAddGuide:
+            @staticmethod
+            def execute(**kw):
+                calls.append(kw)
+                return types.SimpleNamespace(result=(kw["positive"] + [kw["frame_idx"]],))
+
+        comfy_minimax = types.ModuleType("comfy.ldm.minimax.model")
+        comfy_minimax.FRAME_PER_TOKEN = (1, 4, 4, 4, 4)
+        nodes_h3 = types.ModuleType("comfy_extras.nodes_minimax_h3")
+        nodes_h3.MiniMaxH3AddGuide = FakeAddGuide
+        latent = {"samples": types.SimpleNamespace(tensors=(torch.zeros(1, 24, 37, 2, 2), None))}
+        sound = {"waveform": torch.zeros(1, 1, 16000), "sample_rate": 16000}
+        still = torch.zeros(1, 4, 4, 3)
+        # A video with sidecars but `picture: false` must not take the stored-state path.
+        speech = self.kf.LazyKeyframe({"file": "clip.mp4", "at": 0, "from": 1.0, "length": 0.5, "sound": True,
+                                       "picture": False, "sidecars": [{"format": "minimax_h3_latent"}]}, 24)
+        speech.update({"image": None, "audio": sound, "length": 0.5})
+        speech._loaded = True
+        frames = [
+            {"at": 0.0, "image": still, "audio": None},
+            speech,
+            {"at": 2.5, "image": None, "audio": sound, "length": 1.0},
+            {"at": -1.0, "image": None, "audio": sound, "length": 1.0},
+            {"at": 9.0, "image": None, "audio": sound, "length": 1.0},
+            {"at": 5.0, "image": still, "audio": None},
+        ]
+        with patch.dict(sys.modules, {
+            "comfy": types.ModuleType("comfy"), "comfy.ldm": types.ModuleType("comfy.ldm"),
+            "comfy.ldm.minimax": types.ModuleType("comfy.ldm.minimax"), "comfy.ldm.minimax.model": comfy_minimax,
+            "comfy_extras": types.ModuleType("comfy_extras"), "comfy_extras.nodes_minimax_h3": nodes_h3,
+        }):
+            (positive,) = self.kf.StimmaApplyKeyframesH3().execute([], latent, "vae", "avae", frames, 5.0)
+        # Sound lands at round(at * 24), negative from the end, clamped into the 124 frames;
+        # the stills keep their own placement.
+        self.assertEqual(positive, [0, 0, 60, 100, 123, 123])
+        sound_calls = calls[1:5]
+        for kw in sound_calls:
+            self.assertEqual(kw["audio_vae"], "avae")
+            self.assertIs(kw["audio"], sound)
+            self.assertNotIn("image", kw)
+            self.assertNotIn("vae", kw)
+        self.assertEqual(calls[0]["vae"], "vae")
+        self.assertEqual(speech.usage, {"source": "audio", "from": 1.0, "length": 0.5})
+
     def test_ltx_clip_start(self):
         # 5 s at 24 fps -> 121 frames. Starts are 0 or 8j + 1; a 17-frame clip
         # mid-video keeps 16 frames, so the last start is 105.
@@ -213,6 +290,7 @@ class TestKeyframes(unittest.TestCase):
             {"at": -1.0, "image": still, "audio": None, "length": 0.0},
             {"at": 5.0, "image": still, "audio": None, "length": 0.0},
             {"at": 9.0, "image": clip, "audio": None, "length": 22 / 24},
+            {"at": 0.0, "image": None, "audio": {"waveform": None}, "length": 2.0},
         ]
         with patch.dict(sys.modules, {"comfy": comfy, "comfy.utils": comfy_utils,
                                       "comfy_extras": types.ModuleType("comfy_extras"),

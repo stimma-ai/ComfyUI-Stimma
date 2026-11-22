@@ -2803,6 +2803,14 @@
           "link": null
         },
         {
+          "name": "allow_audio",
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "allow_audio"
+          },
+          "link": null
+        },
+        {
           "name": "_stimma_keyframes",
           "type": "STRING",
           "widget": {
@@ -2845,8 +2853,9 @@
         true,
         "duration",
         15,
+        true,
         "",
-        "Pin stills or short clips at exact times in the output. A still at 0 is the first frame; a still with `at` equal to the duration is the last frame. A clip pinned with its sound carries that picture and audio into the output from where it lands, so the last second of an earlier take pinned at 0 continues it. Pinned images are not shown to the prompt; to name one as <Picture N>, also pass it in input_images."
+        "Pin stills or short clips at exact times in the output. A still at 0 is the first frame; a still with `at` equal to the duration is the last frame. A clip pinned with its sound carries that picture and audio into the output from where it lands, so the last second of an earlier take pinned at 0 continues it. Pinned images are not shown to the prompt; to name one as <Picture N>, also pass it in input_images. Audio pinned at a time sets the speech and sound from there, for `length` seconds of it from `from`, and the picture lip-syncs to it and keeps its timing; a video pinned with `picture: false` lends its sound alone. Stills and clips can be pinned alongside it."
       ],
       "title": "Keyframes"
     },

@@ -888,6 +888,15 @@ class TestKeyframes(unittest.TestCase):
         self.assertNotIn("keyframes", schema.get("required", []))
         self.assertIn({"required": ["keyframes"], "properties": {"keyframes": {"minItems": 1}}}, schema["anyOf"])
 
+    def test_allow_audio_accepts_sound_items(self):
+        kf = self._schema(dict(self.KF_INPUTS, allow_audio=True))["properties"]["keyframes"]
+        props = kf["items"]["properties"]
+        self.assertEqual(props["media"]["x-media"], ["image", "video", "audio"])
+        self.assertEqual(set(props), {"media", "at", "from", "length", "sound", "picture"})
+        self.assertIn("For audio", props["length"]["description"])
+        self.assertTrue(kf["x-audio"])
+        self.assertNotIn("x-audio", self._schema(self.KF_INPUTS)["properties"]["keyframes"])
+
     def test_stills_only_omits_clip_fields(self):
         kf = self._schema(dict(self.KF_INPUTS, clip_min_frames=0), task_types=("image-to-video",))["properties"]["keyframes"]
         self.assertEqual(set(kf["items"]["properties"]), {"media", "at", "from"})
@@ -913,6 +922,8 @@ class TestKeyframes(unittest.TestCase):
             kf = next(n for n in wf["nodes"] if n["type"] == "StimmaKeyframesParam")
             saved = [i["name"] for i in kf["inputs"] if i.get("widget")]
             self.assertEqual(saved[-1], "instructions", name)
+            self.assertEqual(saved[saved.index("ui_order") + 1], "allow_audio", name)
+            self.assertIs(kf["widgets_values"][saved.index("allow_audio")], True, name)
             self.assertEqual(len(kf["widgets_values"]), len(saved), name)
             self.assertEqual(wf["last_link_id"], max(links), name)
             self.assertEqual(wf["last_node_id"], max(nodes), name)
