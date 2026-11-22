@@ -1024,7 +1024,7 @@
         0.5,
         "slider",
         20,
-        "Video duration in seconds; H3 snaps this to its valid 24 fps frame grid."
+        "Video duration in seconds; H3 snaps it to its 24 fps frame grid. The native length is 5 s (124 frames), and the segments of a longer take are planned at it. A run can go up to about 15 s, but its GPU time grows with length (15 s takes about three times as long as 5 s) and a run that fails is redone whole."
       ]
     },
     {
