@@ -1024,7 +1024,7 @@
         0.5,
         "slider",
         20,
-        "Video duration in seconds; H3 snaps it to its 24 fps frame grid. The native length is 5 s (124 frames), and every segment or continuation hop of a longer take stays at it. Only a clip that stands alone runs longer, up to about 15 s, and only when the shot needs it. A run past the native length takes more GPU time (by an amount that depends on settings and hardware), drifts more within itself, and is redone whole when it fails, while a take built from native segments redoes only the segment that failed."
+        "Video duration in seconds; H3 snaps this to its valid 24 fps frame grid."
       ]
     },
     {
@@ -2933,7 +2933,7 @@
         15,
         true,
         "",
-        "Pin stills or short clips at exact times in the output. A still at 0 is the first frame; a still with `at` equal to the duration is the last frame. A clip pinned with its sound carries that picture and audio into the output from where it lands, so the last second of an earlier take pinned at 0 continues it. Pinned images are not shown to the prompt; to name one as <Picture N>, also pass it in input_images. Audio pinned at a time guides the sound from there, for `length` seconds of it from `from`, with its timing, whatever it holds: dialogue, narration, music, ambience or effects. A video pinned with `picture: false` lends its sound alone. Stills and clips can be pinned alongside it. For on-screen speech the picture lip-syncs to it; check the lip-sync by eye."
+        "Pin stills or short clips at exact times in the output. A still at 0 is the first frame; a still with `at` equal to the duration is the last frame. A clip pinned with its sound carries that picture and audio into the output from where it lands, so the last second of an earlier take pinned at 0 continues it. Pinned images are not shown to the prompt; to name one as <Picture N>, also pass it in input_images. Audio pinned at a time sets the speech and sound from there, for `length` seconds of it from `from`, and the picture lip-syncs to it and keeps its timing; a video pinned with `picture: false` lends its sound alone. Stills and clips can be pinned alongside it."
       ],
       "title": "Keyframes"
     },

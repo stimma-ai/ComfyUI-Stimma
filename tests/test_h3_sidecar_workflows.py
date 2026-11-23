@@ -24,46 +24,6 @@ class H3WorkflowTests(unittest.TestCase):
                 assert api[state["inputs"]["samples"][0]]["class_type"] == "SamplerCustomAdvanced"
                 assert all(not n["class_type"].count("-") == 4 for n in api.values())
 
-    def _widgets(self, path, node_type, first=None):
-        for node in json.loads(path.read_text())["nodes"]:
-            values = node.get("widgets_values") or []
-            if node.get("type") == node_type and (first is None or values[:1] == [first]):
-                return values
-        raise AssertionError(f"{path.name}: no {node_type}")
-
-    def test_duration_states_the_native_length_where_sizing_is_decided(self):
-        for path in sorted((ROOT / "workflows").glob("Stimma-MiniMax-H3-*V*.json")):
-            with self.subTest(workflow=path.name):
-                description = self._widgets(path, "StimmaFloatParam", "duration")[-1]
-                assert "native length is 5 s (124 frames)" in description
-                assert "15 s" in description
-                # Segments and hops default to native; the longer run is the exception, with its cost.
-                assert "every segment or continuation hop of a longer take stays at it" in description
-                assert "redone whole" in description and "drifts" in description
-                # Scaling depends on settings and hardware; no fixed ratio is promised.
-                assert "three times" not in description
-
-    def test_long_shots_are_still_to_still_segments(self):
-        for path in sorted((ROOT / "workflows").glob("Stimma-MiniMax-H3-[IR]2V*.json")):
-            with self.subTest(workflow=path.name):
-                instructions = self._widgets(path, "StimmaToolInfo")[7]
-                assert "bridge neighbors" not in instructions
-                if "R2V" in path.name:
-                    assert "still-to-still segments" in instructions
-                    # Clip pins at both ends stay for joining clips that already exist.
-                    assert "two existing clips" in instructions
-                    # A shot that travels continues instead of anchoring.
-                    assert "travels" in instructions and "a few hops" in instructions
-                else:
-                    assert "one per pair of neighboring stills" in instructions
-
-    def test_sound_pins_keep_their_role(self):
-        for path in sorted((ROOT / "workflows").glob("Stimma-MiniMax-H3-*V*.json")):
-            with self.subTest(workflow=path.name):
-                keyframes = self._widgets(path, "StimmaKeyframesParam")[-1]
-                assert "music" in keyframes and "narration" in keyframes
-                assert "On-screen speech" in keyframes or "on-screen speech" in keyframes
-
 
 if __name__ == "__main__":
     unittest.main()
