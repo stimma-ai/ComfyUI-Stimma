@@ -1,0 +1,1026 @@
+{
+  "StimmaToolInfo": {
+    "input": {
+      "required": {
+        "slug": [
+          "STRING",
+          {
+            "default": "my-tool"
+          }
+        ],
+        "display_name": [
+          "STRING",
+          {
+            "default": "My Tool"
+          }
+        ],
+        "task_types": [
+          "STRING",
+          {
+            "default": "text-to-image"
+          }
+        ],
+        "badges": [
+          "STRING",
+          {
+            "default": "",
+            "multiline": true
+          }
+        ],
+        "description": [
+          "STRING",
+          {
+            "default": "",
+            "multiline": true
+          }
+        ]
+      },
+      "optional": {
+        "model_vendor": [
+          "STRING",
+          {
+            "default": ""
+          }
+        ],
+        "model": [
+          "STRING",
+          {
+            "default": ""
+          }
+        ],
+        "instructions": [
+          "STRING",
+          {
+            "default": "",
+            "multiline": true
+          }
+        ]
+      }
+    }
+  },
+  "StimmaPromptParam": {
+    "input": {
+      "required": {
+        "name": [
+          "STRING",
+          {
+            "default": "prompt"
+          }
+        ],
+        "default_text": [
+          "STRING",
+          {
+            "default": "",
+            "multiline": true
+          }
+        ],
+        "required": [
+          "BOOLEAN",
+          {
+            "default": true
+          }
+        ],
+        "ui_order": [
+          "INT",
+          {
+            "default": 0,
+            "min": 0,
+            "max": 100
+          }
+        ],
+        "ui_description": [
+          "STRING",
+          {
+            "default": "Text prompt",
+            "multiline": true
+          }
+        ]
+      }
+    }
+  },
+  "StimmaSeedParam": {
+    "input": {
+      "required": {
+        "name": [
+          "STRING",
+          {
+            "default": "seed"
+          }
+        ],
+        "value": [
+          "INT",
+          {
+            "default": 0,
+            "min": 0,
+            "max": 18446744073709551615
+          }
+        ],
+        "ui_order": [
+          "INT",
+          {
+            "default": 99,
+            "min": 0,
+            "max": 100
+          }
+        ]
+      }
+    }
+  },
+  "StimmaImageOutput": {
+    "input": {
+      "required": {
+        "images": [
+          "IMAGE"
+        ],
+        "filename_prefix": [
+          "STRING",
+          {
+            "default": "Stimma"
+          }
+        ]
+      },
+      "optional": {
+        "_stimma_output_dir": [
+          "STRING",
+          {
+            "default": ""
+          }
+        ]
+      },
+      "hidden": {
+        "prompt": "PROMPT",
+        "extra_pnginfo": "EXTRA_PNGINFO"
+      }
+    }
+  },
+  "StimmaImageParam": {
+    "input": {
+      "required": {
+        "image": [
+          [
+            "example.png"
+          ],
+          {
+            "image_upload": true
+          }
+        ],
+        "required": [
+          "BOOLEAN",
+          {
+            "default": true
+          }
+        ],
+        "controlnet_types": [
+          "STRING",
+          {
+            "default": "",
+            "multiline": false
+          }
+        ],
+        "ui_control": [
+          [
+            "image_picker",
+            "video_frame_picker"
+          ]
+        ],
+        "ui_order": [
+          "INT",
+          {
+            "default": 0,
+            "min": 0,
+            "max": 100
+          }
+        ]
+      },
+      "optional": {
+        "allow_prep": [
+          "BOOLEAN",
+          {
+            "default": true
+          }
+        ],
+        "instructions": [
+          "STRING",
+          {
+            "default": "",
+            "multiline": true
+          }
+        ]
+      }
+    }
+  },
+  "StimmaMaskParam": {
+    "input": {
+      "required": {
+        "name": [
+          "STRING",
+          {
+            "default": "mask"
+          }
+        ],
+        "image": [
+          [
+            "example.png"
+          ],
+          {
+            "image_upload": true
+          }
+        ],
+        "source_image_field": [
+          "STRING",
+          {
+            "default": "input_image"
+          }
+        ],
+        "ui_order": [
+          "INT",
+          {
+            "default": 1,
+            "min": 0,
+            "max": 100
+          }
+        ]
+      }
+    }
+  },
+  "StimmaIntParam": {
+    "input": {
+      "required": {
+        "name": [
+          "STRING",
+          {
+            "default": "steps"
+          }
+        ],
+        "value": [
+          "INT",
+          {
+            "default": 20,
+            "min": -2147483648,
+            "max": 2147483647,
+            "display": "number"
+          }
+        ],
+        "minimum": [
+          "INT",
+          {
+            "default": 1,
+            "min": -2147483648,
+            "max": 2147483647,
+            "display": "number"
+          }
+        ],
+        "maximum": [
+          "INT",
+          {
+            "default": 150,
+            "min": -2147483648,
+            "max": 2147483647,
+            "display": "number"
+          }
+        ],
+        "step": [
+          "INT",
+          {
+            "default": 1,
+            "min": 1,
+            "max": 1000,
+            "display": "number"
+          }
+        ],
+        "ui_control": [
+          [
+            "input",
+            "slider",
+            "upscale_resolution"
+          ]
+        ],
+        "ui_order": [
+          "INT",
+          {
+            "default": 0,
+            "min": 0,
+            "max": 2147483647,
+            "display": "number"
+          }
+        ],
+        "ui_description": [
+          "STRING",
+          {
+            "default": "",
+            "multiline": true
+          }
+        ],
+        "ui_format": [
+          [
+            "",
+            "percent",
+            "seconds"
+          ]
+        ]
+      }
+    }
+  },
+  "StimmaFloatParam": {
+    "input": {
+      "required": {
+        "name": [
+          "STRING",
+          {
+            "default": "cfg"
+          }
+        ],
+        "value": [
+          "FLOAT",
+          {
+            "default": 4.0,
+            "min": -1000000000.0,
+            "max": 1000000000.0,
+            "step": 0.01,
+            "display": "number"
+          }
+        ],
+        "minimum": [
+          "FLOAT",
+          {
+            "default": 0.0,
+            "min": -1000000000.0,
+            "max": 1000000000.0,
+            "step": 0.01,
+            "display": "number"
+          }
+        ],
+        "maximum": [
+          "FLOAT",
+          {
+            "default": 20.0,
+            "min": -1000000000.0,
+            "max": 1000000000.0,
+            "step": 0.01,
+            "display": "number"
+          }
+        ],
+        "step": [
+          "FLOAT",
+          {
+            "default": 0.1,
+            "min": 0.001,
+            "max": 100.0,
+            "step": 0.001,
+            "display": "number"
+          }
+        ],
+        "ui_control": [
+          [
+            "input",
+            "slider",
+            "upscale_resolution"
+          ]
+        ],
+        "ui_order": [
+          "INT",
+          {
+            "default": 0,
+            "min": 0,
+            "max": 2147483647,
+            "display": "number"
+          }
+        ],
+        "ui_description": [
+          "STRING",
+          {
+            "default": "",
+            "multiline": true
+          }
+        ],
+        "ui_format": [
+          [
+            "",
+            "percent",
+            "seconds"
+          ]
+        ]
+      }
+    }
+  },
+  "StimmaLayoutGroup": {
+    "input": {
+      "required": {
+        "group_label": [
+          "STRING",
+          {
+            "default": "Settings"
+          }
+        ],
+        "param_names": [
+          "STRING",
+          {
+            "default": "",
+            "multiline": true
+          }
+        ],
+        "collapsed": [
+          "BOOLEAN",
+          {
+            "default": false
+          }
+        ],
+        "ui_order": [
+          "INT",
+          {
+            "default": 0,
+            "min": 0,
+            "max": 100
+          }
+        ]
+      }
+    }
+  },
+  "StimmaImagesParam": {
+    "input": {
+      "required": {
+        "image": [
+          [
+            "example.png"
+          ],
+          {
+            "image_upload": true
+          }
+        ],
+        "min_images": [
+          "INT",
+          {
+            "default": 1,
+            "min": 0,
+            "max": 20
+          }
+        ],
+        "max_images": [
+          "INT",
+          {
+            "default": 3,
+            "min": 1,
+            "max": 20
+          }
+        ],
+        "controlnet_types": [
+          "STRING",
+          {
+            "default": "",
+            "multiline": false
+          }
+        ],
+        "ui_control": [
+          [
+            "image_picker",
+            "video_frame_picker"
+          ]
+        ],
+        "ui_order": [
+          "INT",
+          {
+            "default": 0,
+            "min": 0,
+            "max": 100
+          }
+        ]
+      },
+      "optional": {
+        "allow_prep": [
+          "BOOLEAN",
+          {
+            "default": true
+          }
+        ],
+        "_stimma_images": [
+          "STRING",
+          {
+            "default": "",
+            "multiline": false
+          }
+        ],
+        "instructions": [
+          "STRING",
+          {
+            "default": "",
+            "multiline": true
+          }
+        ]
+      }
+    }
+  },
+  "StimmaOutpaintPadding": {
+    "input": {
+      "required": {
+        "image": [
+          "IMAGE"
+        ],
+        "left_pct": [
+          "INT",
+          {
+            "default": 0,
+            "min": 0,
+            "max": 100,
+            "step": 1,
+            "display": "number"
+          }
+        ],
+        "top_pct": [
+          "INT",
+          {
+            "default": 0,
+            "min": 0,
+            "max": 100,
+            "step": 1,
+            "display": "number"
+          }
+        ],
+        "right_pct": [
+          "INT",
+          {
+            "default": 0,
+            "min": 0,
+            "max": 100,
+            "step": 1,
+            "display": "number"
+          }
+        ],
+        "bottom_pct": [
+          "INT",
+          {
+            "default": 0,
+            "min": 0,
+            "max": 100,
+            "step": 1,
+            "display": "number"
+          }
+        ]
+      }
+    }
+  },
+  "StimmaDropdownParam": {
+    "input": {
+      "required": {
+        "name": [
+          "STRING",
+          {
+            "default": "sampler"
+          }
+        ],
+        "value": [
+          "STRING",
+          {
+            "default": "euler"
+          }
+        ],
+        "ui_order": [
+          "INT",
+          {
+            "default": 0,
+            "min": 0,
+            "max": 2147483647,
+            "display": "number"
+          }
+        ],
+        "ui_description": [
+          "STRING",
+          {
+            "default": "",
+            "multiline": true
+          }
+        ]
+      }
+    }
+  },
+  "StimmaLoraLoader": {
+    "input": {
+      "required": {
+        "model": [
+          "MODEL"
+        ],
+        "clip": [
+          "CLIP"
+        ],
+        "path_filter": [
+          "STRING",
+          {
+            "default": ""
+          }
+        ],
+        "ui_order": [
+          "INT",
+          {
+            "default": 50,
+            "min": 0,
+            "max": 100
+          }
+        ]
+      },
+      "optional": {
+        "lora_1": [
+          [
+            "None"
+          ]
+        ],
+        "strength_1": [
+          "FLOAT",
+          {
+            "default": 1.0,
+            "min": -10.0,
+            "max": 10.0,
+            "step": 0.01
+          }
+        ],
+        "lora_2": [
+          [
+            "None"
+          ]
+        ],
+        "strength_2": [
+          "FLOAT",
+          {
+            "default": 1.0,
+            "min": -10.0,
+            "max": 10.0,
+            "step": 0.01
+          }
+        ],
+        "lora_3": [
+          [
+            "None"
+          ]
+        ],
+        "strength_3": [
+          "FLOAT",
+          {
+            "default": 1.0,
+            "min": -10.0,
+            "max": 10.0,
+            "step": 0.01
+          }
+        ],
+        "lora_4": [
+          [
+            "None"
+          ]
+        ],
+        "strength_4": [
+          "FLOAT",
+          {
+            "default": 1.0,
+            "min": -10.0,
+            "max": 10.0,
+            "step": 0.01
+          }
+        ],
+        "lora_5": [
+          [
+            "None"
+          ]
+        ],
+        "strength_5": [
+          "FLOAT",
+          {
+            "default": 1.0,
+            "min": -10.0,
+            "max": 10.0,
+            "step": 0.01
+          }
+        ],
+        "lora_6": [
+          [
+            "None"
+          ]
+        ],
+        "strength_6": [
+          "FLOAT",
+          {
+            "default": 1.0,
+            "min": -10.0,
+            "max": 10.0,
+            "step": 0.01
+          }
+        ],
+        "lora_7": [
+          [
+            "None"
+          ]
+        ],
+        "strength_7": [
+          "FLOAT",
+          {
+            "default": 1.0,
+            "min": -10.0,
+            "max": 10.0,
+            "step": 0.01
+          }
+        ],
+        "lora_8": [
+          [
+            "None"
+          ]
+        ],
+        "strength_8": [
+          "FLOAT",
+          {
+            "default": 1.0,
+            "min": -10.0,
+            "max": 10.0,
+            "step": 0.01
+          }
+        ],
+        "lora_9": [
+          [
+            "None"
+          ]
+        ],
+        "strength_9": [
+          "FLOAT",
+          {
+            "default": 1.0,
+            "min": -10.0,
+            "max": 10.0,
+            "step": 0.01
+          }
+        ],
+        "lora_10": [
+          [
+            "None"
+          ]
+        ],
+        "strength_10": [
+          "FLOAT",
+          {
+            "default": 1.0,
+            "min": -10.0,
+            "max": 10.0,
+            "step": 0.01
+          }
+        ]
+      }
+    }
+  },
+  "StimmaStringParam": {
+    "input": {
+      "required": {
+        "name": [
+          "STRING",
+          {
+            "default": "sampler"
+          }
+        ],
+        "value": [
+          "STRING",
+          {
+            "default": "euler"
+          }
+        ],
+        "enum_values": [
+          "STRING",
+          {
+            "default": "",
+            "multiline": true
+          }
+        ],
+        "ui_control": [
+          [
+            "dropdown",
+            "textarea"
+          ]
+        ],
+        "ui_order": [
+          "INT",
+          {
+            "default": 0,
+            "min": 0,
+            "max": 2147483647,
+            "display": "number"
+          }
+        ],
+        "ui_description": [
+          "STRING",
+          {
+            "default": "",
+            "multiline": true
+          }
+        ]
+      }
+    }
+  },
+  "KSampler": {
+    "input": {
+      "required": {
+        "model": [
+          "MODEL",
+          {
+            "tooltip": "The model used for denoising the input latent."
+          }
+        ],
+        "seed": [
+          "INT",
+          {
+            "default": 0,
+            "min": 0,
+            "max": 18446744073709551615,
+            "control_after_generate": true,
+            "tooltip": "The random seed used for creating the noise."
+          }
+        ],
+        "steps": [
+          "INT",
+          {
+            "default": 20,
+            "min": 1,
+            "max": 10000,
+            "tooltip": "The number of steps used in the denoising process."
+          }
+        ],
+        "cfg": [
+          "FLOAT",
+          {
+            "default": 8.0,
+            "min": 0.0,
+            "max": 100.0,
+            "step": 0.1,
+            "round": 0.01,
+            "tooltip": "The Classifier-Free Guidance scale balances creativity and adherence to the prompt. Higher values result in images more closely matching the prompt however too high values will negatively impact quality."
+          }
+        ],
+        "sampler_name": [
+          [
+            "euler",
+            "euler_cfg_pp",
+            "euler_ancestral",
+            "euler_ancestral_cfg_pp",
+            "heun",
+            "heunpp2",
+            "exp_heun_2_x0",
+            "exp_heun_2_x0_sde",
+            "dpm_2",
+            "dpm_2_ancestral",
+            "lms",
+            "dpm_fast",
+            "dpm_adaptive",
+            "dpmpp_2s_ancestral",
+            "dpmpp_2s_ancestral_cfg_pp",
+            "dpmpp_sde",
+            "dpmpp_sde_gpu",
+            "dpmpp_2m",
+            "dpmpp_2m_cfg_pp",
+            "dpmpp_2m_sde",
+            "dpmpp_2m_sde_gpu",
+            "dpmpp_2m_sde_heun",
+            "dpmpp_2m_sde_heun_gpu",
+            "dpmpp_3m_sde",
+            "dpmpp_3m_sde_gpu",
+            "ddpm",
+            "lcm",
+            "ipndm",
+            "ipndm_v",
+            "deis",
+            "cfgpp_ud10_ab",
+            "res_multistep",
+            "res_multistep_cfg_pp",
+            "res_multistep_ancestral",
+            "res_multistep_ancestral_cfg_pp",
+            "gradient_estimation",
+            "gradient_estimation_cfg_pp",
+            "er_sde",
+            "seeds_2",
+            "seeds_3",
+            "sa_solver",
+            "sa_solver_pece",
+            "ddim",
+            "uni_pc",
+            "uni_pc_bh2"
+          ],
+          {
+            "tooltip": "The algorithm used when sampling, this can affect the quality, speed, and style of the generated output."
+          }
+        ],
+        "scheduler": [
+          [
+            "simple",
+            "sgm_uniform",
+            "karras",
+            "exponential",
+            "ddim_uniform",
+            "beta",
+            "normal",
+            "linear_quadratic",
+            "kl_optimal"
+          ],
+          {
+            "tooltip": "The scheduler controls how noise is gradually removed to form the image."
+          }
+        ],
+        "positive": [
+          "CONDITIONING",
+          {
+            "tooltip": "The conditioning describing the attributes you want to include in the image."
+          }
+        ],
+        "negative": [
+          "CONDITIONING",
+          {
+            "tooltip": "The conditioning describing the attributes you want to exclude from the image."
+          }
+        ],
+        "latent_image": [
+          "LATENT",
+          {
+            "tooltip": "The latent image to denoise."
+          }
+        ],
+        "denoise": [
+          "FLOAT",
+          {
+            "default": 1.0,
+            "min": 0.0,
+            "max": 1.0,
+            "step": 0.01,
+            "tooltip": "The amount of denoising applied, lower values will maintain the structure of the initial image allowing for image to image sampling."
+          }
+        ]
+      }
+    }
+  },
+  "StimmaResolutionParam": {
+    "input": {
+      "required": {
+        "width": [
+          "INT",
+          {
+            "default": 1024,
+            "min": 64,
+            "max": 16384,
+            "step": 64,
+            "display": "number"
+          }
+        ],
+        "height": [
+          "INT",
+          {
+            "default": 1024,
+            "min": 64,
+            "max": 16384,
+            "step": 64,
+            "display": "number"
+          }
+        ],
+        "min_size": [
+          "INT",
+          {
+            "default": 512,
+            "min": 64,
+            "max": 16384,
+            "display": "number"
+          }
+        ],
+        "max_size": [
+          "INT",
+          {
+            "default": 4096,
+            "min": 64,
+            "max": 16384,
+            "display": "number"
+          }
+        ],
+        "step": [
+          "INT",
+          {
+            "default": 64,
+            "min": 1,
+            "max": 512,
+            "display": "number"
+          }
+        ],
+        "supported_resolutions": [
+          "STRING",
+          {
+            "default": "",
+            "multiline": true
+          }
+        ],
+        "ui_order": [
+          "INT",
+          {
+            "default": 0,
+            "min": 0,
+            "max": 100,
+            "display": "number"
+          }
+        ],
+        "slider_max_pixels": [
+          "INT",
+          {
+            "default": 0,
+            "min": 0,
+            "max": 268435456,
+            "display": "number"
+          }
+        ]
+      }
+    }
+  }
+}

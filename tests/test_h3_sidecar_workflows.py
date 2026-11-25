@@ -11,6 +11,8 @@ ROOT = Path(__file__).resolve().parents[1]
 class H3WorkflowTests(unittest.TestCase):
     def test_every_variant_exports_the_exact_decoded_sample_and_vaes(self):
         for path in sorted((ROOT / "workflows").glob("Stimma-MiniMax-H3-*.json")):
+            if path.name.startswith("Stimma-MiniMax-H3-Image"):
+                continue
             with self.subTest(workflow=path.name):
                 api = _convert_ui_to_api(json.loads(path.read_text()), {})
                 state_id, state = next((k, n) for k, n in api.items() if n["class_type"] == "StimmaH3GenerationState")

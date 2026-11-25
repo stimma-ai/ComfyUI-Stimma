@@ -281,6 +281,52 @@ official INT8 files from
 which is gated: accept the FLUX Kommunity License on Hugging Face and give the
 manager a token before downloading. The VAE is shared with FLUX.2.
 
+## MiniMax H3 Image
+
+`MiniMax H3 Image` (`minimax-h3-image`) is one fused text-to-image and
+image-to-image tool. Omit images to generate; supply up to sixteen ordered
+references to edit or compose. Refer to them explicitly as `<Picture 1>`,
+`<Picture 2>`, etc. Prompts pass through unchanged: use detailed English
+captions or Stimma's Enhance Prompt for short requests.
+
+Width and height set the canvas in both modes; edits do not automatically
+preserve source dimensions. The default is 4096×4096, with 32-pixel alignment.
+The model's effective range is roughly 4–20 MP. Sampling defaults to six steps,
+CFG 1 and Euler/simple. Advanced exposes steps, CFG, negative prompt, sampler,
+scheduler, compatible LoRAs and seed, matching the other image workflows.
+The checkpoint is distilled for the defaults; other settings are experimental.
+Negative prompts apply above CFG 1. Denoise stays at 1; the base tool has no mask input.
+
+Requires ComfyUI v0.45.3 or later, the dedicated H3 **Image** diffusion model
+and image VAE, and the H3 Qwen3-VL 32B encoder (NVFP4 AWQ). The video model and
+video VAE are separate. Downloads and hashes are included in the manager
+manifest. This is the full H3 Image model, not the smaller Pruna P-H3 derivative.
+See the [official model card and license](https://huggingface.co/MiniMaxAI/MiniMax-H3-Image)
+and [ComfyUI model files](https://huggingface.co/Comfy-Org/MiniMax-H3-Image).
+The community license requires separate authorization for third-party hosted
+services and for organizations above its revenue threshold.
+
+
+The image editor uses two additional wrappers with the same weights and model
+identity:
+
+- `minimax-h3-image-inpaint` advertises `inpaint-image` for Repaint and the
+  Remove fallback. It accepts an alpha mask (transparent means repaint), a
+  required source image, and up to fifteen optional references. A marked crop
+  is generated at 2048×2048 and stitched back into the original image, retaining
+  its dimensions. A final composite preserves pixels outside the grown mask
+  exactly, including at zero feather.
+- `minimax-h3-image-outpaint` advertises `outpaint-image` for Expand. It accepts
+  one source and the four `expand_*_pct` controls, renders the marked canvas at
+  about 4 MP with a latent noise mask anchoring the existing image, and
+  composites to the exact expanded size. `mask_feather` blends
+  the join; source pixels outside that seam are preserved. Expand is marked
+  Experimental: border continuation can still show visible seams.
+
+These are visual region guidance and compositing workflows, not separate
+mask-trained H3 checkpoints. They use the existing CropAndStitch, DrawMaskOnImage
+and ColorMatch dependencies already used by the FLUX.3 editor workflows.
+
 ## MiniMax H3 workflows
 
 All H3 tools use conservative native Sol attention. I2V retains optional last-frame

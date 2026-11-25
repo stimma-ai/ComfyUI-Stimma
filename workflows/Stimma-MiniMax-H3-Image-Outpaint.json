@@ -1,0 +1,2848 @@
+{
+  "id": "eefb25e3-3beb-46a6-9cd5-b9e73318ed06",
+  "revision": 0,
+  "last_node_id": 307,
+  "last_link_id": 61,
+  "nodes": [
+    {
+      "id": 1,
+      "type": "StimmaToolInfo",
+      "pos": [
+        -1600,
+        -520
+      ],
+      "size": [
+        300,
+        120
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [],
+      "properties": {
+        "Node name for S&R": "StimmaToolInfo"
+      },
+      "widgets_values": [
+        "minimax-h3-image-outpaint",
+        "MiniMax H3 Image Outpaint",
+        "outpaint-image",
+        "Open Weights\nExperimental",
+        "Extend images with MiniMax H3 Image.",
+        "minimax",
+        "minimax-h3-image",
+        "Supply one source image and positive canvas growth on at least one edge. Growth is a percentage of the original corresponding axis. The border is generated at about 4 MP then resized and composited to the exact expanded canvas. Uses visual region guidance, not a native outpainting checkpoint. Experimental: inspect joins and continuation quality before accepting the result."
+      ]
+    },
+    {
+      "id": 3,
+      "type": "StimmaImagesParam",
+      "pos": [
+        -1600,
+        -340
+      ],
+      "size": [
+        300,
+        120
+      ],
+      "flags": {},
+      "order": 1,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            1
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "StimmaImagesParam"
+      },
+      "widgets_values": [
+        "example.png",
+        1,
+        1,
+        "",
+        "image_picker",
+        2,
+        true,
+        ""
+      ],
+      "title": "Image"
+    },
+    {
+      "id": 6,
+      "type": "StimmaSeedParam",
+      "pos": [
+        -1600,
+        900
+      ],
+      "size": [
+        300,
+        120
+      ],
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "INT",
+          "type": "INT",
+          "links": [
+            35
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "StimmaSeedParam"
+      },
+      "widgets_values": [
+        "seed",
+        0,
+        80
+      ]
+    },
+    {
+      "id": 13,
+      "type": "StimmaLayoutGroup",
+      "pos": [
+        -1250,
+        -520
+      ],
+      "size": [
+        300,
+        120
+      ],
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [],
+      "properties": {
+        "Node name for S&R": "StimmaLayoutGroup"
+      },
+      "widgets_values": [
+        "Expand",
+        "expand_top_pct\nexpand_bottom_pct\nexpand_left_pct\nexpand_right_pct",
+        false,
+        9
+      ]
+    },
+    {
+      "id": 20,
+      "type": "ImageFromBatch",
+      "pos": [
+        -880,
+        -420
+      ],
+      "size": [
+        300,
+        120
+      ],
+      "flags": {},
+      "order": 4,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "link": 1
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            2,
+            7,
+            12,
+            23
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "ImageFromBatch"
+      },
+      "widgets_values": [
+        0,
+        1
+      ],
+      "title": "Target Image (first)"
+    },
+    {
+      "id": 21,
+      "type": "StimmaOutpaintPadding",
+      "pos": [
+        -880,
+        -280
+      ],
+      "size": [
+        300,
+        120
+      ],
+      "flags": {},
+      "order": 5,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "link": 2
+        },
+        {
+          "name": "left_pct",
+          "type": "INT",
+          "link": 3
+        },
+        {
+          "name": "top_pct",
+          "type": "INT",
+          "link": 4
+        },
+        {
+          "name": "right_pct",
+          "type": "INT",
+          "link": 5
+        },
+        {
+          "name": "bottom_pct",
+          "type": "INT",
+          "link": 6
+        }
+      ],
+      "outputs": [
+        {
+          "name": "left",
+          "type": "INT",
+          "links": [
+            8,
+            13
+          ],
+          "slot_index": 0
+        },
+        {
+          "name": "top",
+          "type": "INT",
+          "links": [
+            9,
+            14
+          ],
+          "slot_index": 1
+        },
+        {
+          "name": "right",
+          "type": "INT",
+          "links": [
+            10,
+            15
+          ],
+          "slot_index": 2
+        },
+        {
+          "name": "bottom",
+          "type": "INT",
+          "links": [
+            11,
+            16
+          ],
+          "slot_index": 3
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "StimmaOutpaintPadding"
+      },
+      "widgets_values": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "title": "% \u2192 pixels"
+    },
+    {
+      "id": 22,
+      "type": "ImagePadForOutpaint",
+      "pos": [
+        -880,
+        -60
+      ],
+      "size": [
+        300,
+        120
+      ],
+      "flags": {},
+      "order": 6,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "link": 7
+        },
+        {
+          "name": "left",
+          "type": "INT",
+          "link": 8
+        },
+        {
+          "name": "top",
+          "type": "INT",
+          "link": 9
+        },
+        {
+          "name": "right",
+          "type": "INT",
+          "link": 10
+        },
+        {
+          "name": "bottom",
+          "type": "INT",
+          "link": 11
+        },
+        {
+          "name": "feathering",
+          "type": "INT",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            18,
+            20,
+            25,
+            40
+          ],
+          "slot_index": 0
+        },
+        {
+          "name": "MASK",
+          "type": "MASK",
+          "links": [
+            19
+          ],
+          "slot_index": 1
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "ImagePadForOutpaint"
+      },
+      "widgets_values": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "title": "Pad (hard mask)"
+    },
+    {
+      "id": 23,
+      "type": "ImagePadForOutpaint",
+      "pos": [
+        -880,
+        200
+      ],
+      "size": [
+        300,
+        120
+      ],
+      "flags": {},
+      "order": 7,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "link": 12
+        },
+        {
+          "name": "left",
+          "type": "INT",
+          "link": 13
+        },
+        {
+          "name": "top",
+          "type": "INT",
+          "link": 14
+        },
+        {
+          "name": "right",
+          "type": "INT",
+          "link": 15
+        },
+        {
+          "name": "bottom",
+          "type": "INT",
+          "link": 16
+        },
+        {
+          "name": "feathering",
+          "type": "INT",
+          "link": 17
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [],
+          "slot_index": 0
+        },
+        {
+          "name": "MASK",
+          "type": "MASK",
+          "links": [
+            27,
+            45
+          ],
+          "slot_index": 1
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "ImagePadForOutpaint"
+      },
+      "widgets_values": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "title": "Pad (feathered mask)"
+    },
+    {
+      "id": 24,
+      "type": "DrawMaskOnImage",
+      "pos": [
+        -520,
+        -60
+      ],
+      "size": [
+        300,
+        120
+      ],
+      "flags": {},
+      "order": 8,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "link": 18
+        },
+        {
+          "name": "mask",
+          "type": "MASK",
+          "link": 19
+        }
+      ],
+      "outputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "links": [
+            30
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "DrawMaskOnImage"
+      },
+      "widgets_values": [
+        "0, 255, 0",
+        "cpu"
+      ],
+      "title": "Fill new area"
+    },
+    {
+      "id": 39,
+      "type": "GetImageSize",
+      "pos": [
+        800,
+        100
+      ],
+      "size": [
+        300,
+        120
+      ],
+      "flags": {},
+      "order": 9,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "link": 20
+        }
+      ],
+      "outputs": [
+        {
+          "name": "width",
+          "type": "INT",
+          "links": [
+            21
+          ],
+          "slot_index": 0
+        },
+        {
+          "name": "height",
+          "type": "INT",
+          "links": [
+            22
+          ],
+          "slot_index": 1
+        },
+        {
+          "name": "batch_size",
+          "type": "INT",
+          "links": [],
+          "slot_index": 2
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "GetImageSize"
+      },
+      "widgets_values": [],
+      "title": "Full-res canvas size"
+    },
+    {
+      "id": 40,
+      "type": "ImageScale",
+      "pos": [
+        800,
+        260
+      ],
+      "size": [
+        300,
+        120
+      ],
+      "flags": {},
+      "order": 10,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "link": 39
+        },
+        {
+          "name": "width",
+          "type": "INT",
+          "link": 21
+        },
+        {
+          "name": "height",
+          "type": "INT",
+          "link": 22
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            24
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "ImageScale"
+      },
+      "widgets_values": [
+        "bicubic",
+        1024,
+        1024,
+        "disabled"
+      ],
+      "title": "Back to full res"
+    },
+    {
+      "id": 41,
+      "type": "ColorMatch",
+      "pos": [
+        800,
+        420
+      ],
+      "size": [
+        300,
+        120
+      ],
+      "flags": {},
+      "order": 11,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "image_ref",
+          "type": "IMAGE",
+          "link": 23
+        },
+        {
+          "name": "image_target",
+          "type": "IMAGE",
+          "link": 24
+        }
+      ],
+      "outputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "links": [
+            26
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "ColorMatch"
+      },
+      "widgets_values": [
+        "mkl",
+        1.0,
+        false
+      ],
+      "title": "Harmonize to source"
+    },
+    {
+      "id": 42,
+      "type": "ImageCompositeMasked",
+      "pos": [
+        1120,
+        260
+      ],
+      "size": [
+        300,
+        120
+      ],
+      "flags": {},
+      "order": 12,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "destination",
+          "type": "IMAGE",
+          "link": 25
+        },
+        {
+          "name": "source",
+          "type": "IMAGE",
+          "link": 26
+        },
+        {
+          "name": "mask",
+          "type": "MASK",
+          "link": 27
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            28
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "ImageCompositeMasked"
+      },
+      "widgets_values": [
+        0,
+        0,
+        false
+      ],
+      "title": "Composite into new area"
+    },
+    {
+      "id": 43,
+      "type": "StimmaImageOutput",
+      "pos": [
+        1120,
+        460
+      ],
+      "size": [
+        300,
+        120
+      ],
+      "flags": {},
+      "order": 13,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 28
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "Node name for S&R": "StimmaImageOutput"
+      },
+      "widgets_values": [
+        "MiniMax-H3-Image-Outpaint",
+        ""
+      ]
+    },
+    {
+      "id": 100,
+      "type": "StimmaIntParam",
+      "pos": [
+        -1600,
+        -160
+      ],
+      "size": [
+        300,
+        120
+      ],
+      "flags": {},
+      "order": 14,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "INT",
+          "type": "INT",
+          "links": [
+            4
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "StimmaIntParam"
+      },
+      "widgets_values": [
+        "expand_top_pct",
+        0,
+        0,
+        100,
+        1,
+        "slider",
+        10,
+        "New canvas on the top edge, as a percentage of the image's height",
+        "percent"
+      ],
+      "title": "Expand Top %"
+    },
+    {
+      "id": 101,
+      "type": "StimmaIntParam",
+      "pos": [
+        -1600,
+        -30
+      ],
+      "size": [
+        300,
+        120
+      ],
+      "flags": {},
+      "order": 15,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "INT",
+          "type": "INT",
+          "links": [
+            6
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "StimmaIntParam"
+      },
+      "widgets_values": [
+        "expand_bottom_pct",
+        0,
+        0,
+        100,
+        1,
+        "slider",
+        11,
+        "New canvas on the bottom edge, as a percentage of the image's height",
+        "percent"
+      ],
+      "title": "Expand Bottom %"
+    },
+    {
+      "id": 102,
+      "type": "StimmaIntParam",
+      "pos": [
+        -1600,
+        100
+      ],
+      "size": [
+        300,
+        120
+      ],
+      "flags": {},
+      "order": 16,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "INT",
+          "type": "INT",
+          "links": [
+            3
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "StimmaIntParam"
+      },
+      "widgets_values": [
+        "expand_left_pct",
+        0,
+        0,
+        100,
+        1,
+        "slider",
+        12,
+        "New canvas on the left edge, as a percentage of the image's width",
+        "percent"
+      ],
+      "title": "Expand Left %"
+    },
+    {
+      "id": 103,
+      "type": "StimmaIntParam",
+      "pos": [
+        -1600,
+        230
+      ],
+      "size": [
+        300,
+        120
+      ],
+      "flags": {},
+      "order": 17,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "INT",
+          "type": "INT",
+          "links": [
+            5
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "StimmaIntParam"
+      },
+      "widgets_values": [
+        "expand_right_pct",
+        0,
+        0,
+        100,
+        1,
+        "slider",
+        13,
+        "New canvas on the right edge, as a percentage of the image's width",
+        "percent"
+      ],
+      "title": "Expand Right %"
+    },
+    {
+      "id": 110,
+      "type": "StimmaIntParam",
+      "pos": [
+        -1600,
+        380
+      ],
+      "size": [
+        300,
+        120
+      ],
+      "flags": {},
+      "order": 18,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "INT",
+          "type": "INT",
+          "links": [
+            17
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "StimmaIntParam"
+      },
+      "widgets_values": [
+        "mask_feather",
+        64,
+        0,
+        128,
+        1,
+        "slider",
+        20,
+        "Blend width in pixels where the new canvas meets the original image",
+        ""
+      ]
+    },
+    {
+      "id": 15,
+      "type": "UNETLoader",
+      "pos": [
+        -460,
+        0
+      ],
+      "size": [
+        590,
+        90
+      ],
+      "flags": {},
+      "order": 19,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "MODEL",
+          "type": "MODEL",
+          "links": [
+            51
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "UNETLoader",
+        "models": [
+          {
+            "name": "minimax_h3_image_pruned_int8_convrot.safetensors",
+            "url": "https://huggingface.co/Comfy-Org/MiniMax-H3-Image/resolve/main/diffusion_models/minimax_h3_image_pruned_int8_convrot.safetensors",
+            "directory": "diffusion_models"
+          }
+        ]
+      },
+      "widgets_values": [
+        "minimax_h3_image_pruned_int8_convrot.safetensors",
+        "default"
+      ]
+    },
+    {
+      "id": 16,
+      "type": "CLIPLoader",
+      "pos": [
+        -460,
+        170
+      ],
+      "size": [
+        590,
+        120
+      ],
+      "flags": {},
+      "order": 20,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "CLIP",
+          "type": "CLIP",
+          "links": [
+            52
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "CLIPLoader",
+        "models": [
+          {
+            "name": "qwen3vl_32b_minimax_h3_nvfp4_awq.safetensors",
+            "url": "https://huggingface.co/Comfy-Org/MiniMax-H3/resolve/main/text_encoders/qwen3vl_32b_minimax_h3_nvfp4_awq.safetensors",
+            "directory": "text_encoders"
+          }
+        ]
+      },
+      "widgets_values": [
+        "qwen3vl_32b_minimax_h3_nvfp4_awq.safetensors",
+        "minimax",
+        "default"
+      ]
+    },
+    {
+      "id": 17,
+      "type": "VAELoader",
+      "pos": [
+        -460,
+        360
+      ],
+      "size": [
+        590,
+        70
+      ],
+      "flags": {},
+      "order": 21,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "VAE",
+          "type": "VAE",
+          "links": [
+            29,
+            38,
+            44
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "VAELoader",
+        "models": [
+          {
+            "name": "minimax_h3_image_vae_fp16.safetensors",
+            "url": "https://huggingface.co/Comfy-Org/MiniMax-H3-Image/resolve/main/vae/minimax_h3_image_vae_fp16.safetensors",
+            "directory": "vae"
+          }
+        ]
+      },
+      "widgets_values": [
+        "minimax_h3_image_vae_fp16.safetensors"
+      ]
+    },
+    {
+      "id": 70,
+      "type": "MiniMaxH3ImageConditioning",
+      "pos": [
+        290,
+        -10
+      ],
+      "size": [
+        440,
+        660
+      ],
+      "flags": {},
+      "order": 22,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "clip",
+          "type": "CLIP",
+          "link": 54
+        },
+        {
+          "name": "vae",
+          "shape": 7,
+          "type": "VAE",
+          "link": 29
+        },
+        {
+          "name": "prompt",
+          "type": "STRING",
+          "widget": {
+            "name": "prompt"
+          },
+          "link": null
+        },
+        {
+          "name": "width",
+          "type": "INT",
+          "widget": {
+            "name": "width"
+          },
+          "link": 33
+        },
+        {
+          "name": "height",
+          "type": "INT",
+          "widget": {
+            "name": "height"
+          },
+          "link": 34
+        },
+        {
+          "name": "images.image_1",
+          "type": "IMAGE",
+          "shape": 7,
+          "link": 32
+        }
+      ],
+      "outputs": [
+        {
+          "name": "positive",
+          "type": "CONDITIONING",
+          "links": [
+            36
+          ]
+        },
+        {
+          "name": "LATENT",
+          "type": "LATENT",
+          "links": []
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "MiniMaxH3ImageConditioning"
+      },
+      "widgets_values": [
+        "Edit <Picture 1>. This reference already has the exact desired output canvas and composition. Replace only the bright green border with a seamless continuation of the adjacent scene. Preserve the existing picture at its exact position and scale. Continue all surfaces, textures, lighting gradients, perspective lines, and boundaries across the join at the same positions and angles. Do not reframe, shift, crop, zoom, add a frame, or draw a seam. Leave no green. The finished result must look like one continuous photograph or artwork.",
+        2048,
+        2048
+      ]
+    },
+    {
+      "id": 60,
+      "type": "KSampler",
+      "pos": [
+        840,
+        -10
+      ],
+      "size": [
+        320,
+        510
+      ],
+      "flags": {},
+      "order": 23,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "model",
+          "type": "MODEL",
+          "link": 53
+        },
+        {
+          "name": "positive",
+          "type": "CONDITIONING",
+          "link": 36
+        },
+        {
+          "name": "negative",
+          "type": "CONDITIONING",
+          "link": 57
+        },
+        {
+          "name": "latent_image",
+          "type": "LATENT",
+          "link": 50
+        },
+        {
+          "name": "seed",
+          "type": "INT",
+          "widget": {
+            "name": "seed"
+          },
+          "link": 35
+        },
+        {
+          "name": "steps",
+          "type": "INT",
+          "widget": {
+            "name": "steps"
+          },
+          "link": 58
+        },
+        {
+          "name": "cfg",
+          "type": "FLOAT",
+          "widget": {
+            "name": "cfg"
+          },
+          "link": 59
+        },
+        {
+          "name": "sampler_name",
+          "type": "COMBO",
+          "widget": {
+            "name": "sampler_name"
+          },
+          "link": 60
+        },
+        {
+          "name": "scheduler",
+          "type": "COMBO",
+          "widget": {
+            "name": "scheduler"
+          },
+          "link": 61
+        }
+      ],
+      "outputs": [
+        {
+          "name": "LATENT",
+          "type": "LATENT",
+          "links": [
+            37
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "KSampler"
+      },
+      "widgets_values": [
+        0,
+        "fixed",
+        6,
+        1,
+        "euler",
+        "simple",
+        1
+      ]
+    },
+    {
+      "id": 38,
+      "type": "VAEDecode",
+      "pos": [
+        1200,
+        0
+      ],
+      "size": [
+        230,
+        60
+      ],
+      "flags": {},
+      "order": 24,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "samples",
+          "type": "LATENT",
+          "link": 37
+        },
+        {
+          "name": "vae",
+          "type": "VAE",
+          "link": 38
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            39
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "VAEDecode"
+      }
+    },
+    {
+      "id": 80,
+      "type": "ImageScaleToTotalPixels",
+      "pos": [
+        150,
+        600
+      ],
+      "size": [
+        320,
+        140
+      ],
+      "flags": {},
+      "order": 25,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "link": 30
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            31,
+            32
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "ImageScaleToTotalPixels"
+      },
+      "widgets_values": [
+        "lanczos",
+        4.0,
+        32
+      ]
+    },
+    {
+      "id": 81,
+      "type": "GetImageSize",
+      "pos": [
+        520,
+        600
+      ],
+      "size": [
+        260,
+        100
+      ],
+      "flags": {},
+      "order": 26,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "link": 31
+        }
+      ],
+      "outputs": [
+        {
+          "name": "width",
+          "type": "INT",
+          "links": [
+            33,
+            41,
+            46
+          ],
+          "slot_index": 0
+        },
+        {
+          "name": "height",
+          "type": "INT",
+          "links": [
+            34,
+            42,
+            47
+          ],
+          "slot_index": 1
+        },
+        {
+          "name": "batch_size",
+          "type": "INT",
+          "links": [],
+          "slot_index": 2
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "GetImageSize"
+      },
+      "widgets_values": []
+    },
+    {
+      "id": 83,
+      "type": "ImageScale",
+      "pos": [
+        150,
+        850
+      ],
+      "size": [
+        300,
+        120
+      ],
+      "flags": {},
+      "order": 27,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "link": 40
+        },
+        {
+          "name": "width",
+          "type": "INT",
+          "link": 41
+        },
+        {
+          "name": "height",
+          "type": "INT",
+          "link": 42
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            43
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "ImageScale"
+      },
+      "widgets_values": [
+        "bicubic",
+        1024,
+        1024,
+        "disabled"
+      ],
+      "title": "Back to full res"
+    },
+    {
+      "id": 84,
+      "type": "VAEEncode",
+      "pos": [
+        500,
+        850
+      ],
+      "size": [
+        220,
+        80
+      ],
+      "flags": {},
+      "order": 28,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "pixels",
+          "type": "IMAGE",
+          "link": 43
+        },
+        {
+          "name": "vae",
+          "type": "VAE",
+          "link": 44
+        }
+      ],
+      "outputs": [
+        {
+          "name": "LATENT",
+          "type": "LATENT",
+          "links": [
+            48
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "VAEEncode"
+      },
+      "widgets_values": [],
+      "title": "Encode crop"
+    },
+    {
+      "id": 85,
+      "type": "SetLatentNoiseMask",
+      "pos": [
+        800,
+        850
+      ],
+      "size": [
+        240,
+        80
+      ],
+      "flags": {},
+      "order": 29,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "samples",
+          "type": "LATENT",
+          "link": 48
+        },
+        {
+          "name": "mask",
+          "type": "MASK",
+          "link": 49
+        }
+      ],
+      "outputs": [
+        {
+          "name": "LATENT",
+          "type": "LATENT",
+          "links": [
+            50
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "SetLatentNoiseMask"
+      },
+      "widgets_values": []
+    },
+    {
+      "id": 86,
+      "type": "ResizeMask",
+      "pos": [
+        1100,
+        850
+      ],
+      "size": [
+        300,
+        180
+      ],
+      "flags": {},
+      "order": 30,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "mask",
+          "type": "MASK",
+          "link": 45
+        },
+        {
+          "name": "width",
+          "type": "INT",
+          "link": 46,
+          "widget": {
+            "name": "width"
+          }
+        },
+        {
+          "name": "height",
+          "type": "INT",
+          "link": 47,
+          "widget": {
+            "name": "height"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "mask",
+          "type": "MASK",
+          "links": [
+            49
+          ],
+          "slot_index": 0
+        },
+        {
+          "name": "width",
+          "type": "INT",
+          "links": [],
+          "slot_index": 1
+        },
+        {
+          "name": "height",
+          "type": "INT",
+          "links": [],
+          "slot_index": 2
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "ResizeMask"
+      },
+      "widgets_values": [
+        512,
+        512,
+        false,
+        "nearest-exact",
+        "disabled"
+      ],
+      "title": "Mask \u2192 image size"
+    },
+    {
+      "id": 300,
+      "type": "StimmaIntParam",
+      "pos": [
+        -1700,
+        400
+      ],
+      "size": [
+        360,
+        309
+      ],
+      "flags": {},
+      "order": 31,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "name",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "name"
+          }
+        },
+        {
+          "name": "value",
+          "type": "INT",
+          "link": null,
+          "widget": {
+            "name": "value"
+          }
+        },
+        {
+          "name": "minimum",
+          "type": "INT",
+          "link": null,
+          "widget": {
+            "name": "minimum"
+          }
+        },
+        {
+          "name": "maximum",
+          "type": "INT",
+          "link": null,
+          "widget": {
+            "name": "maximum"
+          }
+        },
+        {
+          "name": "step",
+          "type": "INT",
+          "link": null,
+          "widget": {
+            "name": "step"
+          }
+        },
+        {
+          "name": "ui_control",
+          "type": "COMBO",
+          "link": null,
+          "widget": {
+            "name": "ui_control"
+          }
+        },
+        {
+          "name": "ui_order",
+          "type": "INT",
+          "link": null,
+          "widget": {
+            "name": "ui_order"
+          }
+        },
+        {
+          "name": "ui_description",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "ui_description"
+          }
+        },
+        {
+          "name": "ui_format",
+          "type": "COMBO",
+          "link": null,
+          "widget": {
+            "name": "ui_format"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "value",
+          "type": "INT",
+          "links": [
+            58
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "StimmaIntParam"
+      },
+      "widgets_values": [
+        "steps",
+        6,
+        1,
+        50,
+        1,
+        "slider",
+        30,
+        "Diffusion steps; 6 is the distilled default.",
+        ""
+      ]
+    },
+    {
+      "id": 301,
+      "type": "StimmaFloatParam",
+      "pos": [
+        -1300,
+        400
+      ],
+      "size": [
+        384,
+        355
+      ],
+      "flags": {},
+      "order": 32,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "name",
+          "type": "STRING",
+          "widget": {
+            "name": "name"
+          },
+          "link": null
+        },
+        {
+          "name": "value",
+          "type": "FLOAT",
+          "widget": {
+            "name": "value"
+          },
+          "link": null
+        },
+        {
+          "name": "minimum",
+          "type": "FLOAT",
+          "widget": {
+            "name": "minimum"
+          },
+          "link": null
+        },
+        {
+          "name": "maximum",
+          "type": "FLOAT",
+          "widget": {
+            "name": "maximum"
+          },
+          "link": null
+        },
+        {
+          "name": "step",
+          "type": "FLOAT",
+          "widget": {
+            "name": "step"
+          },
+          "link": null
+        },
+        {
+          "name": "ui_control",
+          "type": "COMBO",
+          "widget": {
+            "name": "ui_control"
+          },
+          "link": null
+        },
+        {
+          "name": "ui_order",
+          "type": "INT",
+          "widget": {
+            "name": "ui_order"
+          },
+          "link": null
+        },
+        {
+          "name": "ui_description",
+          "type": "STRING",
+          "widget": {
+            "name": "ui_description"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "value",
+          "type": "FLOAT",
+          "links": [
+            59
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "StimmaFloatParam"
+      },
+      "widgets_values": [
+        "cfg",
+        1.0,
+        1.0,
+        10.0,
+        0.1,
+        "slider",
+        35,
+        "Classifier-free guidance; 1 is the distilled default.",
+        ""
+      ]
+    },
+    {
+      "id": 302,
+      "type": "StimmaDropdownParam",
+      "pos": [
+        -900,
+        400
+      ],
+      "size": [
+        320,
+        120
+      ],
+      "flags": {},
+      "order": 33,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "name",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "name"
+          }
+        },
+        {
+          "name": "value",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "value"
+          }
+        },
+        {
+          "name": "ui_order",
+          "type": "INT",
+          "link": null,
+          "widget": {
+            "name": "ui_order"
+          }
+        },
+        {
+          "name": "ui_description",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "ui_description"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "value",
+          "type": "*",
+          "links": [
+            60
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "StimmaDropdownParam"
+      },
+      "widgets_values": [
+        "sampler",
+        "euler",
+        40,
+        "Sampling algorithm"
+      ]
+    },
+    {
+      "id": 303,
+      "type": "StimmaDropdownParam",
+      "pos": [
+        -1700,
+        700
+      ],
+      "size": [
+        320,
+        120
+      ],
+      "flags": {},
+      "order": 34,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "name",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "name"
+          }
+        },
+        {
+          "name": "value",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "value"
+          }
+        },
+        {
+          "name": "ui_order",
+          "type": "INT",
+          "link": null,
+          "widget": {
+            "name": "ui_order"
+          }
+        },
+        {
+          "name": "ui_description",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "ui_description"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "value",
+          "type": "*",
+          "links": [
+            61
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "StimmaDropdownParam"
+      },
+      "widgets_values": [
+        "scheduler",
+        "simple",
+        45,
+        "Noise schedule"
+      ]
+    },
+    {
+      "id": 304,
+      "type": "StimmaStringParam",
+      "pos": [
+        -1300,
+        700
+      ],
+      "size": [
+        384,
+        355
+      ],
+      "flags": {},
+      "order": 35,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "name",
+          "type": "STRING",
+          "widget": {
+            "name": "name"
+          },
+          "link": null
+        },
+        {
+          "name": "value",
+          "type": "STRING",
+          "widget": {
+            "name": "value"
+          },
+          "link": null
+        },
+        {
+          "name": "enum_values",
+          "type": "STRING",
+          "widget": {
+            "name": "enum_values"
+          },
+          "link": null
+        },
+        {
+          "name": "ui_control",
+          "type": "COMBO",
+          "widget": {
+            "name": "ui_control"
+          },
+          "link": null
+        },
+        {
+          "name": "ui_order",
+          "type": "INT",
+          "widget": {
+            "name": "ui_order"
+          },
+          "link": null
+        },
+        {
+          "name": "ui_description",
+          "type": "STRING",
+          "widget": {
+            "name": "ui_description"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "value",
+          "type": "STRING",
+          "links": [
+            56
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "StimmaStringParam"
+      },
+      "widgets_values": [
+        "negative_prompt",
+        "",
+        "",
+        "textarea",
+        36,
+        "Used when CFG exceeds 1."
+      ]
+    },
+    {
+      "id": 305,
+      "type": "StimmaLayoutGroup",
+      "pos": [
+        -900,
+        700
+      ],
+      "size": [
+        360,
+        179
+      ],
+      "flags": {},
+      "order": 36,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "group_label",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "group_label"
+          }
+        },
+        {
+          "name": "param_names",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "param_names"
+          }
+        },
+        {
+          "name": "collapsed",
+          "type": "BOOLEAN",
+          "link": null,
+          "widget": {
+            "name": "collapsed"
+          }
+        },
+        {
+          "name": "ui_order",
+          "type": "INT",
+          "link": null,
+          "widget": {
+            "name": "ui_order"
+          }
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "Node name for S&R": "StimmaLayoutGroup"
+      },
+      "widgets_values": [
+        "Advanced",
+        "mask_feather\nsteps\ncfg\nnegative_prompt !full_width\nsampler\nscheduler\nloras\nseed",
+        true,
+        90
+      ]
+    },
+    {
+      "id": 306,
+      "type": "StimmaLoraLoader",
+      "pos": [
+        -1700,
+        1000
+      ],
+      "size": [
+        360,
+        647
+      ],
+      "flags": {},
+      "order": 37,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "model",
+          "type": "MODEL",
+          "link": 51
+        },
+        {
+          "name": "clip",
+          "type": "CLIP",
+          "link": 52
+        },
+        {
+          "name": "path_filter",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "path_filter"
+          }
+        },
+        {
+          "name": "ui_order",
+          "type": "INT",
+          "link": null,
+          "widget": {
+            "name": "ui_order"
+          }
+        },
+        {
+          "name": "lora_1",
+          "type": "COMBO",
+          "link": null,
+          "widget": {
+            "name": "lora_1"
+          },
+          "shape": 7
+        },
+        {
+          "name": "strength_1",
+          "type": "FLOAT",
+          "link": null,
+          "widget": {
+            "name": "strength_1"
+          },
+          "shape": 7
+        },
+        {
+          "name": "lora_2",
+          "type": "COMBO",
+          "link": null,
+          "widget": {
+            "name": "lora_2"
+          },
+          "shape": 7
+        },
+        {
+          "name": "strength_2",
+          "type": "FLOAT",
+          "link": null,
+          "widget": {
+            "name": "strength_2"
+          },
+          "shape": 7
+        },
+        {
+          "name": "lora_3",
+          "type": "COMBO",
+          "link": null,
+          "widget": {
+            "name": "lora_3"
+          },
+          "shape": 7
+        },
+        {
+          "name": "strength_3",
+          "type": "FLOAT",
+          "link": null,
+          "widget": {
+            "name": "strength_3"
+          },
+          "shape": 7
+        },
+        {
+          "name": "lora_4",
+          "type": "COMBO",
+          "link": null,
+          "widget": {
+            "name": "lora_4"
+          },
+          "shape": 7
+        },
+        {
+          "name": "strength_4",
+          "type": "FLOAT",
+          "link": null,
+          "widget": {
+            "name": "strength_4"
+          },
+          "shape": 7
+        },
+        {
+          "name": "lora_5",
+          "type": "COMBO",
+          "link": null,
+          "widget": {
+            "name": "lora_5"
+          },
+          "shape": 7
+        },
+        {
+          "name": "strength_5",
+          "type": "FLOAT",
+          "link": null,
+          "widget": {
+            "name": "strength_5"
+          },
+          "shape": 7
+        },
+        {
+          "name": "lora_6",
+          "type": "COMBO",
+          "link": null,
+          "widget": {
+            "name": "lora_6"
+          },
+          "shape": 7
+        },
+        {
+          "name": "strength_6",
+          "type": "FLOAT",
+          "link": null,
+          "widget": {
+            "name": "strength_6"
+          },
+          "shape": 7
+        },
+        {
+          "name": "lora_7",
+          "type": "COMBO",
+          "link": null,
+          "widget": {
+            "name": "lora_7"
+          },
+          "shape": 7
+        },
+        {
+          "name": "strength_7",
+          "type": "FLOAT",
+          "link": null,
+          "widget": {
+            "name": "strength_7"
+          },
+          "shape": 7
+        },
+        {
+          "name": "lora_8",
+          "type": "COMBO",
+          "link": null,
+          "widget": {
+            "name": "lora_8"
+          },
+          "shape": 7
+        },
+        {
+          "name": "strength_8",
+          "type": "FLOAT",
+          "link": null,
+          "widget": {
+            "name": "strength_8"
+          },
+          "shape": 7
+        },
+        {
+          "name": "lora_9",
+          "type": "COMBO",
+          "link": null,
+          "widget": {
+            "name": "lora_9"
+          },
+          "shape": 7
+        },
+        {
+          "name": "strength_9",
+          "type": "FLOAT",
+          "link": null,
+          "widget": {
+            "name": "strength_9"
+          },
+          "shape": 7
+        },
+        {
+          "name": "lora_10",
+          "type": "COMBO",
+          "link": null,
+          "widget": {
+            "name": "lora_10"
+          },
+          "shape": 7
+        },
+        {
+          "name": "strength_10",
+          "type": "FLOAT",
+          "link": null,
+          "widget": {
+            "name": "strength_10"
+          },
+          "shape": 7
+        }
+      ],
+      "outputs": [
+        {
+          "name": "model",
+          "type": "MODEL",
+          "links": [
+            53
+          ],
+          "slot_index": 0
+        },
+        {
+          "name": "clip",
+          "type": "CLIP",
+          "links": [
+            54,
+            55
+          ],
+          "slot_index": 1
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "StimmaLoraLoader"
+      },
+      "widgets_values": [
+        "minimax-h3-image/**",
+        60,
+        "None",
+        1.0,
+        "None",
+        1.0,
+        "None",
+        1.0,
+        "None",
+        1.0,
+        "None",
+        1.0,
+        "None",
+        1.0,
+        "None",
+        1.0,
+        "None",
+        1.0,
+        "None",
+        1.0,
+        "None",
+        1.0
+      ]
+    },
+    {
+      "id": 307,
+      "type": "CLIPTextEncode",
+      "pos": [
+        -1300,
+        1000
+      ],
+      "size": [
+        400,
+        200
+      ],
+      "flags": {},
+      "order": 38,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "clip",
+          "type": "CLIP",
+          "link": 55
+        },
+        {
+          "name": "text",
+          "type": "STRING",
+          "link": 56,
+          "widget": {
+            "name": "text"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "CONDITIONING",
+          "type": "CONDITIONING",
+          "links": [
+            57
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "CLIPTextEncode"
+      },
+      "widgets_values": [
+        ""
+      ]
+    }
+  ],
+  "links": [
+    [
+      1,
+      3,
+      0,
+      20,
+      0,
+      "IMAGE"
+    ],
+    [
+      2,
+      20,
+      0,
+      21,
+      0,
+      "IMAGE"
+    ],
+    [
+      3,
+      102,
+      0,
+      21,
+      1,
+      "INT"
+    ],
+    [
+      4,
+      100,
+      0,
+      21,
+      2,
+      "INT"
+    ],
+    [
+      5,
+      103,
+      0,
+      21,
+      3,
+      "INT"
+    ],
+    [
+      6,
+      101,
+      0,
+      21,
+      4,
+      "INT"
+    ],
+    [
+      7,
+      20,
+      0,
+      22,
+      0,
+      "IMAGE"
+    ],
+    [
+      8,
+      21,
+      0,
+      22,
+      1,
+      "INT"
+    ],
+    [
+      9,
+      21,
+      1,
+      22,
+      2,
+      "INT"
+    ],
+    [
+      10,
+      21,
+      2,
+      22,
+      3,
+      "INT"
+    ],
+    [
+      11,
+      21,
+      3,
+      22,
+      4,
+      "INT"
+    ],
+    [
+      12,
+      20,
+      0,
+      23,
+      0,
+      "IMAGE"
+    ],
+    [
+      13,
+      21,
+      0,
+      23,
+      1,
+      "INT"
+    ],
+    [
+      14,
+      21,
+      1,
+      23,
+      2,
+      "INT"
+    ],
+    [
+      15,
+      21,
+      2,
+      23,
+      3,
+      "INT"
+    ],
+    [
+      16,
+      21,
+      3,
+      23,
+      4,
+      "INT"
+    ],
+    [
+      17,
+      110,
+      0,
+      23,
+      5,
+      "INT"
+    ],
+    [
+      18,
+      22,
+      0,
+      24,
+      0,
+      "IMAGE"
+    ],
+    [
+      19,
+      22,
+      1,
+      24,
+      1,
+      "MASK"
+    ],
+    [
+      20,
+      22,
+      0,
+      39,
+      0,
+      "IMAGE"
+    ],
+    [
+      21,
+      39,
+      0,
+      40,
+      1,
+      "INT"
+    ],
+    [
+      22,
+      39,
+      1,
+      40,
+      2,
+      "INT"
+    ],
+    [
+      23,
+      20,
+      0,
+      41,
+      0,
+      "IMAGE"
+    ],
+    [
+      24,
+      40,
+      0,
+      41,
+      1,
+      "IMAGE"
+    ],
+    [
+      25,
+      22,
+      0,
+      42,
+      0,
+      "IMAGE"
+    ],
+    [
+      26,
+      41,
+      0,
+      42,
+      1,
+      "IMAGE"
+    ],
+    [
+      27,
+      23,
+      1,
+      42,
+      2,
+      "MASK"
+    ],
+    [
+      28,
+      42,
+      0,
+      43,
+      0,
+      "IMAGE"
+    ],
+    [
+      29,
+      17,
+      0,
+      70,
+      1,
+      "VAE"
+    ],
+    [
+      30,
+      24,
+      0,
+      80,
+      0,
+      "IMAGE"
+    ],
+    [
+      31,
+      80,
+      0,
+      81,
+      0,
+      "IMAGE"
+    ],
+    [
+      32,
+      80,
+      0,
+      70,
+      5,
+      "IMAGE"
+    ],
+    [
+      33,
+      81,
+      0,
+      70,
+      3,
+      "INT"
+    ],
+    [
+      34,
+      81,
+      1,
+      70,
+      4,
+      "INT"
+    ],
+    [
+      35,
+      6,
+      0,
+      60,
+      4,
+      "INT"
+    ],
+    [
+      36,
+      70,
+      0,
+      60,
+      1,
+      "CONDITIONING"
+    ],
+    [
+      37,
+      60,
+      0,
+      38,
+      0,
+      "LATENT"
+    ],
+    [
+      38,
+      17,
+      0,
+      38,
+      1,
+      "VAE"
+    ],
+    [
+      39,
+      38,
+      0,
+      40,
+      0,
+      "IMAGE"
+    ],
+    [
+      40,
+      22,
+      0,
+      83,
+      0,
+      "IMAGE"
+    ],
+    [
+      41,
+      81,
+      0,
+      83,
+      1,
+      "INT"
+    ],
+    [
+      42,
+      81,
+      1,
+      83,
+      2,
+      "INT"
+    ],
+    [
+      43,
+      83,
+      0,
+      84,
+      0,
+      "IMAGE"
+    ],
+    [
+      44,
+      17,
+      0,
+      84,
+      1,
+      "VAE"
+    ],
+    [
+      45,
+      23,
+      1,
+      86,
+      0,
+      "MASK"
+    ],
+    [
+      46,
+      81,
+      0,
+      86,
+      1,
+      "INT"
+    ],
+    [
+      47,
+      81,
+      1,
+      86,
+      2,
+      "INT"
+    ],
+    [
+      48,
+      84,
+      0,
+      85,
+      0,
+      "LATENT"
+    ],
+    [
+      49,
+      86,
+      0,
+      85,
+      1,
+      "MASK"
+    ],
+    [
+      50,
+      85,
+      0,
+      60,
+      3,
+      "LATENT"
+    ],
+    [
+      51,
+      15,
+      0,
+      306,
+      0,
+      "MODEL"
+    ],
+    [
+      52,
+      16,
+      0,
+      306,
+      1,
+      "CLIP"
+    ],
+    [
+      53,
+      306,
+      0,
+      60,
+      0,
+      "MODEL"
+    ],
+    [
+      54,
+      306,
+      1,
+      70,
+      0,
+      "CLIP"
+    ],
+    [
+      55,
+      306,
+      1,
+      307,
+      0,
+      "CLIP"
+    ],
+    [
+      56,
+      304,
+      0,
+      307,
+      1,
+      "STRING"
+    ],
+    [
+      57,
+      307,
+      0,
+      60,
+      2,
+      "CONDITIONING"
+    ],
+    [
+      58,
+      300,
+      0,
+      60,
+      5,
+      "INT"
+    ],
+    [
+      59,
+      301,
+      0,
+      60,
+      6,
+      "FLOAT"
+    ],
+    [
+      60,
+      302,
+      0,
+      60,
+      7,
+      "COMBO"
+    ],
+    [
+      61,
+      303,
+      0,
+      60,
+      8,
+      "COMBO"
+    ]
+  ],
+  "groups": [],
+  "config": {},
+  "extra": {},
+  "version": 0.4
+}

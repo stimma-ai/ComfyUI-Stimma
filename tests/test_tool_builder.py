@@ -60,13 +60,17 @@ class TestReferenceToVideoDescriptor(unittest.TestCase):
                     field_nodes=[field("size", "StimmaResolutionParam", inputs)])
                 descriptor = _build_single_tool(workflow, object_info=None, config=object(), provider=object()).to_descriptor()
                 props = descriptor.parameter_schema["properties"]
-                self.assertEqual(props["width"]["maximum"], 4096, path.name)
-                self.assertEqual(props["height"]["maximum"], 4096, path.name)
-                self.assertEqual(props["width"]["x-resolution-slider-max-pixels"], 4194304, path.name)
-                self.assertNotIn("x-supported_resolutions", props["width"], path.name)
+                # H3 Image is tuned for 16 MP; existing image tools retain 4 MP.
+                h3_image = path.name == "Stimma-MiniMax-H3-Image.json"
+                maximum, area = (8192, 20971520) if h3_image else (4096, 4194304)
+                self.assertEqual(props["width"]["maximum"], maximum, path.name)
+                self.assertEqual(props["height"]["maximum"], maximum, path.name)
+                self.assertEqual(props["width"]["x-resolution-slider-max-pixels"], area, path.name)
+                if not h3_image:
+                    self.assertNotIn("x-supported_resolutions", props["width"], path.name)
                 self.assertEqual(module.StimmaResolutionParam().execute(3136, 1344, **{k: v for k, v in inputs.items() if k not in ("width", "height")}), (3136, 1344))
                 count += 1
-        self.assertEqual(count, 20)
+        self.assertEqual(count, 21)
         self.assertEqual(module.StimmaResolutionParam().execute(1024, 1024, 256, 2048, 64, "", 3), (1024, 1024))
 
     def test_typed_sections_are_optional_but_one_is_required(self):

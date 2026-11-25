@@ -756,7 +756,10 @@
         "Stimma-MiniMax-H3-R2V-Turbo.json",
         "Stimma-MiniMax-H3-R2V.json",
         "Stimma-MiniMax-H3-T2V-Turbo.json",
-        "Stimma-MiniMax-H3-T2V.json"
+        "Stimma-MiniMax-H3-T2V.json",
+        "Stimma-MiniMax-H3-Image.json",
+        "Stimma-MiniMax-H3-Image-Inpaint.json",
+        "Stimma-MiniMax-H3-Image-Outpaint.json"
       ],
       "size": 15687142551,
       "sha256": "35a88d51044231fe332301d7a62aa81e3f2cba62febeb446e2c1e3e0ef76f2c6",
@@ -2399,6 +2402,42 @@
       "gated": false,
       "license": "Apache-2.0",
       "license_url": "https://huggingface.co/akhaliq/MOSS-Image-Edit-HQ"
+    },
+    "minimax_h3_image_pruned_int8_convrot.safetensors": {
+      "directory": "diffusion_models",
+      "source": {
+        "type": "huggingface",
+        "repo": "Comfy-Org/MiniMax-H3-Image",
+        "path": "diffusion_models/minimax_h3_image_pruned_int8_convrot.safetensors"
+      },
+      "used_by": [
+        "Stimma-MiniMax-H3-Image.json",
+        "Stimma-MiniMax-H3-Image-Inpaint.json",
+        "Stimma-MiniMax-H3-Image-Outpaint.json"
+      ],
+      "size": 20979314802,
+      "sha256": "83eb140f1ff95c068f8a6886e6d3f3d0d4ab2e07bb2fe6d2ef992a51146ee622",
+      "gated": false,
+      "license": "minimax-h3-image-community-license-agreement",
+      "license_url": "https://huggingface.co/MiniMaxAI/MiniMax-H3-Image/blob/main/LICENSE"
+    },
+    "minimax_h3_image_vae_fp16.safetensors": {
+      "directory": "vae",
+      "source": {
+        "type": "huggingface",
+        "repo": "Comfy-Org/MiniMax-H3-Image",
+        "path": "vae/minimax_h3_image_vae_fp16.safetensors"
+      },
+      "used_by": [
+        "Stimma-MiniMax-H3-Image.json",
+        "Stimma-MiniMax-H3-Image-Inpaint.json",
+        "Stimma-MiniMax-H3-Image-Outpaint.json"
+      ],
+      "size": 1168505312,
+      "sha256": "d80e9c2e5cfc9844869961ff5a58c9a9e52182df6bfb30b26018dd7f348721af",
+      "gated": false,
+      "license": "minimax-h3-image-community-license-agreement",
+      "license_url": "https://huggingface.co/MiniMaxAI/MiniMax-H3-Image/blob/main/LICENSE"
     }
   },
   "unresolved": [
